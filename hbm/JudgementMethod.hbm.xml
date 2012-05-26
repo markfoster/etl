@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+<!  Entity: 
+<!                      org.cqc.JudgementMethod
+<! 
+<!  Author: matt h
+<!  Generated: 30-Apr-2012 13:37:57 
+<!  Hibernate version: 3.2.2.GA 
+<!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+<hibernate-mapping>
+    <class name="org.cqc.JudgementMethod" table="judgement_method" catalog="hibtest">
+        <composite-id name="id" class="org.cqc.JudgementMethodId">
+            <key-property name="providerId" type="string">
+                <column name="provider_id" length="30" />
+            </key-property>
+            <key-property name="locationId" type="string">
+                <column name="location_id" length="30" />
+            </key-property>
+            <key-property name="outcomeId" type="string">
+                <column name="outcome_id" length="30" />
+            </key-property>
+            <key-property name="methodId" type="string">
+                <column name="method_id" length="30" />
+            </key-property>
+        </composite-id>
+        <property name="methodText" type="string">
+            <column name="method_text" />
+        </property>
+        <property name="hashvalue" type="string">
+            <column name="hashvalue" length="32" />
+        </property>
+        <property name="action" type="java.lang.Character">
+            <column name="action" length="1" />
+        </property>
+    </class>
+</hibernate-mapping>

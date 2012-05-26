@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class entity-name="Geocode" table="cqc_address_cache" catalog="etl">
+        <id name="GeoId" column="ID">
+            <generator class="assigned" />
+        </id>
+        <property name="postcode" type="string">
+            <column name="postal_code" length="16" />
+        </property>
+        <property name="latitude" type="big_decimal">
+            <column name="latitude" precision="10" scale="8" />
+        </property>
+        <property name="longitude" type="big_decimal">
+            <column name="longitude" precision="10" scale="8" />
+        </property>
+    </class>
+</hibernate-mapping>

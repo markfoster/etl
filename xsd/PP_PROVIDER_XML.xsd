@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Provider Profile - Provider XSD
+     v0.1 03-05-2012 MCRITES - Created
+  -->
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="max1"><xs:restriction base="xs:string"><xs:maxLength value="1"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max2"><xs:restriction base="xs:string"><xs:maxLength value="2"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max5"><xs:restriction base="xs:string"><xs:maxLength value="5"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max10"><xs:restriction base="xs:string"><xs:maxLength value="10"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max30"><xs:restriction base="xs:string"><xs:maxLength value="30"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max32"><xs:restriction base="xs:string"><xs:maxLength value="32"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max40"><xs:restriction base="xs:string"><xs:maxLength value="40"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max50"><xs:restriction base="xs:string"><xs:maxLength value="50"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max100"><xs:restriction base="xs:string"><xs:maxLength value="100"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max115"><xs:restriction base="xs:string"><xs:maxLength value="115"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max200"><xs:restriction base="xs:string"><xs:maxLength value="200"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max255"><xs:restriction base="xs:string"><xs:maxLength value="255"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max1000"><xs:restriction base="xs:string"><xs:maxLength value="1000"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max4000"><xs:restriction base="xs:string"><xs:maxLength value="4000"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max32000"><xs:restriction base="xs:string"><xs:maxLength value="32000"/></xs:restriction></xs:simpleType>
+    <xs:element name="List_Of_Provider">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Provider" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Provider_Id" type="max50" />
+                            <xs:element name="Name" type="max100" />
+                            <xs:element name="In_Process" type="max1" />
+                            <xs:element name="Type" type="max30" />
+                            <xs:element name="Local_Authority" type="max50" />
+                            <xs:element name="Region" type="max50" />
+                            <xs:element name="Also_Known_As" type="max100" />
+                            <xs:element name="Address_Line_1" type="max200" />
+                            <xs:element name="Address_Line_2" type="max100" />
+                            <xs:element name="Town_City" type="max50" />
+                            <xs:element name="County" type="max50" />
+                            <xs:element name="Postcode" type="max30" />
+                            <xs:element name="Subtype" type="max30" />
+                            <xs:element name="Segmentation" type="max50" />
+                            <xs:element name="Telephone" type="max40" />
+                            <xs:element name="Email" type="max50" />
+                            <xs:element name="Website" type="max100" />
+                            <xs:element name="Fax" type="max40" />
+                            <xs:element name="Under_Review_Text" type="max255" />
+                            <xs:element name="Is_Partnership" type="max1" />
+                            <xs:element name="Action_Code" type="max1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

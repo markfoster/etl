@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<appconfig>
+	<dbType>MYSQL</dbType>
+	<driver>com.mysql.jdbc.Driver</driver>
+      	<jdbcConnectionString>jdbc:mysql://localhost:3306/preview_delta</jdbcConnectionString>
+	<databaseIP>localhost</databaseIP>
+	<databaseCatalog>preview_delta</databaseCatalog>
+	<databaseUsername>root</databaseUsername>
+	<databasePassword>root</databasePassword>
+	<sourceTarget>output</sourceTarget>
+	<projectName>pp</projectName>
+	<topLevel>org.cqc</topLevel>
+	<libPath>lib</libPath>
+	<schemaStrategy>PARTIAL</schemaStrategy>
+</appconfig>

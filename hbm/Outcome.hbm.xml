@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 24-May-2012 10:56:36 by Hibernate Tools 3.2.2.GA -->
+<hibernate-mapping>
+    <class name="org.cqc.Outcome" table="outcome" catalog="preview_delta">
+        <composite-id name="id" class="org.cqc.OutcomeId">
+            <key-property name="providerId" type="string">
+                <column name="provider_id" length="30" />
+            </key-property>
+
+            <key-property name="locationId" type="string">
+                <column name="location_id" length="30" />
+            </key-property>
+
+            <key-property name="outcomeId" type="string">
+                <column name="outcome_id" length="30" />
+            </key-property>
+        </composite-id>
+
+        <property name="judgementId" type="string">
+            <column name="judgement_id" length="30" />
+        </property>
+
+        <property name="judgementDate" type="string">
+            <column name="judgement_date" length="20" />
+        </property>
+
+        <property name="judgementReason" type="string">
+            <column name="judgement_reason" />
+        </property>
+
+        <property name="judgementUserExperience" type="string">
+            <column name="judgement_user_experience" />
+        </property>
+
+        <property name="judgementOtherEvidence" type="string">
+            <column name="judgement_other_evidence" />
+        </property>
+
+        <property name="judgementScoreId" type="string">
+            <column name="judgement_score_id" length="30" />
+        </property>
+
+        <property name="outcomeStatementId" type="string">
+            <column name="outcome_statement_id" length="30" />
+        </property>
+
+        <property name="judgementSummary" type="string">
+            <column name="judgement_summary" />
+        </property>
+
+        <property name="actionCode" type="java.lang.Character">
+            <column name="action_code" length="1" />
+        </property>
+
+        <property name="lastUpdated" type="timestamp">
+            <column name="last_updated" length="19" />
+        </property>
+    </class>
+</hibernate-mapping>
+

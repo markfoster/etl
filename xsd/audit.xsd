@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Provider Profile - Audit XSD v0.1 02-05-2012 MCRITES - Created  -->
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="loadType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="delta"/>
+            <xs:enumeration value="full"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:attributeGroup name="auditAttributes">
+        <xs:attribute name="inserts" type="xs:integer"/>
+        <xs:attribute name="updates" type="xs:integer"/>
+        <xs:attribute name="deletes" type="xs:integer"/>
+        <xs:attribute name="load" type="loadType"/>
+    </xs:attributeGroup>
+    <xs:element name="Audit">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="Provider"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Provider_Regulated_Activity"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Provider_Condition"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Nominated_Individual"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Partner"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Location"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Location_Regulated_Activity"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Location_Condition"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Registered_Manager"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Manager_Condition"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Report_Summary"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Chapter"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Outcome"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Service_Type"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Service_User_Band"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+            </xs:all>
+            <xs:attribute name="timestamp" type="xs:dateTime"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
