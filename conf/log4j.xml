@@ -10,7 +10,7 @@
         </layout>
     </appender>
     <appender name="rolling-file" class="org.apache.log4j.RollingFileAppender">
-        <param name="file" value="Program-Name.log"/>
+        <param name="file" value="etl.log"/>
         <param name="MaxFileSize" value="1000KB"/>
     <!-- Keep one backup file -->
         <param name="MaxBackupIndex" value="4"/>
