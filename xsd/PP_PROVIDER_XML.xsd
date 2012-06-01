@@ -25,26 +25,26 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="Provider_Id" type="max50" />
-                            <xs:element name="Name" type="max100" />
-                            <xs:element name="In_Process" type="max1" />
-                            <xs:element name="Type" type="max30" />
-                            <xs:element name="Local_Authority" type="max50" />
-                            <xs:element name="Region" type="max50" />
-                            <xs:element name="Also_Known_As" type="max100" />
-                            <xs:element name="Address_Line_1" type="max200" />
-                            <xs:element name="Address_Line_2" type="max100" />
-                            <xs:element name="Town_City" type="max50" />
-                            <xs:element name="County" type="max50" />
-                            <xs:element name="Postcode" type="max30" />
-                            <xs:element name="Subtype" type="max30" />
-                            <xs:element name="Segmentation" type="max50" />
-                            <xs:element name="Telephone" type="max40" />
-                            <xs:element name="Email" type="max50" />
-                            <xs:element name="Website" type="max100" />
-                            <xs:element name="Fax" type="max40" />
-                            <xs:element name="Under_Review_Text" type="max255" />
-                            <xs:element name="Is_Partnership" type="max1" />
-                            <xs:element name="Action_Code" type="max1" />
+                            <xs:element name="Name" type="max100" minOccurs="0" />
+                            <xs:element name="In_Process" type="max1" minOccurs="0" />
+                            <xs:element name="Type" type="max30" minOccurs="0" />
+                            <xs:element name="Local_Authority" type="max50" minOccurs="0" />
+                            <xs:element name="Region" type="max50" minOccurs="0" />
+                            <xs:element name="Also_Known_As" type="max100" minOccurs="0" />
+                            <xs:element name="Address_Line_1" type="max200" minOccurs="0" />
+                            <xs:element name="Address_Line_2" type="max100" minOccurs="0" />
+                            <xs:element name="Town_City" type="max50" minOccurs="0" />
+                            <xs:element name="County" type="max50" minOccurs="0" />
+                            <xs:element name="Postcode" type="max30" minOccurs="0" />
+                            <xs:element name="Subtype" type="max30" minOccurs="0" />
+                            <xs:element name="Segmentation" type="max50" minOccurs="0" />
+                            <xs:element name="Telephone" type="max40" minOccurs="0" />
+                            <xs:element name="Email" type="max50" minOccurs="0" />
+                            <xs:element name="Website" type="max100" minOccurs="0" />
+                            <xs:element name="Fax" type="max40" minOccurs="0" />
+                            <xs:element name="Under_Review_Text" type="max255" minOccurs="0" />
+                            <xs:element name="Is_Partnership" type="max1" minOccurs="0" />
+                            <xs:element name="Action_Code" type="max1" minOccurs="0" />
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>

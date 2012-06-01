@@ -13,9 +13,11 @@
         <!-- Database type -->
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+	<property name="hibernate.show.sql">true</property> 
 
       <!-- Mapping files -->
       <mapping resource="Provider.hbm.xml"/>
+      <mapping resource="Location.hbm.xml"/>
 
     </session-factory>
 </hibernate-configuration>

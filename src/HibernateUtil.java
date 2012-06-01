@@ -14,6 +14,23 @@ public class HibernateUtil {
     private static HashMap<String, SessionFactory> sessionFactoryMap = new HashMap<String, SessionFactory>();
  
     public static final ThreadLocal sessionMapsThreadLocal = new ThreadLocal();
+
+     private static SessionFactory sessionFactory;
+     static {
+         try {
+             sessionFactory = new Configuration().configure().buildSessionFactory();
+        } catch (Throwable ex) {
+             throw new ExceptionInInitializerError(ex);
+         }
+     }
+
+     public static SessionFactory getSessionFactory() {
+         return sessionFactory;
+     }
+     public static void shutdown() {
+
+         getSessionFactory().close();
+     }
  
     public static Session currentSession(String key) throws HibernateException {
         HashMap<String, Session> sessionMaps = (HashMap<String, Session>) sessionMapsThreadLocal.get();
@@ -21,17 +38,21 @@ public class HibernateUtil {
             sessionMaps = new HashMap();
             sessionMapsThreadLocal.set(sessionMaps);
         }
+        System.out.println("SM = " + sessionMaps);
+        System.out.println("SFM = " + sessionFactoryMap);
         // Open a new Session, if this Thread has none yet
         Session s = (Session) sessionMaps.get(key);
         if (s == null) {
+            System.out.println("Opening Session...");
             s = ((SessionFactory)sessionFactoryMap.get(key)).openSession();
+            System.out.println("New session = " + s);
             sessionMaps.put(key, s);
         }
         return s;
     }
 
     public static Session currentSession() throws HibernateException {
-        return currentSession("");
+        return currentSession("default");
     }
  
     public static void closeSessions() throws HibernateException {
@@ -85,7 +106,7 @@ public class HibernateUtil {
     }
 
     public static void buildSessionFactory() {
-        String key = "";
+        String key = "default";
         try {
             // Create the SessionFactory
             SessionFactory sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();

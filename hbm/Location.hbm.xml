@@ -1,101 +1,116 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 24-May-2012 10:56:36 by Hibernate Tools 3.2.2.GA -->
+<!-- Generated 29-May-2012 11:53:12 by Hibernate Tools 3.2.2.GA -->
 <hibernate-mapping>
-    <class name="org.cqc.Location" table="location" catalog="preview_delta">
-        <composite-id name="id" class="org.cqc.LocationId">
-            <key-property name="providerId" type="string">
-                <column name="provider_id" length="50" />
-            </key-property>
+    <class name="Location" table="location" catalog="preview_delta">
 
-            <key-property name="locationId" type="string">
-                <column name="location_id" length="50" />
-            </key-property>
-        </composite-id>
+        <id name="locationId" type="string" node="Location_Id">
+            <column name="location_id" length="50" />
+        </id>
 
-        <property name="name" type="string">
-            <column name="name" length="100" />
+        <property name="providerId" type="string" node="Provider_Id">
+            <column name="provider_id" length="50" />
         </property>
 
-        <property name="inProcess" type="string">
-            <column name="in_process" length="1" />
-        </property>
-
-        <property name="type" type="string">
-            <column name="type" length="30" />
-        </property>
-
-        <property name="alsoKnownAs" type="string">
-            <column name="also_known_as" length="100" />
-        </property>
-
-        <property name="address1" type="string">
-            <column name="address1" length="200" />
-        </property>
-
-        <property name="address2" type="string">
-            <column name="address2" length="100" />
-        </property>
-
-        <property name="towncity" type="string">
-            <column name="towncity" length="50" />
-        </property>
-
-        <property name="county" type="string">
-            <column name="county" length="50" />
-        </property>
-
-        <property name="postcode" type="string">
-            <column name="postcode" length="30" />
-        </property>
-
-        <property name="latitude" type="big_decimal">
-            <column name="latitude" precision="10" scale="8" />
-        </property>
-
-        <property name="longitude" type="big_decimal">
-            <column name="longitude" precision="10" scale="8" />
-        </property>
-
-        <property name="subtype" type="string">
-            <column name="subtype" length="30" />
-        </property>
-
-        <property name="telephone" type="string">
-            <column name="telephone" length="20" />
-        </property>
-
-        <property name="email" type="string">
-            <column name="email" length="100" />
-        </property>
-
-        <property name="website" type="string">
-            <column name="website" length="100" />
-        </property>
-
-        <property name="fax" type="string">
-            <column name="fax" length="20" />
-        </property>
-
-        <property name="underReviewText" type="string">
-            <column name="under_review_text" />
-        </property>
-
-        <property name="userExperience" type="string">
-            <column name="user_experience" />
-        </property>
-
-        <property name="aboutLocation" type="string">
+        <property name="aboutLocation" type="string" node="About_Location">
             <column name="about_location" />
         </property>
 
-        <property name="actionCode" type="java.lang.Character">
+        <property name="actionCode" type="java.lang.Character" node="Action_Code">
             <column name="action_code" length="1" />
         </property>
 
-        <property name="lastUpdated" type="timestamp">
+        <property name="addressLine1" type="string" node="Address_Line_1">
+            <column name="address_line_1" length="200" />
+        </property>
+
+        <property name="addressLine2" type="string" node="Address_Line_2">
+            <column name="address_line_2" length="100" />
+        </property>
+
+        <property name="alsoKnownAs" type="string" node="Also_Known_As">
+            <column name="also_known_as" length="100" />
+        </property>
+
+        <property name="county" type="string" node="County">
+            <column name="county" length="50" />
+        </property>
+
+        <property name="email" type="string" node="Email">
+            <column name="email" length="100" />
+        </property>
+
+        <property name="fax" type="string" node="Fax">
+            <column name="fax" length="20" />
+        </property>
+
+        <property name="inProcess" type="string" node="In_Process">
+            <column name="in_process" length="1" />
+        </property>
+
+        <property name="lastUpdated" type="timestamp" node="Last_Updated">
             <column name="last_updated" length="19" />
+        </property>
+
+        <property name="latitude" type="big_decimal" node="Latitude">
+            <column name="latitude" precision="10" scale="8" />
+        </property>
+
+        <property name="localAuthority" type="string" node="Local_Authority">
+            <column name="local_authority" length="50" />
+        </property>
+
+        <property name="longitude" type="big_decimal" node="Longitude">
+            <column name="longitude" precision="10" scale="8" />
+        </property>
+
+        <property name="name" type="string" node="Name">
+            <column name="name" length="100" />
+        </property>
+
+        <property name="postcode" type="string" node="Postcode">
+            <column name="postcode" length="30" />
+        </property>
+
+        <property name="region" type="string" node="Region">
+            <column name="region" length="50" />
+        </property>
+
+        <property name="segmentation" type="string" node="Segmentation">
+            <column name="segmentation" length="50" />
+        </property>
+
+        <property name="statementDate" type="timestamp" node="Statement_Date">
+            <column name="statement_date" length="19" />
+        </property>
+
+        <property name="subtype" type="string" node="Subtype">
+            <column name="subtype" length="30" />
+        </property>
+
+        <property name="telephone" type="string" node="Telephone">
+            <column name="telephone" length="20" />
+        </property>
+
+        <property name="townCity" type="string" node="Town_City">
+            <column name="town_city" length="50" />
+        </property>
+
+        <property name="type" type="string" node="Type">
+            <column name="type" length="30" />
+        </property>
+
+        <property name="underReviewText" type="string" node ="Under_Review_Text">
+            <column name="under_review_text" />
+        </property>
+
+        <property name="userExperience" type="string" node="User_Experience">
+            <column name="user_experience" />
+        </property>
+
+        <property name="website" type="string" node="Website">
+            <column name="website" length="100" />
         </property>
     </class>
 </hibernate-mapping>

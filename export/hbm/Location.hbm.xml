@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 29-May-2012 11:53:12 by Hibernate Tools 3.2.2.GA -->
+<hibernate-mapping>
+    <class name=".Location" table="location" catalog="preview_delta">
+        <composite-id name="id" class=".LocationId">
+            <key-property name="providerId" type="string">
+                <column name="provider_id" length="50" />
+            </key-property>
+
+            <key-property name="locationId" type="string">
+                <column name="location_id" length="50" />
+            </key-property>
+        </composite-id>
+
+        <property name="aboutLocation" type="string">
+            <column name="about_location" />
+        </property>
+
+        <property name="actionCode" type="java.lang.Character">
+            <column name="action_code" length="1" />
+        </property>
+
+        <property name="addressLine1" type="string">
+            <column name="address_line_1" length="200" />
+        </property>
+
+        <property name="addressLine2" type="string">
+            <column name="address_line_2" length="100" />
+        </property>
+
+        <property name="alsoKnownAs" type="string">
+            <column name="also_known_as" length="100" />
+        </property>
+
+        <property name="county" type="string">
+            <column name="county" length="50" />
+        </property>
+
+        <property name="email" type="string">
+            <column name="email" length="100" />
+        </property>
+
+        <property name="fax" type="string">
+            <column name="fax" length="20" />
+        </property>
+
+        <property name="inProcess" type="string">
+            <column name="in_process" length="1" />
+        </property>
+
+        <property name="lastUpdated" type="timestamp">
+            <column name="last_updated" length="19" />
+        </property>
+
+        <property name="latitude" type="big_decimal">
+            <column name="latitude" precision="10" scale="8" />
+        </property>
+
+        <property name="localAuthority" type="string">
+            <column name="local_authority" length="50" />
+        </property>
+
+        <property name="longitude" type="big_decimal">
+            <column name="longitude" precision="10" scale="8" />
+        </property>
+
+        <property name="name" type="string">
+            <column name="name" length="100" />
+        </property>
+
+        <property name="postcode" type="string">
+            <column name="postcode" length="30" />
+        </property>
+
+        <property name="region" type="string">
+            <column name="region" length="50" />
+        </property>
+
+        <property name="segmentation" type="string">
+            <column name="segmentation" length="50" />
+        </property>
+
+        <property name="statementDate" type="timestamp">
+            <column name="statement_date" length="19" />
+        </property>
+
+        <property name="subtype" type="string">
+            <column name="subtype" length="30" />
+        </property>
+
+        <property name="telephone" type="string">
+            <column name="telephone" length="20" />
+        </property>
+
+        <property name="townCity" type="string">
+            <column name="town_city" length="50" />
+        </property>
+
+        <property name="type" type="string">
+            <column name="type" length="30" />
+        </property>
+
+        <property name="underReviewText" type="string">
+            <column name="under_review_text" />
+        </property>
+
+        <property name="userExperience" type="string">
+            <column name="user_experience" />
+        </property>
+
+        <property name="website" type="string">
+            <column name="website" length="100" />
+        </property>
+    </class>
+</hibernate-mapping>
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<Audit timestamp="2012-05-29T10:16:17.090000000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Provider inserts="21188" updates="0" deletes="0" load="FULL"/>
+  <Provider_Regulated_Activity inserts="44959" updates="0" deletes="0" load="FULL"/>
+  <Provider_Condition inserts="28211" updates="0" deletes="0" load="FULL"/>
+  <Nominated_Individual inserts="46" updates="0" deletes="0" load="FULL"/>
+  <Partner inserts="5489" updates="0" deletes="0" load="FULL"/>
+  <Location inserts="39179" updates="0" deletes="0" load="FULL"/>
+  <Location_Regulated_Activity inserts="76602" updates="0" deletes="0" load="FULL"/>
+  <Location_Condition inserts="45148" updates="0" deletes="0" load="FULL"/>
+  <Registered_Manager inserts="45957" updates="0" deletes="0" load="FULL"/>
+  <Registered_Manager_Condition inserts="228" updates="0" deletes="0" load="FULL"/>
+  <Report_Summary inserts="7787" updates="0" deletes="0" load="FULL"/>
+  <Chapter inserts="0" updates="0" deletes="0" load="FULL"/>
+  <Outcome inserts="180000" updates="0" deletes="0" load="FULL"/>
+  <Service_Type inserts="48032" updates="0" deletes="0" load="FULL"/>
+  <Service_User_Band inserts="102628" updates="0" deletes="0" load="FULL"/>
+</Audit>

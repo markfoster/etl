@@ -5,8 +5,8 @@
 <xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:simpleType name="loadType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="delta"/>
-            <xs:enumeration value="full"/>
+            <xs:enumeration value="DELTA"/>
+            <xs:enumeration value="FULL"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:attributeGroup name="auditAttributes">

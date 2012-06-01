@@ -1,3 +1,4 @@
+import java.text.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,13 +43,15 @@ public class parse {
         public static void main(String[] arg) throws IOException {
 
                 HibernateUtil.buildSessionFactory();
-                System.out.println("Hello");
                 parse p = new parse();
+
+		//p.saveEntity("Location");
+                //if (true) System.exit(0);
 
                 //String xml = fileToString("hbm/Geocode.hbm.xml");
                 //if (p.checkXML(xml) != null) System.out.println("XML is well formed");
 
-                String xml = fileToString("xml/audit.xml");
+                String xml = fileToString("xml/pp_audit_xml.xml");
                 String xsd = fileToString("xsd/PP_AUDIT_XML.xsd");
 		String result = "";
                 try {
@@ -68,9 +71,12 @@ public class parse {
                 Iterator i = keys.iterator();
                 while (i.hasNext()) {
                        String key = (String)i.next();
-                       if (key != "Provider") continue;
-		       String xmlFile = "xml/" + key + ".xml";
+                       //if (key != "Provider" && key != "Location") continue;
+                       //if (key != "Provider") continue;
+                       if (key != "Location") continue;
+		       String xmlFile = "xml/pp_" + key.toLowerCase() + "_xml.xml";
 		       String xsdFile = "xsd/PP_" + key.toUpperCase() + "_XML.xsd";
+		       //logger.info("Load and Validate (" + xmlFile + ", " + xsdFile + ")");
 		       System.out.println("Load and Validate (" + xmlFile + ", " + xsdFile + ")");
 	               xml = fileToString(xmlFile);	
 	               xsd = fileToString(xsdFile);	
@@ -80,7 +86,7 @@ public class parse {
                            docs.put(key, doc);
                            p.checkXSD(xsd);
                            p.validateXML(xml, xsd);
-			   p.validateActions(key, xml, (Map)audits.get(key));
+			   //p.validateActions(key, xml, (Map)audits.get(key));
 			   p.loadXML(doc, key);
 			   //p.checkData(doc, (Map)audits.get(key));
 		       } catch (Exception ex) {
@@ -94,8 +100,7 @@ public class parse {
 		int updates = Integer.parseInt("1");
                 System.out.println("Updates = " + updates);
 
-                //HibernateUtil.buildSessionFactory();
-		//p.saveProviders();
+		//p.saveEntity("Location");
 		//p.saveOutcomes();
                 //p.readGeocodes();
         }
@@ -111,6 +116,8 @@ public class parse {
                 try {
                         //session = HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
                         session = HibernateUtil.currentSession();
+			System.out.println("Session = " + session);
+
                         // List all providers
                         Session dom4jSession = session.getSession(EntityMode.DOM4J);
                         Query q = dom4jSession.createQuery("FROM cqc_address_cache");
@@ -130,24 +137,28 @@ public class parse {
                 }
         }
 
-	public void saveProviders() {
+	public void saveEntity(String entity) {
+		System.out.println("In saveProviders()");
 		Session session = null;
 		try {
 			//session = HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
+			System.out.println("Session = " + session);
 			session = HibernateUtil.currentSession();
+			System.out.println("Session = " + session);
+
 	        	// List all providers
 			Session dom4jSession = session.getSession(EntityMode.DOM4J);
-			Query q = dom4jSession.createQuery("FROM Provider");
+			Query q = dom4jSession.createQuery("FROM " + entity);
 			List results = q.list();
             		org.dom4j.Document document = DocumentHelper.createDocument();
-            		Element rootElement = document.addElement("Providers");
+            		Element rootElement = document.addElement("List_Of_" + entity);
             		for (int i = 0; i < results.size(); i++) {
                 		Element catalog = (Element) results.get(i);
                 		rootElement.add(catalog);
             		}
             		OutputFormat format = OutputFormat.createPrettyPrint();
 
-            		XMLWriter output = new XMLWriter(new FileWriter(new java.io.File("/tmp/providers.xml")), format);
+            		XMLWriter output = new XMLWriter(new FileWriter(new java.io.File("/tmp/" + entity + ".xml")), format);
             		output.setIndentLevel(1);
             		output.write(document);
             		output.close();
@@ -157,16 +168,18 @@ public class parse {
             		writer.write(document);
             		System.out.println(sw.toString());
 		} catch(Exception e) {
+			System.out.println("saveProviders exception...");
 			e.printStackTrace();
 			System.out.println(e.getMessage());
 		} finally {
-			session.close();
+                        if (session != null)
+			    session.close();
 		}
 	}
 
    	public boolean validateActions(String entity, String xml, Map actions) {
-		System.out.println("Validating Actions for " + entity);
-		System.out.println("Passed map = " + actions);
+		logger.info("Validating Actions for " + entity);
+		logger.info("Passed map = " + actions);
                 Document doc = null;
 
 		int iDelete = 0, iUpdate = 0, iInsert = 0;
@@ -175,14 +188,13 @@ public class parse {
 			SAXReader sax = new SAXReader();
 			doc = sax.read(new StringReader(xml));
 			List list = doc.selectNodes("//" + entity + "/Action_Code");
-			System.out.println(list);
 			for (Iterator iter = list.iterator(); iter.hasNext(); ) {
             	             Element e = (Element)iter.next();
             		     String action = e.getText();
                              if (action.equals("I")) iInsert++;
                              if (action.equals("U")) iUpdate++;
                              if (action.equals("D")) iDelete++;
-                             logger.info("action  = " + action);
+                             //logger.info("action  = " + action);
         		}
                         int cInsert = 0, cDelete = 0, cUpdate = 0;
                         cInsert = Integer.parseInt((String)actions.get("inserts"));
@@ -214,19 +226,46 @@ public class parse {
        }
 
        public boolean loadXML(Document doc, String entity) {
-                System.out.println("Loading XML " + entity);
+                logger.info("Loading XML into delta database : " + entity);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String nowAsString = df.format(new Date());
+        System.out.println("Now = " + nowAsString);
                 try {
+			Session session = HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
                         List list = doc.selectNodes("//" + entity);
                         for (Iterator iter = list.iterator(); iter.hasNext(); ) {
-                             Object e = iter.next();
-                             System.out.println(e);
-                             //HibernateUtil.currentSession().save(entity, e);
+                             Object obj = iter.next();
+                             Element e = (Element)obj;
+
+                             //org.hibernate.util.XMLHelper.dump(e);
+
+                             Element eUpdated = DocumentHelper.createElement("Last_Updated");
+			     eUpdated.setText(nowAsString);
+                             e.add(eUpdated);
+
+                             Element eAction = e.element("Action_Code");
+                             System.out.println("Action Code = " + eAction.getName() + "; " + eAction.getText());
+
+                             eAction = e.element("Location_Id");
+                             eAction.setText("T-" + eAction.getText());
+                             System.out.println("Action Code = " + eAction.getName() + "; " + eAction.getText());
+
+                             org.hibernate.util.XMLHelper.dump(e);
+			     //for (Iterator iter1 = e.elementIterator(); iter1.hasNext(); ) {
+                             //     e1 = (Element)iter1.next();
+                             //     System.out.println("Element : " + e1.getName() + "; " + e1.getText());
+			     //}
+
+		             Transaction tx = session.beginTransaction();
+             		     session.save(obj);
+       			     tx.commit();
                         }
-                        return false;
                 } catch (Exception e) {
                         logger.error("Error", e);
                         return false;
                 }
+                logger.info("Load complete : " + entity);
+                return true;
         }
  
         public Map parse(String xml) {

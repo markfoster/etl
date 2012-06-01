@@ -38,7 +38,7 @@
 
     <target name="build">
         <mkdir dir="build"/>
-        <javac srcdir="src" destdir="build" includeantruntime="false">
+        <javac srcdir="src" destdir="build" includeantruntime="false" debug="on" debuglevel="lines,vars,source">
           <classpath>
             <path refid="classpath" />
           </classpath>
@@ -86,7 +86,7 @@
        </fileset>
     </classpath>
   </taskdef>
-  <hibernatetool destdir="src"> <!-- check that directory exists -->
+  <hibernatetool destdir="export/src"> <!-- check that directory exists -->
 	<classpath>
 	  <path location="hbm"/>
 	       <fileset dir="lib">
@@ -102,7 +102,6 @@
   </hibernatetool>
 </target>
 
-<!--
 <target name="gen-hbm" description="Generate HBM files from schema" depends="build">
   <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask">
     <classpath>
@@ -126,7 +125,6 @@
     <hbm2hbmxml/>
   </hibernatetool>
 </target>
--->
 
 <target name="download-jars">
     <ivy:retrieve/>
