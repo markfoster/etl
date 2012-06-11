@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Provider Profile - Service_User_Band XSD
      v0.1 03-05-2012 MCRITES - Created
+     v0.2 29-05-2012 MCRITES - Added minOccurs indicators
   -->
-<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema version="0.2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:simpleType name="max1"><xs:restriction base="xs:string"><xs:maxLength value="1"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max2"><xs:restriction base="xs:string"><xs:maxLength value="2"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max5"><xs:restriction base="xs:string"><xs:maxLength value="5"/></xs:restriction></xs:simpleType>
@@ -21,13 +22,13 @@
     <xs:element name="List_Of_Service_User_Band">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="Service_User_Band" maxOccurs="unbounded">
+                <xs:element name="Service_User_Band" minOccurs="0" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="Provider_Id" type="max50" />
-                            <xs:element name="Location_Id" type="max50" />
-                            <xs:element name="Service_User_Band_Id" type="max50" />
-                            <xs:element name="Action_Code" type="max1" />
+                            <xs:element name="Provider_Id" type="max50" minOccurs="0" />
+                            <xs:element name="Location_Id" type="max50" minOccurs="0" />
+                            <xs:element name="Service_User_Band_Id" type="max50" minOccurs="0" />
+                            <xs:element name="Action_Code" type="max1" minOccurs="0" />
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>

@@ -73,7 +73,7 @@ public class parse {
                        String key = (String)i.next();
                        //if (key != "Provider" && key != "Location") continue;
                        //if (key != "Provider") continue;
-                       if (key != "Location") continue;
+                       if (key != "Registered_Manager_Condition") continue;
 		       String xmlFile = "xml/pp_" + key.toLowerCase() + "_xml.xml";
 		       String xsdFile = "xsd/PP_" + key.toUpperCase() + "_XML.xsd";
 		       //logger.info("Load and Validate (" + xmlFile + ", " + xsdFile + ")");
@@ -232,33 +232,40 @@ public class parse {
         System.out.println("Now = " + nowAsString);
                 try {
 			Session session = HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
+                        //Session session = HibernateUtil.currentSession();
                         List list = doc.selectNodes("//" + entity);
                         for (Iterator iter = list.iterator(); iter.hasNext(); ) {
                              Object obj = iter.next();
                              Element e = (Element)obj;
 
-                             //org.hibernate.util.XMLHelper.dump(e);
+                             org.hibernate.util.XMLHelper.dump(e);
 
                              Element eUpdated = DocumentHelper.createElement("Last_Updated");
 			     eUpdated.setText(nowAsString);
                              e.add(eUpdated);
 
-                             Element eAction = e.element("Action_Code");
-                             System.out.println("Action Code = " + eAction.getName() + "; " + eAction.getText());
+                             //Element eAction = e.element("Action_Code");
+                             //System.out.println("Action Code = " + eAction.getName() + "; " + eAction.getText());
 
-                             eAction = e.element("Location_Id");
-                             eAction.setText("T-" + eAction.getText());
-                             System.out.println("Action Code = " + eAction.getName() + "; " + eAction.getText());
+                             //eAction = e.element("Location_Id");
+                             //eAction.setText("T-" + eAction.getText());
+                             //System.out.println("Action Code = " + eAction.getName() + "; " + eAction.getText());
 
-                             org.hibernate.util.XMLHelper.dump(e);
+                             //org.hibernate.util.XMLHelper.dump(e);
 			     //for (Iterator iter1 = e.elementIterator(); iter1.hasNext(); ) {
                              //     e1 = (Element)iter1.next();
                              //     System.out.println("Element : " + e1.getName() + "; " + e1.getText());
 			     //}
 
+			     //try {
 		             Transaction tx = session.beginTransaction();
              		     session.save(obj);
        			     tx.commit();
+             		     session.evict(obj);
+             		     session.flush();
+			     //} catch (Exception ex) {
+                             //    logger.error("Error", ex);
+       			    // }
                         }
                 } catch (Exception e) {
                         logger.error("Error", e);

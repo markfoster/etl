@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Provider Profile - Audit XSD
-     v0.1 02-05-2012 MCRITES - Created
+     v0.1   02-05-2012  MCRITES - Created
+     v0.1.1 22-05-2012  MCRITES - Renamed Manager_Condition to Registered_Manager_Condition
   -->
-<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema version="0.1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:simpleType name="loadType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="DELTA"/>

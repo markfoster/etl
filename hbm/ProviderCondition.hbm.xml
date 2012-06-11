@@ -3,38 +3,35 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 24-May-2012 10:56:36 by Hibernate Tools 3.2.2.GA -->
 <hibernate-mapping>
-    <class name="org.cqc.ProviderCondition" table="provider_condition" catalog="preview_delta">
-        <composite-id name="id" class="org.cqc.ProviderConditionId">
-            <key-property name="providerId" type="string">
+    <class name="Provider_Condition" table="provider_condition" catalog="preview_delta">
+
+        <composite-id>
+            <key-property name="providerId" type="string" node="Provider_Id">
                 <column name="provider_id" length="50" />
             </key-property>
 
-            <key-property name="locationId" type="string">
-                <column name="location_id" length="50" />
-            </key-property>
-
-            <key-property name="conditionId" type="string">
+            <key-property name="conditionId" type="string" node="Condition_Id">
                 <column name="condition_id" length="50" />
             </key-property>
         </composite-id>
 
-        <property name="regulatedActivityNumber" type="string">
+        <property name="regulatedActivityNumber" type="string" node="Regulated_Activity_Number">
             <column name="regulated_activity_number" length="10" not-null="true" />
         </property>
 
-        <property name="text" type="string">
+        <property name="text" type="string" node="Text">
             <column name="text" />
         </property>
 
-        <property name="reason" type="string">
+        <property name="reason" type="string" node="Reason">
             <column name="reason" />
         </property>
 
-        <property name="actionCode" type="java.lang.Character">
+        <property name="actionCode" type="java.lang.Character" node="Action_Code">
             <column name="action_code" length="1" />
         </property>
 
-        <property name="lastUpdated" type="timestamp">
+        <property name="lastUpdated" type="timestamp" node="Last_Updated">
             <column name="last_updated" length="19" />
         </property>
     </class>

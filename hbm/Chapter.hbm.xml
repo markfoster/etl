@@ -3,30 +3,31 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 24-May-2012 10:56:36 by Hibernate Tools 3.2.2.GA -->
 <hibernate-mapping>
-    <class name="org.cqc.Chapter" table="chapter" catalog="preview_delta">
-        <composite-id name="id" class="org.cqc.ChapterId">
-            <key-property name="providerId" type="string">
+    <class name="Chapter" table="chapter" catalog="preview_delta">
+
+        <composite-id>
+            <key-property name="providerId" type="string" node="Provider_Id">
                 <column name="provider_id" length="50" />
             </key-property>
 
-            <key-property name="locationId" type="string">
+            <key-property name="locationId" type="string" node="Location_Id">
                 <column name="location_id" length="50" />
             </key-property>
 
-            <key-property name="chapterNumber" type="string">
+            <key-property name="chapterNumber" type="string" node="Chapter_Number">
                 <column name="chapter_number" length="5" />
             </key-property>
         </composite-id>
 
-        <property name="score" type="java.lang.Integer">
+        <property name="score" type="java.lang.Integer" node="Score">
             <column name="score" />
         </property>
 
-        <property name="actionCode" type="java.lang.Character">
+        <property name="actionCode" type="java.lang.Character" node="Action_Code">
             <column name="action_code" length="1" />
         </property>
 
-        <property name="lastUpdated" type="timestamp">
+        <property name="lastUpdated" type="timestamp" node="Last_Updated">
             <column name="last_updated" length="19" />
         </property>
     </class>

@@ -3,58 +3,59 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 24-May-2012 10:56:36 by Hibernate Tools 3.2.2.GA -->
 <hibernate-mapping>
-    <class name="org.cqc.Outcome" table="outcome" catalog="preview_delta">
-        <composite-id name="id" class="org.cqc.OutcomeId">
-            <key-property name="providerId" type="string">
+    <class name="Outcome" table="outcome" catalog="preview_delta">
+
+        <composite-id>
+            <key-property name="providerId" type="string" node="Provider_Id">
                 <column name="provider_id" length="30" />
             </key-property>
 
-            <key-property name="locationId" type="string">
+            <key-property name="locationId" type="string" node="Location_Id">
                 <column name="location_id" length="30" />
             </key-property>
 
-            <key-property name="outcomeId" type="string">
+            <key-property name="outcomeId" type="string" node="Outcome_Id">
                 <column name="outcome_id" length="30" />
             </key-property>
         </composite-id>
 
-        <property name="judgementId" type="string">
+        <property name="judgementId" type="string" node="Judgement_Id">
             <column name="judgement_id" length="30" />
         </property>
 
-        <property name="judgementDate" type="string">
+       <property name="judgementDate" type="string" node="Judgement_Date">
             <column name="judgement_date" length="20" />
         </property>
 
-        <property name="judgementReason" type="string">
+        <property name="judgementReason" type="string" node="Judgement_Reason">
             <column name="judgement_reason" />
         </property>
 
-        <property name="judgementUserExperience" type="string">
+        <property name="judgementUserExperience" type="string" node="Judgement_User_Experience">
             <column name="judgement_user_experience" />
         </property>
 
-        <property name="judgementOtherEvidence" type="string">
+        <property name="judgementOtherEvidence" type="string" node="Judgement_Other_Evidence">
             <column name="judgement_other_evidence" />
         </property>
 
-        <property name="judgementScoreId" type="string">
+        <property name="judgementScoreId" type="string" node="Judgement_Score_Id">
             <column name="judgement_score_id" length="30" />
         </property>
 
-        <property name="outcomeStatementId" type="string">
+        <property name="outcomeStatementId" type="string" node="Outcome_Statement_Id">
             <column name="outcome_statement_id" length="30" />
         </property>
 
-        <property name="judgementSummary" type="string">
+        <property name="judgementSummary" type="string" node="Judgement_Summary">
             <column name="judgement_summary" />
         </property>
 
-        <property name="actionCode" type="java.lang.Character">
+        <property name="actionCode" type="java.lang.Character" node="Action_Code">
             <column name="action_code" length="1" />
         </property>
 
-        <property name="lastUpdated" type="timestamp">
+        <property name="lastUpdated" type="timestamp" node="Last_Updated">
             <column name="last_updated" length="19" />
         </property>
     </class>

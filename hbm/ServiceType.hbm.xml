@@ -4,7 +4,8 @@
 <!-- Generated 24-May-2012 10:56:36 by Hibernate Tools 3.2.2.GA -->
 <hibernate-mapping>
     <class name="org.cqc.ServiceType" table="service_type" catalog="preview_delta">
-        <composite-id name="id" class="org.cqc.ServiceTypeId">
+
+        <composite-id>
             <key-property name="providerId" type="string">
                 <column name="provider_id" length="30" />
             </key-property>

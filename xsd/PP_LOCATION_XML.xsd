@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Provider Profile - Location XSD
      v0.1 03-05-2012 MCRITES - Created
+     v0.2 29-05-2012 MCRITES - Added minOccurs indicators
   -->
-<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema version="0.2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:simpleType name="max1"><xs:restriction base="xs:string"><xs:maxLength value="1"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max2"><xs:restriction base="xs:string"><xs:maxLength value="2"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max5"><xs:restriction base="xs:string"><xs:maxLength value="5"/></xs:restriction></xs:simpleType>
@@ -21,7 +22,7 @@
     <xs:element name="List_Of_Location">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="Location" maxOccurs="unbounded">
+                <xs:element name="Location" minOccurs="0" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="Provider_Id" type="max50" minOccurs="0" />
