@@ -34,6 +34,7 @@
                 <xs:element name="Outcome"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
                 <xs:element name="Service_Type"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
                 <xs:element name="Service_User_Band"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
+                <xs:element name="Visit_Date"><xs:complexType><xs:attributeGroup ref="auditAttributes"/></xs:complexType></xs:element>
             </xs:all>
             <xs:attribute name="timestamp" type="xs:dateTime"/>
         </xs:complexType>

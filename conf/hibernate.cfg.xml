@@ -15,16 +15,24 @@
       <property name="hibernate.default_entity_mode">dom4j</property> 
 
       <!-- Mapping files -->
-      <mapping resource="Provider.hbm.xml"/>
-      <mapping resource="Location.hbm.xml"/>
-      <mapping resource="NominatedIndividual.hbm.xml"/>
-      <mapping resource="ProviderCondition.hbm.xml"/>
+     <!-- Mapping files -->
       <mapping resource="Chapter.hbm.xml"/>
+      <mapping resource="Location.hbm.xml"/>
       <mapping resource="LocationCondition.hbm.xml"/>
       <mapping resource="LocationRegulatedActivity.hbm.xml"/>
+      <mapping resource="NominatedIndividual.hbm.xml"/>
       <mapping resource="Outcome.hbm.xml"/>
       <mapping resource="Partner.hbm.xml"/>
+      <mapping resource="Provider.hbm.xml"/>
+      <mapping resource="ProviderCondition.hbm.xml"/>
+      <mapping resource="ProviderRegulatedActivity.hbm.xml"/>
+      <mapping resource="RegisteredManager.hbm.xml"/> 
       <mapping resource="RegisteredManagerCondition.hbm.xml"/>
+      <mapping resource="ReportSummary.hbm.xml"/>
+<!--
+      <mapping resource="ServiceType.hbm.xml"/>
+      <mapping resource="ServiceUserBand.hbm.xml"/>
+-->
 
     </session-factory>
 </hibernate-configuration>

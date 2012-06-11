@@ -73,7 +73,7 @@ public class parse {
                        String key = (String)i.next();
                        //if (key != "Provider" && key != "Location") continue;
                        //if (key != "Provider") continue;
-                       if (key != "Registered_Manager_Condition") continue;
+                       if (key != "Report_Summary") continue;
 		       String xmlFile = "xml/pp_" + key.toLowerCase() + "_xml.xml";
 		       String xsdFile = "xsd/PP_" + key.toUpperCase() + "_XML.xsd";
 		       //logger.info("Load and Validate (" + xmlFile + ", " + xsdFile + ")");
@@ -244,25 +244,27 @@ public class parse {
 			     eUpdated.setText(nowAsString);
                              e.add(eUpdated);
 
-                             //Element eAction = e.element("Action_Code");
-                             //System.out.println("Action Code = " + eAction.getName() + "; " + eAction.getText());
+/**
+                             Element eAction = e.element("Action_Code");
+                             System.out.println("Action Code = " + eAction.getName() + "; " + eAction.getText());
 
-                             //eAction = e.element("Location_Id");
+                             eAction = e.element("Provider_Id");
                              //eAction.setText("T-" + eAction.getText());
-                             //System.out.println("Action Code = " + eAction.getName() + "; " + eAction.getText());
+                             System.out.println("Provider Id = " + eAction.getName() + "; " + eAction.getText());
 
                              //org.hibernate.util.XMLHelper.dump(e);
 			     //for (Iterator iter1 = e.elementIterator(); iter1.hasNext(); ) {
                              //     e1 = (Element)iter1.next();
                              //     System.out.println("Element : " + e1.getName() + "; " + e1.getText());
 			     //}
+**/
 
 			     //try {
 		             Transaction tx = session.beginTransaction();
              		     session.save(obj);
        			     tx.commit();
-             		     session.evict(obj);
-             		     session.flush();
+             		     //session.evict(obj);
+             		     //session.flush();
 			     //} catch (Exception ex) {
                              //    logger.error("Error", ex);
        			    // }

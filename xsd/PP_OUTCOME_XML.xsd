@@ -3,8 +3,9 @@
      v0.1 03-05-2012 MCRITES - Created
      v0.1.1 28-05-2012 MCRITES - Added Method element
      v0.2 29-05-2012 MCRITES - Added minOccurs indicators
+     v0.2.1 06-06-2012 MCRITES - Replaced Review_Date with Report_Publication_Date. Removed Visit_Date
   -->
-<xs:schema version="0.2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema version="0.2.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:simpleType name="max1"><xs:restriction base="xs:string"><xs:maxLength value="1"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max2"><xs:restriction base="xs:string"><xs:maxLength value="2"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max5"><xs:restriction base="xs:string"><xs:maxLength value="5"/></xs:restriction></xs:simpleType>
@@ -29,15 +30,13 @@
                             <xs:element name="Provider_Id" type="max50" minOccurs="0" />
                             <xs:element name="Location_Id" type="max50" minOccurs="0" />
                             <xs:element name="Outcome_Number" type="max2" minOccurs="0" />
-                            <xs:element name="Judgement_Date" type="xs:date" minOccurs="0" />
+                            <xs:element name="Report_Publication_Date" type="xs:date" minOccurs="0" />
                             <xs:element name="Review_Reason" type="max30" minOccurs="0" />
                             <xs:element name="User_Experience" type="max32000" minOccurs="0" />
                             <xs:element name="Other_Evidence" type="max32000" minOccurs="0" />
                             <xs:element name="Judgement_Statement_Id" type="max10" minOccurs="0" />
                             <xs:element name="Outcome_Statement_Id" type="max10" minOccurs="0" />
                             <xs:element name="Judgement_Summary" type="max32000" minOccurs="0" />
-                            <xs:element name="Visit_Date" type="xs:date" minOccurs="0" />
-                            <xs:element name="Report_Publication_Date" type="xs:date" minOccurs="0" />
                             <xs:element name="Inspection_Theme" type="max50" minOccurs="0" />
                             <xs:element name="Compliance_Level" type="max50" minOccurs="0" />
                             <xs:element name="Inspection_Announced" type="max1" minOccurs="0" />

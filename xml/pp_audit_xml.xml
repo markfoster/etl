@@ -15,4 +15,5 @@
   <Outcome inserts="180000" updates="0" deletes="0" load="FULL"/>
   <Service_Type inserts="48032" updates="0" deletes="0" load="FULL"/>
   <Service_User_Band inserts="102628" updates="0" deletes="0" load="FULL"/>
+  <Visit_Date inserts="0" updates="0" deletes="0" load="DELTA"/>
 </Audit>
