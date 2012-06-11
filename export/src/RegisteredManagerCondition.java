@@ -1,5 +1,5 @@
 // default package
-// Generated 28-May-2012 14:25:40 by Hibernate Tools 3.2.2.GA
+// Generated 11-Jun-2012 16:41:24 by Hibernate Tools 3.2.2.GA
 
 
 import java.util.Date;
@@ -11,7 +11,6 @@ public class RegisteredManagerCondition  implements java.io.Serializable {
 
 
      private RegisteredManagerConditionId id;
-     private String conditionId;
      private String conditionText;
      private Character actionCode;
      private Date lastUpdated;
@@ -23,9 +22,8 @@ public class RegisteredManagerCondition  implements java.io.Serializable {
     public RegisteredManagerCondition(RegisteredManagerConditionId id) {
         this.id = id;
     }
-    public RegisteredManagerCondition(RegisteredManagerConditionId id, String conditionId, String conditionText, Character actionCode, Date lastUpdated) {
+    public RegisteredManagerCondition(RegisteredManagerConditionId id, String conditionText, Character actionCode, Date lastUpdated) {
        this.id = id;
-       this.conditionId = conditionId;
        this.conditionText = conditionText;
        this.actionCode = actionCode;
        this.lastUpdated = lastUpdated;
@@ -37,13 +35,6 @@ public class RegisteredManagerCondition  implements java.io.Serializable {
     
     public void setId(RegisteredManagerConditionId id) {
         this.id = id;
-    }
-    public String getConditionId() {
-        return this.conditionId;
-    }
-    
-    public void setConditionId(String conditionId) {
-        this.conditionId = conditionId;
     }
     public String getConditionText() {
         return this.conditionText;

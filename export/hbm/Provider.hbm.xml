@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 29-May-2012 11:53:12 by Hibernate Tools 3.2.2.GA -->
+<!-- Generated 11-Jun-2012 16:41:30 by Hibernate Tools 3.2.2.GA -->
 <hibernate-mapping>
     <class name=".Provider" table="provider" catalog="preview_delta">
         <id name="providerId" type="string">
@@ -54,8 +54,8 @@
             <column name="latitude" precision="10" scale="8" />
         </property>
 
-        <property name="locationAuthority" type="string">
-            <column name="location_authority" length="50" />
+        <property name="localAuthority" type="string">
+            <column name="local_authority" length="50" />
         </property>
 
         <property name="longitude" type="big_decimal">

@@ -1,5 +1,5 @@
-//package org.cqc;
-// Generated 24-May-2012 12:01:54 by Hibernate Tools 3.2.2.GA
+// default package
+// Generated 11-Jun-2012 16:41:24 by Hibernate Tools 3.2.2.GA
 
 
 import java.util.Date;
@@ -9,53 +9,63 @@ import java.util.Date;
  */
 public class Outcome  implements java.io.Serializable {
 
-    private String providerId;
-    private String locationId;
-    private String outcomeId;
-     private String judgementId;
-     private String judgementDate;
-     private String judgementReason;
-     private String judgementUserExperience;
-     private String judgementOtherEvidence;
-     private String judgementScoreId;
+     private String providerId;
+     private String locationId;
+     private String outcomeNumber;
+     private String reportPublicationDate;
+     private String reviewReason;
+     private String userExperience;
+     private String otherEvidence;
      private String outcomeStatementId;
+     private String judgementStatementId;
      private String judgementSummary;
+     private String method;
+     private String inspectionTheme;
+     private String judgementReason;
+     private String complianceLevel;
+     private Character inspectionAnnounced;
+     private String source;
      private Character actionCode;
      private Date lastUpdated;
 
     public Outcome() {
     }
-	
-    public Outcome(String providerId, String locationId, String outcomeId) {
-       this.providerId = providerId;
-       this.locationId = locationId;
-       this.outcomeId = outcomeId;
-    }
 
-    public Outcome(String providerId, String locationId, String outcomeId, String judgementId, String judgementDate, String judgementReason, String judgementUserExperience, String judgementOtherEvidence, String judgementScoreId, String outcomeStatementId, String judgementSummary, Character actionCode, Date lastUpdated) {
+    public Outcome(String providerId, String locationId, String outcomeNumber, String reportPublicationDate) {
        this.providerId = providerId;
        this.locationId = locationId;
-       this.outcomeId = outcomeId;
-       this.judgementId = judgementId;
-       this.judgementDate = judgementDate;
-       this.judgementReason = judgementReason;
-       this.judgementUserExperience = judgementUserExperience;
-       this.judgementOtherEvidence = judgementOtherEvidence;
-       this.judgementScoreId = judgementScoreId;
+       this.outcomeNumber = outcomeNumber;
+       this.reportPublicationDate = reportPublicationDate;
+    }
+	
+    public Outcome(String providerId, String locationId, String outcomeNumber, String reportPublicationDate, String reviewReason, String userExperience, String otherEvidence, String outcomeStatementId, String judgementStatementId, String judgementSummary, String method, String inspectionTheme, String judgementReason, String complianceLevel, Character inspectionAnnounced, String source, Character actionCode, Date lastUpdated) {
+       this.providerId = providerId;
+       this.locationId = locationId;
+       this.outcomeNumber = outcomeNumber;
+       this.reportPublicationDate = reportPublicationDate;
+       this.reviewReason = reviewReason;
+       this.userExperience = userExperience;
+       this.otherEvidence = otherEvidence;
        this.outcomeStatementId = outcomeStatementId;
+       this.judgementStatementId = judgementStatementId;
        this.judgementSummary = judgementSummary;
+       this.method = method;
+       this.inspectionTheme = inspectionTheme;
+       this.judgementReason = judgementReason;
+       this.complianceLevel = complianceLevel;
+       this.inspectionAnnounced = inspectionAnnounced;
+       this.source = source;
        this.actionCode = actionCode;
        this.lastUpdated = lastUpdated;
     }
- 
+  
     public String getProviderId() {
         return this.providerId;
     }
- 
+
     public void setProviderId(String providerId) {
         this.providerId = providerId;
     }
-
     public String getLocationId() {
         return this.locationId;
     }
@@ -63,56 +73,41 @@ public class Outcome  implements java.io.Serializable {
     public void setLocationId(String locationId) {
         this.locationId = locationId;
     }
-
-    public String getOutcomeId() {
-        return this.outcomeId;
+    public String getOutcomeNumber() {
+        return this.outcomeNumber;
     }
 
-    public void setOutcomeId(String outcomeId) {
-        this.outcomeId = outcomeId;
-    } 
+    public void setOutcomeNumber(String outcomeNumber) {
+        this.outcomeNumber = outcomeNumber;
+    }
+    public String getReportPublicationDate() {
+        return this.reportPublicationDate;
+    }
 
-    public String getJudgementId() {
-        return this.judgementId;
+    public void setReportPublicationDate(String reportPublicationDate) {
+        this.reportPublicationDate = reportPublicationDate;
+    }
+ 
+    public String getReviewReason() {
+        return this.reviewReason;
     }
     
-    public void setJudgementId(String judgementId) {
-        this.judgementId = judgementId;
+    public void setReviewReason(String reviewReason) {
+        this.reviewReason = reviewReason;
     }
-    public String getJudgementDate() {
-        return this.judgementDate;
-    }
-    
-    public void setJudgementDate(String judgementDate) {
-        this.judgementDate = judgementDate;
-    }
-    public String getJudgementReason() {
-        return this.judgementReason;
+    public String getUserExperience() {
+        return this.userExperience;
     }
     
-    public void setJudgementReason(String judgementReason) {
-        this.judgementReason = judgementReason;
+    public void setUserExperience(String userExperience) {
+        this.userExperience = userExperience;
     }
-    public String getJudgementUserExperience() {
-        return this.judgementUserExperience;
-    }
-    
-    public void setJudgementUserExperience(String judgementUserExperience) {
-        this.judgementUserExperience = judgementUserExperience;
-    }
-    public String getJudgementOtherEvidence() {
-        return this.judgementOtherEvidence;
+    public String getOtherEvidence() {
+        return this.otherEvidence;
     }
     
-    public void setJudgementOtherEvidence(String judgementOtherEvidence) {
-        this.judgementOtherEvidence = judgementOtherEvidence;
-    }
-    public String getJudgementScoreId() {
-        return this.judgementScoreId;
-    }
-    
-    public void setJudgementScoreId(String judgementScoreId) {
-        this.judgementScoreId = judgementScoreId;
+    public void setOtherEvidence(String otherEvidence) {
+        this.otherEvidence = otherEvidence;
     }
     public String getOutcomeStatementId() {
         return this.outcomeStatementId;
@@ -121,12 +116,61 @@ public class Outcome  implements java.io.Serializable {
     public void setOutcomeStatementId(String outcomeStatementId) {
         this.outcomeStatementId = outcomeStatementId;
     }
+    public String getJudgementStatementId() {
+        return this.judgementStatementId;
+    }
+    
+    public void setJudgementStatementId(String judgementStatementId) {
+        this.judgementStatementId = judgementStatementId;
+    }
     public String getJudgementSummary() {
         return this.judgementSummary;
     }
     
     public void setJudgementSummary(String judgementSummary) {
         this.judgementSummary = judgementSummary;
+    }
+    public String getMethod() {
+        return this.method;
+    }
+    
+    public void setMethod(String method) {
+        this.method = method;
+    }
+    public String getInspectionTheme() {
+        return this.inspectionTheme;
+    }
+    
+    public void setInspectionTheme(String inspectionTheme) {
+        this.inspectionTheme = inspectionTheme;
+    }
+    public String getJudgementReason() {
+        return this.judgementReason;
+    }
+    
+    public void setJudgementReason(String judgementReason) {
+        this.judgementReason = judgementReason;
+    }
+    public String getComplianceLevel() {
+        return this.complianceLevel;
+    }
+    
+    public void setComplianceLevel(String complianceLevel) {
+        this.complianceLevel = complianceLevel;
+    }
+    public Character getInspectionAnnounced() {
+        return this.inspectionAnnounced;
+    }
+    
+    public void setInspectionAnnounced(Character inspectionAnnounced) {
+        this.inspectionAnnounced = inspectionAnnounced;
+    }
+    public String getSource() {
+        return this.source;
+    }
+    
+    public void setSource(String source) {
+        this.source = source;
     }
     public Character getActionCode() {
         return this.actionCode;
@@ -143,7 +187,27 @@ public class Outcome  implements java.io.Serializable {
         this.lastUpdated = lastUpdated;
     }
 
+   public boolean equals(Object other) {
+         if ( (this == other ) ) return true;
+                 if ( (other == null ) ) return false;
+                 if ( !(other instanceof Outcome) ) return false;
+                 Outcome castOther = ( Outcome ) other;
 
+                 return ( (this.getProviderId()==castOther.getProviderId()) || ( this.getProviderId()!=null && castOther.getProviderId()!=null && this.getProviderId().equals(castOther.getProviderId()) ) )
+ && ( (this.getLocationId()==castOther.getLocationId()) || ( this.getLocationId()!=null && castOther.getLocationId()!=null && this.getLocationId().equals(castOther.getLocationId()) ) )
+ && ( (this.getOutcomeNumber()==castOther.getOutcomeNumber()) || ( this.getOutcomeNumber()!=null && castOther.getOutcomeNumber()!=null && this.getOutcomeNumber().equals(castOther.getOutcomeNumber()) ) )
+ && ( (this.getReportPublicationDate()==castOther.getReportPublicationDate()) || ( this.getReportPublicationDate()!=null && castOther.getReportPublicationDate()!=null && this.getReportPublicationDate().equals(castOther.getReportPublicationDate()) ) );
+   }
+
+   public int hashCode() {
+         int result = 17;
+
+         result = 37 * result + ( getProviderId() == null ? 0 : this.getProviderId().hashCode() );
+         result = 37 * result + ( getLocationId() == null ? 0 : this.getLocationId().hashCode() );
+         result = 37 * result + ( getOutcomeNumber() == null ? 0 : this.getOutcomeNumber().hashCode() );
+         result = 37 * result + ( getReportPublicationDate() == null ? 0 : this.getReportPublicationDate().hashCode() );
+         return result;
+   }
 
 
 }

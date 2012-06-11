@@ -1,5 +1,5 @@
 // default package
-// Generated 28-May-2012 14:25:40 by Hibernate Tools 3.2.2.GA
+// Generated 11-Jun-2012 16:41:24 by Hibernate Tools 3.2.2.GA
 
 
 import java.math.BigDecimal;
@@ -23,7 +23,7 @@ public class Provider  implements java.io.Serializable {
      private String isPartnership;
      private Date lastUpdated;
      private BigDecimal latitude;
-     private String locationAuthority;
+     private String localAuthority;
      private BigDecimal longitude;
      private String name;
      private String postcode;
@@ -43,7 +43,7 @@ public class Provider  implements java.io.Serializable {
     public Provider(String providerId) {
         this.providerId = providerId;
     }
-    public Provider(String providerId, Character actionCode, String addressLine1, String addressLine2, String alsoKnownAs, String county, String email, String fax, String inProcess, String isPartnership, Date lastUpdated, BigDecimal latitude, String locationAuthority, BigDecimal longitude, String name, String postcode, String region, String segmentation, String subtype, String telephone, String townCity, String type, String underReviewText, String website) {
+    public Provider(String providerId, Character actionCode, String addressLine1, String addressLine2, String alsoKnownAs, String county, String email, String fax, String inProcess, String isPartnership, Date lastUpdated, BigDecimal latitude, String localAuthority, BigDecimal longitude, String name, String postcode, String region, String segmentation, String subtype, String telephone, String townCity, String type, String underReviewText, String website) {
        this.providerId = providerId;
        this.actionCode = actionCode;
        this.addressLine1 = addressLine1;
@@ -56,7 +56,7 @@ public class Provider  implements java.io.Serializable {
        this.isPartnership = isPartnership;
        this.lastUpdated = lastUpdated;
        this.latitude = latitude;
-       this.locationAuthority = locationAuthority;
+       this.localAuthority = localAuthority;
        this.longitude = longitude;
        this.name = name;
        this.postcode = postcode;
@@ -154,12 +154,12 @@ public class Provider  implements java.io.Serializable {
     public void setLatitude(BigDecimal latitude) {
         this.latitude = latitude;
     }
-    public String getLocationAuthority() {
-        return this.locationAuthority;
+    public String getLocalAuthority() {
+        return this.localAuthority;
     }
     
-    public void setLocationAuthority(String locationAuthority) {
-        this.locationAuthority = locationAuthority;
+    public void setLocalAuthority(String localAuthority) {
+        this.localAuthority = localAuthority;
     }
     public BigDecimal getLongitude() {
         return this.longitude;

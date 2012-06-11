@@ -1,5 +1,5 @@
 // default package
-// Generated 28-May-2012 14:25:40 by Hibernate Tools 3.2.2.GA
+// Generated 11-Jun-2012 16:41:24 by Hibernate Tools 3.2.2.GA
 
 
 
@@ -10,15 +10,13 @@ public class ProviderConditionId  implements java.io.Serializable {
 
 
      private String providerId;
-     private String locationId;
      private String conditionId;
 
     public ProviderConditionId() {
     }
 
-    public ProviderConditionId(String providerId, String locationId, String conditionId) {
+    public ProviderConditionId(String providerId, String conditionId) {
        this.providerId = providerId;
-       this.locationId = locationId;
        this.conditionId = conditionId;
     }
    
@@ -28,13 +26,6 @@ public class ProviderConditionId  implements java.io.Serializable {
     
     public void setProviderId(String providerId) {
         this.providerId = providerId;
-    }
-    public String getLocationId() {
-        return this.locationId;
-    }
-    
-    public void setLocationId(String locationId) {
-        this.locationId = locationId;
     }
     public String getConditionId() {
         return this.conditionId;
@@ -52,7 +43,6 @@ public class ProviderConditionId  implements java.io.Serializable {
 		 ProviderConditionId castOther = ( ProviderConditionId ) other; 
          
 		 return ( (this.getProviderId()==castOther.getProviderId()) || ( this.getProviderId()!=null && castOther.getProviderId()!=null && this.getProviderId().equals(castOther.getProviderId()) ) )
- && ( (this.getLocationId()==castOther.getLocationId()) || ( this.getLocationId()!=null && castOther.getLocationId()!=null && this.getLocationId().equals(castOther.getLocationId()) ) )
  && ( (this.getConditionId()==castOther.getConditionId()) || ( this.getConditionId()!=null && castOther.getConditionId()!=null && this.getConditionId().equals(castOther.getConditionId()) ) );
    }
    
@@ -60,7 +50,6 @@ public class ProviderConditionId  implements java.io.Serializable {
          int result = 17;
          
          result = 37 * result + ( getProviderId() == null ? 0 : this.getProviderId().hashCode() );
-         result = 37 * result + ( getLocationId() == null ? 0 : this.getLocationId().hashCode() );
          result = 37 * result + ( getConditionId() == null ? 0 : this.getConditionId().hashCode() );
          return result;
    }   

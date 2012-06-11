@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 29-May-2012 11:53:12 by Hibernate Tools 3.2.2.GA -->
+<!-- Generated 11-Jun-2012 16:41:30 by Hibernate Tools 3.2.2.GA -->
 <hibernate-mapping>
     <class name=".Outcome" table="outcome" catalog="preview_delta">
         <composite-id name="id" class=".OutcomeId">
@@ -13,41 +13,61 @@
                 <column name="location_id" length="30" />
             </key-property>
 
-            <key-property name="outcomeId" type="string">
-                <column name="outcome_id" length="30" />
+            <key-property name="outcomeNumber" type="string">
+                <column name="outcome_number" length="30" />
+            </key-property>
+
+            <key-property name="reportPublicationDate" type="string">
+                <column name="report_publication_date" length="20" />
             </key-property>
         </composite-id>
 
-        <property name="judgementId" type="string">
-            <column name="judgement_id" length="30" />
+        <property name="reviewReason" type="string">
+            <column name="review_reason" />
         </property>
 
-        <property name="judgementDate" type="string">
-            <column name="judgement_date" length="20" />
+        <property name="userExperience" type="string">
+            <column name="user_experience" />
         </property>
 
-        <property name="judgementReason" type="string">
-            <column name="judgement_reason" />
-        </property>
-
-        <property name="judgementUserExperience" type="string">
-            <column name="judgement_user_experience" />
-        </property>
-
-        <property name="judgementOtherEvidence" type="string">
-            <column name="judgement_other_evidence" />
-        </property>
-
-        <property name="judgementScoreId" type="string">
-            <column name="judgement_score_id" length="30" />
+        <property name="otherEvidence" type="string">
+            <column name="other_evidence" />
         </property>
 
         <property name="outcomeStatementId" type="string">
             <column name="outcome_statement_id" length="30" />
         </property>
 
+        <property name="judgementStatementId" type="string">
+            <column name="judgement_statement_id" length="30" />
+        </property>
+
         <property name="judgementSummary" type="string">
             <column name="judgement_summary" />
+        </property>
+
+        <property name="method" type="string">
+            <column name="method" />
+        </property>
+
+        <property name="inspectionTheme" type="string">
+            <column name="inspection_theme" length="50" />
+        </property>
+
+        <property name="judgementReason" type="string">
+            <column name="judgement_reason" />
+        </property>
+
+        <property name="complianceLevel" type="string">
+            <column name="compliance_level" length="50" />
+        </property>
+
+        <property name="inspectionAnnounced" type="java.lang.Character">
+            <column name="inspection_announced" length="1" />
+        </property>
+
+        <property name="source" type="string">
+            <column name="source" length="10" />
         </property>
 
         <property name="actionCode" type="java.lang.Character">

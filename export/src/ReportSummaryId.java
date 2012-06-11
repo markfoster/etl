@@ -1,5 +1,5 @@
 // default package
-// Generated 28-May-2012 14:25:40 by Hibernate Tools 3.2.2.GA
+// Generated 11-Jun-2012 16:41:24 by Hibernate Tools 3.2.2.GA
 
 
 
@@ -11,13 +11,15 @@ public class ReportSummaryId  implements java.io.Serializable {
 
      private String providerId;
      private String locationId;
+     private String reportPublicationDate;
 
     public ReportSummaryId() {
     }
 
-    public ReportSummaryId(String providerId, String locationId) {
+    public ReportSummaryId(String providerId, String locationId, String reportPublicationDate) {
        this.providerId = providerId;
        this.locationId = locationId;
+       this.reportPublicationDate = reportPublicationDate;
     }
    
     public String getProviderId() {
@@ -34,6 +36,13 @@ public class ReportSummaryId  implements java.io.Serializable {
     public void setLocationId(String locationId) {
         this.locationId = locationId;
     }
+    public String getReportPublicationDate() {
+        return this.reportPublicationDate;
+    }
+    
+    public void setReportPublicationDate(String reportPublicationDate) {
+        this.reportPublicationDate = reportPublicationDate;
+    }
 
 
    public boolean equals(Object other) {
@@ -43,7 +52,8 @@ public class ReportSummaryId  implements java.io.Serializable {
 		 ReportSummaryId castOther = ( ReportSummaryId ) other; 
          
 		 return ( (this.getProviderId()==castOther.getProviderId()) || ( this.getProviderId()!=null && castOther.getProviderId()!=null && this.getProviderId().equals(castOther.getProviderId()) ) )
- && ( (this.getLocationId()==castOther.getLocationId()) || ( this.getLocationId()!=null && castOther.getLocationId()!=null && this.getLocationId().equals(castOther.getLocationId()) ) );
+ && ( (this.getLocationId()==castOther.getLocationId()) || ( this.getLocationId()!=null && castOther.getLocationId()!=null && this.getLocationId().equals(castOther.getLocationId()) ) )
+ && ( (this.getReportPublicationDate()==castOther.getReportPublicationDate()) || ( this.getReportPublicationDate()!=null && castOther.getReportPublicationDate()!=null && this.getReportPublicationDate().equals(castOther.getReportPublicationDate()) ) );
    }
    
    public int hashCode() {
@@ -51,6 +61,7 @@ public class ReportSummaryId  implements java.io.Serializable {
          
          result = 37 * result + ( getProviderId() == null ? 0 : this.getProviderId().hashCode() );
          result = 37 * result + ( getLocationId() == null ? 0 : this.getLocationId().hashCode() );
+         result = 37 * result + ( getReportPublicationDate() == null ? 0 : this.getReportPublicationDate().hashCode() );
          return result;
    }   
 

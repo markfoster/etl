@@ -1,5 +1,5 @@
 // default package
-// Generated 28-May-2012 14:25:40 by Hibernate Tools 3.2.2.GA
+// Generated 11-Jun-2012 16:41:24 by Hibernate Tools 3.2.2.GA
 
 
 import java.util.Date;
@@ -11,7 +11,6 @@ public class ReportSummary  implements java.io.Serializable {
 
 
      private ReportSummaryId id;
-     private Date reviewDate;
      private String text;
      private Character actionCode;
      private Date lastUpdated;
@@ -23,9 +22,8 @@ public class ReportSummary  implements java.io.Serializable {
     public ReportSummary(ReportSummaryId id) {
         this.id = id;
     }
-    public ReportSummary(ReportSummaryId id, Date reviewDate, String text, Character actionCode, Date lastUpdated) {
+    public ReportSummary(ReportSummaryId id, String text, Character actionCode, Date lastUpdated) {
        this.id = id;
-       this.reviewDate = reviewDate;
        this.text = text;
        this.actionCode = actionCode;
        this.lastUpdated = lastUpdated;
@@ -37,13 +35,6 @@ public class ReportSummary  implements java.io.Serializable {
     
     public void setId(ReportSummaryId id) {
         this.id = id;
-    }
-    public Date getReviewDate() {
-        return this.reviewDate;
-    }
-    
-    public void setReviewDate(Date reviewDate) {
-        this.reviewDate = reviewDate;
     }
     public String getText() {
         return this.text;

@@ -1,5 +1,5 @@
 // default package
-// Generated 28-May-2012 14:25:40 by Hibernate Tools 3.2.2.GA
+// Generated 11-Jun-2012 16:41:24 by Hibernate Tools 3.2.2.GA
 
 
 import java.util.Date;
@@ -11,14 +11,18 @@ public class Outcome  implements java.io.Serializable {
 
 
      private OutcomeId id;
-     private String judgementId;
-     private String judgementDate;
-     private String judgementReason;
-     private String judgementUserExperience;
-     private String judgementOtherEvidence;
-     private String judgementScoreId;
+     private String reviewReason;
+     private String userExperience;
+     private String otherEvidence;
      private String outcomeStatementId;
+     private String judgementStatementId;
      private String judgementSummary;
+     private String method;
+     private String inspectionTheme;
+     private String judgementReason;
+     private String complianceLevel;
+     private Character inspectionAnnounced;
+     private String source;
      private Character actionCode;
      private Date lastUpdated;
 
@@ -29,16 +33,20 @@ public class Outcome  implements java.io.Serializable {
     public Outcome(OutcomeId id) {
         this.id = id;
     }
-    public Outcome(OutcomeId id, String judgementId, String judgementDate, String judgementReason, String judgementUserExperience, String judgementOtherEvidence, String judgementScoreId, String outcomeStatementId, String judgementSummary, Character actionCode, Date lastUpdated) {
+    public Outcome(OutcomeId id, String reviewReason, String userExperience, String otherEvidence, String outcomeStatementId, String judgementStatementId, String judgementSummary, String method, String inspectionTheme, String judgementReason, String complianceLevel, Character inspectionAnnounced, String source, Character actionCode, Date lastUpdated) {
        this.id = id;
-       this.judgementId = judgementId;
-       this.judgementDate = judgementDate;
-       this.judgementReason = judgementReason;
-       this.judgementUserExperience = judgementUserExperience;
-       this.judgementOtherEvidence = judgementOtherEvidence;
-       this.judgementScoreId = judgementScoreId;
+       this.reviewReason = reviewReason;
+       this.userExperience = userExperience;
+       this.otherEvidence = otherEvidence;
        this.outcomeStatementId = outcomeStatementId;
+       this.judgementStatementId = judgementStatementId;
        this.judgementSummary = judgementSummary;
+       this.method = method;
+       this.inspectionTheme = inspectionTheme;
+       this.judgementReason = judgementReason;
+       this.complianceLevel = complianceLevel;
+       this.inspectionAnnounced = inspectionAnnounced;
+       this.source = source;
        this.actionCode = actionCode;
        this.lastUpdated = lastUpdated;
     }
@@ -50,47 +58,26 @@ public class Outcome  implements java.io.Serializable {
     public void setId(OutcomeId id) {
         this.id = id;
     }
-    public String getJudgementId() {
-        return this.judgementId;
+    public String getReviewReason() {
+        return this.reviewReason;
     }
     
-    public void setJudgementId(String judgementId) {
-        this.judgementId = judgementId;
+    public void setReviewReason(String reviewReason) {
+        this.reviewReason = reviewReason;
     }
-    public String getJudgementDate() {
-        return this.judgementDate;
-    }
-    
-    public void setJudgementDate(String judgementDate) {
-        this.judgementDate = judgementDate;
-    }
-    public String getJudgementReason() {
-        return this.judgementReason;
+    public String getUserExperience() {
+        return this.userExperience;
     }
     
-    public void setJudgementReason(String judgementReason) {
-        this.judgementReason = judgementReason;
+    public void setUserExperience(String userExperience) {
+        this.userExperience = userExperience;
     }
-    public String getJudgementUserExperience() {
-        return this.judgementUserExperience;
-    }
-    
-    public void setJudgementUserExperience(String judgementUserExperience) {
-        this.judgementUserExperience = judgementUserExperience;
-    }
-    public String getJudgementOtherEvidence() {
-        return this.judgementOtherEvidence;
+    public String getOtherEvidence() {
+        return this.otherEvidence;
     }
     
-    public void setJudgementOtherEvidence(String judgementOtherEvidence) {
-        this.judgementOtherEvidence = judgementOtherEvidence;
-    }
-    public String getJudgementScoreId() {
-        return this.judgementScoreId;
-    }
-    
-    public void setJudgementScoreId(String judgementScoreId) {
-        this.judgementScoreId = judgementScoreId;
+    public void setOtherEvidence(String otherEvidence) {
+        this.otherEvidence = otherEvidence;
     }
     public String getOutcomeStatementId() {
         return this.outcomeStatementId;
@@ -99,12 +86,61 @@ public class Outcome  implements java.io.Serializable {
     public void setOutcomeStatementId(String outcomeStatementId) {
         this.outcomeStatementId = outcomeStatementId;
     }
+    public String getJudgementStatementId() {
+        return this.judgementStatementId;
+    }
+    
+    public void setJudgementStatementId(String judgementStatementId) {
+        this.judgementStatementId = judgementStatementId;
+    }
     public String getJudgementSummary() {
         return this.judgementSummary;
     }
     
     public void setJudgementSummary(String judgementSummary) {
         this.judgementSummary = judgementSummary;
+    }
+    public String getMethod() {
+        return this.method;
+    }
+    
+    public void setMethod(String method) {
+        this.method = method;
+    }
+    public String getInspectionTheme() {
+        return this.inspectionTheme;
+    }
+    
+    public void setInspectionTheme(String inspectionTheme) {
+        this.inspectionTheme = inspectionTheme;
+    }
+    public String getJudgementReason() {
+        return this.judgementReason;
+    }
+    
+    public void setJudgementReason(String judgementReason) {
+        this.judgementReason = judgementReason;
+    }
+    public String getComplianceLevel() {
+        return this.complianceLevel;
+    }
+    
+    public void setComplianceLevel(String complianceLevel) {
+        this.complianceLevel = complianceLevel;
+    }
+    public Character getInspectionAnnounced() {
+        return this.inspectionAnnounced;
+    }
+    
+    public void setInspectionAnnounced(Character inspectionAnnounced) {
+        this.inspectionAnnounced = inspectionAnnounced;
+    }
+    public String getSource() {
+        return this.source;
+    }
+    
+    public void setSource(String source) {
+        this.source = source;
     }
     public Character getActionCode() {
         return this.actionCode;
