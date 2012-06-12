@@ -14,6 +14,9 @@ public class jdbcexample {
     	ApplicationContext context = 
     		new ClassPathXmlApplicationContext("spring.xml");
 
+	Object a = context.getBean("sysprops");
+        System.out.println(a);
+
 	JdbcTemplate jt = new JdbcTemplate();
         jt.setDataSource((DataSource)context.getBean("preview-delta"));
 
@@ -21,13 +24,14 @@ public class jdbcexample {
         System.out.println("Providers = " + rowCount);
 	//String s = (String)jt.queryForObject("select * from provider", String.class);
 
+/**
         List<String> postcodes = jt.query("select postcode from provider", new RowMapper() {
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
                    return resultSet.getString(1);
             }
         });
         System.out.println(postcodes);
-
+**/
 
 /** 
         CustomerDAO customerDAO = (CustomerDAO) context.getBean("customerDAO");

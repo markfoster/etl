@@ -73,7 +73,7 @@ public class parse {
                        String key = (String)i.next();
                        //if (key != "Provider" && key != "Location") continue;
                        //if (key != "Provider") continue;
-                       if (key != "Outcome") continue;
+                       if (key != "Service_User_Band") continue;
 		       String xmlFile = "xml/pp_" + key.toLowerCase() + "_xml.xml";
 		       String xsdFile = "xsd/PP_" + key.toUpperCase() + "_XML.xsd";
 		       //logger.info("Load and Validate (" + xmlFile + ", " + xsdFile + ")");

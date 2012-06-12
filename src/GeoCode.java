@@ -25,14 +25,14 @@ public class GeoCode {
         private static final String googleKey = "Y6D95O6w_dXHs58ve2ixLrSV8tU=";
         private static final String googleID  = "gme-carequalitycommission";
 
-
 	// URL prefix to the geocoder
         private static final String GEOCODER_REQUEST_PREFIX_FOR_XML = "http://maps.googleapis.com/maps/api/geocode/xml";
 
         public static void main(String[] args) {
 		GeoCode gc = new GeoCode();
-                //gc.getAddress("", "", "", postcode, "");
-                //gc.checkAddress(postcode);
+                String postcode = "RG263DN";
+                float[] latlng  = gc.getAddress("", "", "", "", postcode, "");
+		System.out.println("Coords for '" + postcode + "' = " + latlng);
 	}
 
         public float[] getAddress(String address1, 

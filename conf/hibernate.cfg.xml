@@ -29,10 +29,9 @@
       <mapping resource="RegisteredManager.hbm.xml"/> 
       <mapping resource="RegisteredManagerCondition.hbm.xml"/>
       <mapping resource="ReportSummary.hbm.xml"/>
-<!--
       <mapping resource="ServiceType.hbm.xml"/>
       <mapping resource="ServiceUserBand.hbm.xml"/>
--->
+      <mapping resource="VisitDate.hbm.xml"/>
 
     </session-factory>
 </hibernate-configuration>

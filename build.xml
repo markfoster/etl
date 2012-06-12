@@ -67,6 +67,18 @@
         </java>
     </target>
 
+   <target name="rungeo" depends="build">
+        <java classname="GeoCode" fork="true">
+        <!-- <java classname="DBTest" fork="true"> -->
+        <classpath path="build"/>
+        <classpath path="conf"/>
+        <classpath path="hbm"/>
+        <classpath>
+            <path refid="classpath" />
+        </classpath>
+        </java>
+    </target>
+
    <target name="rundb" depends="build">
         <java classname="jdbcexample" fork="true">
         <classpath path="build"/>
