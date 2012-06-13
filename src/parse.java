@@ -55,11 +55,12 @@ public class parse {
                 String xsd = fileToString("xsd/PP_AUDIT_XML.xsd");
 		String result = "";
                 try {
-                if (p.checkXML(xml) != null) System.out.println("XML is well formed");
+                	if (p.checkXML(xml) != null) 
+                            System.out.println("XML is well formed");
                     	p.checkXSD(xsd);
  			p.validateXML(xml, xsd);
                 } catch (Exception ex) {
-                	System.out.println("Audit XML issues: " + ex.getMessage());
+                	System.err.println("Audit XML issues: " + ex.getMessage());
 			System.exit(0);
 		}
 
@@ -90,7 +91,7 @@ public class parse {
 			   p.loadXML(doc, key);
 			   //p.checkData(doc, (Map)audits.get(key));
 		       } catch (Exception ex) {
-			   System.out.println("Invalid XML: " + ex.getMessage());
+			   System.err.println("Invalid XML: " + ex.getMessage());
                            System.exit(0);
 		       }
                        //System.out.print(key + ": ");
@@ -229,16 +230,19 @@ public class parse {
                 logger.info("Loading XML into delta database : " + entity);
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowAsString = df.format(new Date());
-        System.out.println("Now = " + nowAsString);
+        logger.info("Now = " + nowAsString);
                 try {
 			Session session = HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
                         //Session session = HibernateUtil.currentSession();
+                        logger.info("Node selection starts");
                         List list = doc.selectNodes("//" + entity);
+                        logger.info("Node selection complete");
+                        logger.info("Load starting...");
                         for (Iterator iter = list.iterator(); iter.hasNext(); ) {
                              Object obj = iter.next();
                              Element e = (Element)obj;
 
-                             org.hibernate.util.XMLHelper.dump(e);
+                             //org.hibernate.util.XMLHelper.dump(e);
 
                              Element eUpdated = DocumentHelper.createElement("Last_Updated");
 			     eUpdated.setText(nowAsString);
@@ -314,7 +318,7 @@ public class parse {
                 Map<String, String> attrMap = new HashMap<String, String>();
 		for (Iterator i = e.attributeIterator(); i.hasNext(); ) {
                      Attribute attribute = (Attribute)i.next();
-            	     System.out.println(e.getName() + " : " + attribute.getName() + "=" + attribute.getValue());
+            	     logger.info(e.getName() + " : " + attribute.getName() + "=" + attribute.getValue());
                      attrMap.put((String)attribute.getName(), (String)attribute.getValue());
         	}
                 map.put(e.getName(), attrMap);
