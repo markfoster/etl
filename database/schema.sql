@@ -30,7 +30,7 @@ CREATE TABLE `chapter` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`chapter_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,7 +69,7 @@ CREATE TABLE `location` (
   `user_experience` longtext,
   `website` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +90,7 @@ CREATE TABLE `location_condition` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`condition_id`,`regulated_activity_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,7 +107,7 @@ CREATE TABLE `location_regulated_activity` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`regulated_activity_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,7 +122,7 @@ CREATE TABLE `lookup` (
   `location_id` varchar(50) NOT NULL,
   `nid` int(11) NOT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`nid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -139,7 +139,7 @@ CREATE TABLE `nominated_individual` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`regulated_activity_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -169,7 +169,7 @@ CREATE TABLE `outcome` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`outcome_number`,`report_publication_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -186,7 +186,7 @@ CREATE TABLE `partner` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`partner_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,7 +222,7 @@ CREATE TABLE `provider` (
   `under_review_text` varchar(255) DEFAULT NULL,
   `website` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`provider_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -241,7 +241,7 @@ CREATE TABLE `provider_condition` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`condition_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -257,7 +257,7 @@ CREATE TABLE `provider_regulated_activity` (
   `action_code` varchar(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`regulated_activity_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='	';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='	';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -277,7 +277,7 @@ CREATE TABLE `registered_manager` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`registered_manager_id`,`regulated_activity_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -297,7 +297,7 @@ CREATE TABLE `registered_manager_condition` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`registered_manager_id`,`regulated_activity_number`,`condition_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -315,7 +315,7 @@ CREATE TABLE `report_summary` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`report_publication_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -332,7 +332,7 @@ CREATE TABLE `service_type` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`service_type_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -349,7 +349,7 @@ CREATE TABLE `service_user_band` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`service_user_band_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -368,7 +368,7 @@ CREATE TABLE `visit_date` (
   `action_code` char(1) DEFAULT NULL,
   `last_updated` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`provider_id`,`location_id`,`outcome_number`,`report_publication_date`,`visit_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -380,4 +380,4 @@ CREATE TABLE `visit_date` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-06-12 16:39:54
+-- Dump completed on 2012-06-13  9:41:17

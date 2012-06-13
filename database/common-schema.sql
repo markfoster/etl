@@ -29,7 +29,7 @@ CREATE TABLE `geocode_cache` (
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(10,8) DEFAULT NULL,
   PRIMARY KEY (`location_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `process_state` (
   `update_id` timestamp NULL DEFAULT NULL,
   `run_id` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`entity`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -59,7 +59,7 @@ CREATE TABLE `variable` (
   `name` varchar(128) NOT NULL,
   `value` longtext,
   PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -82,7 +82,7 @@ CREATE TABLE `watchdog` (
   `hostname` varchar(128) DEFAULT NULL,
   `timestamp` int(11) DEFAULT NULL,
   PRIMARY KEY (`wid`,`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -96,7 +96,7 @@ CREATE TABLE `websitelookupcategory` (
   `idWebsiteLookupCategory` int(11) NOT NULL,
   `LookupText` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idWebsiteLookupCategory`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -112,7 +112,7 @@ CREATE TABLE `websitelookuptext` (
   `key` varchar(30) DEFAULT NULL,
   `value` longtext,
   PRIMARY KEY (`idWebsiteLookupText`,`idWebsiteLookupCategory`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -124,4 +124,4 @@ CREATE TABLE `websitelookuptext` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-06-12 10:44:10
+-- Dump completed on 2012-06-13  9:41:26
