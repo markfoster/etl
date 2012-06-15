@@ -11,6 +11,7 @@
 
     <!-- Path to required library files. -->
     <property name="lib.dir" value="lib" />
+    <property name="run.module" value="ProcessState" />
 
     <path id="classpath" >
         <fileset dir="${lib.dir}">
@@ -81,6 +82,16 @@
 
    <target name="rundb" depends="build">
         <java classname="jdbcexample" fork="true">
+        <classpath path="build"/>
+        <classpath path="conf"/>
+        <classpath>
+            <path refid="classpath" />
+        </classpath>
+        </java>
+    </target>
+
+   <target name="runp" depends="build">
+        <java classname="${run.module}" fork="true">
         <classpath path="build"/>
         <classpath path="conf"/>
         <classpath>

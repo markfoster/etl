@@ -40,6 +40,9 @@ public class parse {
 	//Logger logger = Logger.getLogger(this.getClass().getName());
 	Logger logger = Logger.getLogger("stdout");
 
+        private Session g_session;
+        private String  g_nowAsString; 
+
         public static void main(String[] arg) throws IOException {
 
                 HibernateUtil.buildSessionFactory();
@@ -74,7 +77,7 @@ public class parse {
                        String key = (String)i.next();
                        //if (key != "Provider" && key != "Location") continue;
                        //if (key != "Provider") continue;
-                       if (key != "Service_User_Band") continue;
+                       if (key != "Chapter") continue;
 		       String xmlFile = "xml/pp_" + key.toLowerCase() + "_xml.xml";
 		       String xsdFile = "xsd/PP_" + key.toUpperCase() + "_XML.xsd";
 		       //logger.info("Load and Validate (" + xmlFile + ", " + xsdFile + ")");
@@ -227,6 +230,66 @@ public class parse {
        }
 
        public boolean loadXML(Document doc, String entity) {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String nowAsString = df.format(new Date());
+        logger.info("Now = " + nowAsString);
+              g_nowAsString = nowAsString;
+	      Session session = HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
+              g_session = session;
+              treeWalk(doc, entity);
+              return true;
+       }
+
+	/**
+	 * Walk the tree 
+	 * @param document
+	 * @param entity
+	 */
+    private void treeWalk(Document document, String entity) {
+        treeWalk(document.getRootElement(), entity);
+    }
+
+	/**
+	 * Walk the tree 
+	 * @param document
+	 * @param entity
+	 */
+    private void treeWalk(Element element, String entity) {
+        for (int i = 0, size = element.nodeCount(); i < size; i++) {
+            Node node = element.node(i);
+            if (node instanceof Element) {
+                Element e = (Element)node;
+                if (e.getName().equals(entity)) {
+                    System.out.println("treeWalk 1 element = " + e.getName() + "; " + e.getText());
+                    treeProcess(e);
+		}
+                else
+                   treeWalk((Element)node, entity);
+            } else {
+                //System.out.println("treeWalk element = " + node.getName() + "; " + node.getText());
+                //org.hibernate.util.XMLHelper.dump(node);
+                //treeProcess(element);
+            }
+        }
+    }	
+
+    private void treeProcess(Element element) {
+        Element eUpdated = DocumentHelper.createElement("Last_Updated");
+	eUpdated.setText(g_nowAsString);
+        element.add(eUpdated);
+        //org.hibernate.util.XMLHelper.dump(element);
+        try {
+           Transaction tx = g_session.beginTransaction();
+           g_session.save(element);
+           tx.commit();
+           //session.evict(obj);
+           //session.flush();
+        } catch (Exception ex) {
+           logger.error("Error", ex);
+        }
+    }
+
+       public boolean loadXML(Document doc, String entity, int i) {
                 logger.info("Loading XML into delta database : " + entity);
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowAsString = df.format(new Date());

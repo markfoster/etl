@@ -1,35 +1,3 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <List_Of_Registered_Manager xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Registered_Manager>
-    <Provider_Id>1-101694312</Provider_Id>
-    <Location_Id>1-311928959</Location_Id>
-    <Regulated_Activity_Number>RA1</Regulated_Activity_Number>
-    <Registered_Manager_Id>1-288721888</Registered_Manager_Id>
-    <Name>Mr. Stuart Smith</Name>
-    <Action_Code>I</Action_Code>
-  </Registered_Manager>
-  <Registered_Manager>
-    <Provider_Id>1-101728486</Provider_Id>
-    <Location_Id>1-120960209</Location_Id>
-    <Regulated_Activity_Number>RA8</Regulated_Activity_Number>
-    <Registered_Manager_Id>1-836-180</Registered_Manager_Id>
-    <Name>Miss Jacqueline hall</Name>
-    <Action_Code>I</Action_Code>
-  </Registered_Manager>
-  <Registered_Manager>
-    <Provider_Id>1-146365379</Provider_Id>
-    <Location_Id>1-272007245</Location_Id>
-    <Regulated_Activity_Number>RA1</Regulated_Activity_Number>
-    <Registered_Manager_Id>1-109543268</Registered_Manager_Id>
-    <Name>Mrs. Anita Mary Briggs</Name>
-    <Action_Code>I</Action_Code>
-  </Registered_Manager>
-  <Registered_Manager>
-    <Provider_Id>1-102642921</Provider_Id>
-    <Location_Id>1-131820373</Location_Id>
-    <Regulated_Activity_Number>RA2</Regulated_Activity_Number>
-    <Registered_Manager_Id>1-132630580</Registered_Manager_Id>
-    <Name>Mrs. anon Odebode</Name>
-    <Action_Code>I</Action_Code>
-  </Registered_Manager>
 </List_Of_Registered_Manager>

@@ -14,11 +14,16 @@ import org.xml.sax.InputSource;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.util.*;
 
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
+import javax.sql.DataSource;
 
 public class GeoCode {
 
@@ -34,6 +39,44 @@ public class GeoCode {
                 float[] latlng  = gc.getAddress("", "", "", "", postcode, "");
 		System.out.println("Coords for '" + postcode + "' = " + latlng);
 	}
+
+        /**
+        * getAddress
+        * @param postcode - a valid postal code
+        * @return float[] - latitude and longitude coordinates
+        * Get the address coordinate details from a postalcode
+        */
+        public static float[] getAddress(String postcode) {
+                float[] latlng = {0.0f, 0.0f};
+                try {
+                    latlng = getCache(postcode);
+                } catch (Exception ex) {
+                }
+
+               	float lat = 0.0f;
+                float lng = 0.0f;
+                ApplicationContext context = SpringUtils.getApplicationContext();
+                JdbcTemplate jT_Common = new JdbcTemplate();
+                jT_Common.setDataSource((DataSource)context.getBean("common"));
+
+                String sql = "SELECT latitude, longitude FROM geocode_cache WHERE postcode = '" + postcode + "'";
+                List coords = jT_Common.queryForList(sql);
+                if (!coords.isEmpty() && coords.size() == 1) {
+                    Map map = (Map)coords.get(0); 
+                    lat = ((java.math.BigDecimal)map.get("latitude")).floatValue();
+                    lng = ((java.math.BigDecimal)map.get("longitude")).floatValue();
+                } else {
+	            //float[] ilatlng = getAddress("", "", "", "", postcode, "");
+	            float[] ilatlng = {1.0f, 2.0f};
+                    lat = ilatlng[0];
+                    lng = ilatlng[1];
+	            //latlng = getAddress("", "", "", "", postcode, "");
+                }
+                //System.out.println("Coords = " + coords);
+	        //float[] latlng = getAddress("", "", "", "", postcode, "");
+	        //float[] latlng = {lat, lng};
+                return latlng;
+        }
 
         public float[] getAddress(String address1, 
                                   String address2, 
@@ -87,7 +130,7 @@ public class GeoCode {
 
                 } catch (Exception e) {
                         // unable to connect to api - need to put error handling in here
-                        String errorMsg = "Unable to connect to Google API" + e.toString();
+                        String errorMsg = "Unable to connect to Google API : " + e.toString();
                         System.out.println(e);
                 }
                 finally {
@@ -101,11 +144,13 @@ public class GeoCode {
                 NodeList resultNodeList = null;
                 // b) extract the locality for the first result
                 try {
-			resultNodeList = (NodeList) xpath.evaluate("/GeocodeResponse/status", geocoderResultDocument, XPathConstants.NODESET);
+			resultNodeList = (NodeList)xpath.evaluate("/GeocodeResponse/status", geocoderResultDocument, XPathConstants.NODESET);
 			System.out.println(resultNodeList.item(0).getTextContent());
 			if ("OK".equals(resultNodeList.item(0).getTextContent())) {
 				// Extract the coordinates of the first result
-				resultNodeList = (NodeList) xpath.evaluate("/GeocodeResponse/result[1]/geometry/location/*", geocoderResultDocument, XPathConstants.NODESET);
+				resultNodeList = (NodeList) xpath.evaluate("/GeocodeResponse/result[1]/geometry/location/*", 
+                                                                           geocoderResultDocument, 
+                                                                           XPathConstants.NODESET);
 				lat = Float.NaN;
 				lng = Float.NaN;
 				for(int i=0; i<resultNodeList.getLength(); ++i) {
@@ -131,6 +176,32 @@ public class GeoCode {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
+
+                // update the cache
+                setCache(postcode, coord);
         	return coord;
 	}
+
+        private static float[] getCache(String postcode) throws Exception {
+                float lat = 0.0f;
+                float lng = 0.0f;
+                ApplicationContext context = SpringUtils.getApplicationContext();
+                JdbcTemplate jT_Common = new JdbcTemplate();
+                jT_Common.setDataSource((DataSource)context.getBean("common"));
+                String sql = "SELECT latitude, longitude FROM geocode_cache WHERE postcode = '" + postcode + "'";
+                List coords = jT_Common.queryForList(sql);
+                if (!coords.isEmpty() && coords.size() == 1) {
+                    Map map = (Map)coords.get(0);
+                    lat = ((java.math.BigDecimal)map.get("latitude")).floatValue();
+                    lng = ((java.math.BigDecimal)map.get("longitude")).floatValue();
+                } else {
+                    throw new Exception("no cache value found");
+                }
+                float[] latlng = {lat, lng};
+                return latlng;
+        }
+
+        private static void setCache(String postcode, float[] coords) {
+        }
+
 }
