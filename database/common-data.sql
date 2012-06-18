@@ -52,9 +52,9 @@ DROP TABLE IF EXISTS `process_state`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `process_state` (
   `entity` varchar(30) NOT NULL,
-  `state` varchar(20) DEFAULT NULL,
+  `state` varchar(40) DEFAULT NULL,
   `update_id` timestamp NULL DEFAULT NULL,
-  `run_id` varchar(10) DEFAULT NULL,
+  `run_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`entity`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -65,7 +65,7 @@ CREATE TABLE `process_state` (
 
 LOCK TABLES `process_state` WRITE;
 /*!40000 ALTER TABLE `process_state` DISABLE KEYS */;
-INSERT INTO `process_state` VALUES ('Location','FULL','2012-06-01 08:25:19','0001'),('Provider','FULL','2012-06-01 08:25:19','0001'),('System','IDLE','2012-06-01 08:25:19','0001');
+INSERT INTO `process_state` VALUES ('Location','FULL','2012-06-01 08:25:19',1),('Provider','FULL','2012-06-01 08:25:19',1),('System','IDLE','2012-06-01 08:25:19',1),('Chapter','FULL','2012-06-15 16:51:55',1),('Visit_Date','FULL','2012-06-15 16:51:55',1),('Lock','CLEAR','2012-06-15 17:00:32',1);
 /*!40000 ALTER TABLE `process_state` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -100,7 +100,7 @@ DROP TABLE IF EXISTS `watchdog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `watchdog` (
-  `wid` int(11) NOT NULL,
+  `wid` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
   `type` varchar(16) DEFAULT NULL,
   `message` longtext,
@@ -110,9 +110,9 @@ CREATE TABLE `watchdog` (
   `location` text,
   `referer` text,
   `hostname` varchar(128) DEFAULT NULL,
-  `timestamp` int(11) DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`wid`,`uid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -121,6 +121,7 @@ CREATE TABLE `watchdog` (
 
 LOCK TABLES `watchdog` WRITE;
 /*!40000 ALTER TABLE `watchdog` DISABLE KEYS */;
+INSERT INTO `watchdog` VALUES (1,500,'Parse','Parse error',NULL,2,'PREV',NULL,NULL,NULL,'2012-06-13 18:40:21');
 /*!40000 ALTER TABLE `watchdog` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -181,4 +182,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-06-13  9:41:39
+-- Dump completed on 2012-06-18 17:53:39
