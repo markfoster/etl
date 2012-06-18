@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 24-May-2012 10:56:36 by Hibernate Tools 3.2.2.GA -->
+<hibernate-mapping>
+    <class name="Nominated_Individual" table="nominated_individual" catalog="preview_delta">
+        <composite-id>
+            <key-property name="providerId" type="string" node="Provider_Id">
+                <column name="provider_id" length="50" />
+            </key-property>
+
+            <key-property name="regulatedActivityNumber" type="string" node="Regulated_Activity_Number">
+                <column name="regulated_activity_number" length="10" />
+            </key-property>
+        </composite-id>
+
+        <property name="name" type="string" node="Name">
+            <column name="name" length="115" />
+        </property>
+
+        <property name="actionCode" type="java.lang.Character" node="Action_Code">
+            <column name="action_code" length="1" />
+        </property>
+
+        <property name="lastUpdated" type="timestamp" node="Last_Updated">
+            <column name="last_updated" length="19" />
+        </property>
+    </class>
+</hibernate-mapping>
+
