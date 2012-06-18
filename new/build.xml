@@ -1,0 +1,176 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" default="build">
+
+<condition property="shared_lib.dir" value="/e">
+<os family="windows" />
+</condition>
+
+<condition property="shared_lib.dir" value="/usr/share/java">
+<os family="unix" />
+</condition>
+
+
+    <!-- Path to required library files. -->
+    <property name="lib.dir" value="lib" />
+    <property name="run.module" value="ProcessState" />
+
+    <path id="classpath" >
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="conf"/>
+        <fileset dir="build"/>
+	<!--
+        <fileset dir="${shared_lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+	-->
+    </path>
+
+<path id="toolslib">
+ <path location="lib/hibernate-tools-3.2.4.GA.jar" />
+ <path location="lib/hibernate3.jar" />
+ <path location="lib/freemarker.jar" />
+ <path location="${jdbc.driver.jar}" />
+</path>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="build">
+        <mkdir dir="build"/>
+        <javac srcdir="src" destdir="build" includeantruntime="false" debug="on" debuglevel="lines,vars,source">
+          <classpath>
+            <path refid="classpath" />
+          </classpath>
+          <!-- <compilerarg value="-Xlint:unchecked" /> -->
+        </javac>
+    </target>
+
+    <target name="jar" depends="build">
+        <mkdir dir="build/jar"/>
+        <jar destfile="build/jar/test.jar" basedir="build">
+            <manifest>
+                <attribute name="Main-Class" value="HelloWorld"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="build">
+        <java classname="parse" fork="true">
+        <!-- <java classname="DBTest" fork="true"> -->
+        <classpath path="build"/>
+        <classpath path="conf"/>
+        <classpath path="hbm"/>
+	<classpath>
+            <path refid="classpath" />
+        </classpath>
+        </java>
+    </target>
+
+   <target name="rungeo" depends="build">
+        <java classname="GeoCode" fork="true">
+        <!-- <java classname="DBTest" fork="true"> -->
+        <classpath path="build"/>
+        <classpath path="conf"/>
+        <classpath path="hbm"/>
+        <classpath>
+            <path refid="classpath" />
+        </classpath>
+        </java>
+    </target>
+
+   <target name="rundb" depends="build">
+        <java classname="jdbcexample" fork="true">
+        <classpath path="build"/>
+        <classpath path="conf"/>
+        <classpath>
+            <path refid="classpath" />
+        </classpath>
+        </java>
+    </target>
+
+   <target name="runp" depends="build">
+        <java classname="${run.module}" fork="true">
+        <classpath path="build"/>
+        <classpath path="conf"/>
+        <classpath>
+            <path refid="classpath" />
+        </classpath>
+        </java>
+    </target>
+
+<target name="gen-java" description="Generate Java files from schema" depends="build">
+  <!-- task definition; project.class.path contains all necessary libs -->
+  <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask">
+    <classpath>
+       <fileset dir="lib">
+	  <include name="**/*.jar" />
+       </fileset>
+    </classpath>
+  </taskdef>
+  <hibernatetool destdir="export/src"> <!-- check that directory exists -->
+	<classpath>
+	  <path location="hbm"/>
+	       <fileset dir="lib">
+		  <include name="**/*.jar" />
+	       </fileset>
+	 </classpath>
+	<jdbcconfiguration
+            configurationfile="conf/hibernate.cfg.xml"
+            revengfile="conf/hibernate.reveng.xml"
+            detectmanytomany="true">
+        </jdbcconfiguration>
+    <hbm2java jdk5="true" />
+  </hibernatetool>
+</target>
+
+<target name="gen-hbm" description="Generate HBM files from schema" depends="build">
+  <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask">
+    <classpath>
+       <fileset dir="lib">
+	  <include name="**/*.jar" />
+       </fileset>
+    </classpath>
+  </taskdef>
+  <hibernatetool destdir="export/hbm">
+	<classpath>
+	  <path location="hbm"/>
+	       <fileset dir="lib">
+		  <include name="**/*.jar" />
+	       </fileset>
+	 </classpath>
+	<jdbcconfiguration
+            configurationfile="conf/hibernate.cfg.xml"
+            revengfile="conf/hibernate.reveng.xml"
+            detectmanytomany="true">
+        </jdbcconfiguration>
+    <hbm2hbmxml/>
+  </hibernatetool>
+</target>
+
+<target name="download-jars">
+    <ivy:retrieve/>
+</target>
+
+<target name="genxml">
+  <taskdef name="xmlbean" classname="org.apache.xmlbeans.impl.tool.XMLBean">
+    <classpath>
+       <fileset dir="lib">
+          <include name="**/*.jar" />
+       </fileset>
+    </classpath>
+  </taskdef>
+
+        <xmlbean
+            schema="xsd/PP_AUDIT_XML.xsd"
+            srcgendir="output"
+            classgendir="output"
+            srconly="true"
+            download="true"
+            source="1.4"
+            debug="true" verbose="true"
+        />
+  </target>
+
+</project>
