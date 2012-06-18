@@ -41,9 +41,9 @@ DROP TABLE IF EXISTS `process_state`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `process_state` (
   `entity` varchar(30) NOT NULL,
-  `state` varchar(20) DEFAULT NULL,
+  `state` varchar(40) DEFAULT NULL,
   `update_id` timestamp NULL DEFAULT NULL,
-  `run_id` varchar(10) DEFAULT NULL,
+  `run_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`entity`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -70,7 +70,7 @@ DROP TABLE IF EXISTS `watchdog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `watchdog` (
-  `wid` int(11) NOT NULL,
+  `wid` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
   `type` varchar(16) DEFAULT NULL,
   `message` longtext,
@@ -80,9 +80,9 @@ CREATE TABLE `watchdog` (
   `location` text,
   `referer` text,
   `hostname` varchar(128) DEFAULT NULL,
-  `timestamp` int(11) DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`wid`,`uid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -124,4 +124,4 @@ CREATE TABLE `websitelookuptext` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-06-13  9:41:26
+-- Dump completed on 2012-06-18 18:42:44
