@@ -5,13 +5,15 @@
 <hibernate-mapping>
     <class name="Location" table="location" catalog="preview_delta">
 
-        <id name="locationId" type="string" node="Location_Id">
-            <column name="location_id" length="50" />
-        </id>
+        <composite-id>
+            <key-property name="providerId" type="string" node="Provider_Id">
+                <column name="provider_id" length="50" />
+            </key-property>
 
-        <property name="providerId" type="string" node="Provider_Id">
-            <column name="provider_id" length="50" />
-        </property>
+            <key-property name="locationId" type="string" node="Location_Id">
+                <column name="location_id" length="50" />
+            </key-property>
+        </composite-id>
 
         <property name="aboutLocation" type="string" node="About_Location">
             <column name="about_location" />
