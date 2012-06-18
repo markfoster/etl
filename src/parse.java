@@ -77,7 +77,7 @@ public class parse {
                        String key = (String)i.next();
                        //if (key != "Provider" && key != "Location") continue;
                        //if (key != "Provider") continue;
-                       if (key != "Chapter") continue;
+                       if (key != "Visit_Date") continue;
 		       String xmlFile = "xml/pp_" + key.toLowerCase() + "_xml.xml";
 		       String xsdFile = "xsd/PP_" + key.toUpperCase() + "_XML.xsd";
 		       //logger.info("Load and Validate (" + xmlFile + ", " + xsdFile + ")");
@@ -260,7 +260,7 @@ public class parse {
             if (node instanceof Element) {
                 Element e = (Element)node;
                 if (e.getName().equals(entity)) {
-                    System.out.println("treeWalk 1 element = " + e.getName() + "; " + e.getText());
+                    //System.out.println("treeWalk 1 element = " + e.getName() + "; " + e.getText());
                     treeProcess(e);
 		}
                 else
@@ -277,13 +277,22 @@ public class parse {
         Element eUpdated = DocumentHelper.createElement("Last_Updated");
 	eUpdated.setText(g_nowAsString);
         element.add(eUpdated);
-        //org.hibernate.util.XMLHelper.dump(element);
+        org.hibernate.util.XMLHelper.dump(element);
         try {
            Transaction tx = g_session.beginTransaction();
-           g_session.save(element);
+           Element eAction = element.element("Action_Code");
+           String actionCode = eAction.getText();
+           if (actionCode.equals("I"))
+               g_session.save(element);
+           if (actionCode.equals("U"))
+               g_session.saveOrUpdate(element);
+           if (actionCode.equals("D"))
+               g_session.save(element);
            tx.commit();
            //session.evict(obj);
            //session.flush();
+        } catch (org.hibernate.JDBCException ex) {
+           logger.error("Error processing " + element.getName() + " : " + ex.getSQLException().getMessage());
         } catch (Exception ex) {
            logger.error("Error", ex);
         }

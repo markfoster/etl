@@ -20,6 +20,10 @@
             <key-property name="reportPublicationDate" type="string" node="Report_Publication_Date">
                 <column name="report_publication_date" length="20" />
             </key-property>
+
+            <key-property name="visitDate" type="string" node="Visit_Date">
+                <column name="visit_date" length="20" />
+            </key-property>
         </composite-id>
 
         <property name="actionCode" type="java.lang.Character" node="Action_Code">

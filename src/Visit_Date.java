@@ -107,7 +107,6 @@ return ( (this.getProviderId()==castOther.getProviderId()) || ( this.getProvider
 
    public int hashCode() {
          int result = 17;
-
          result = 37 * result + ( getProviderId() == null ? 0 : this.getProviderId().hashCode() );
          result = 37 * result + ( getLocationId() == null ? 0 : this.getLocationId().hashCode() );
          result = 37 * result + ( getOutcomeNumber() == null ? 0 : this.getOutcomeNumber().hashCode() );
