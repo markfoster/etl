@@ -16,12 +16,18 @@ public class HibernateUtil {
     public static final ThreadLocal sessionMapsThreadLocal = new ThreadLocal();
 
      private static SessionFactory sessionFactory;
+     private static Configuration configuration;
+
      static {
          try {
              sessionFactory = new Configuration().configure().buildSessionFactory();
         } catch (Throwable ex) {
              throw new ExceptionInInitializerError(ex);
          }
+     }
+
+     public static Configuration getConfiguration() {
+         return configuration;
      }
 
      public static SessionFactory getSessionFactory() {
@@ -109,7 +115,8 @@ public class HibernateUtil {
         String key = "default";
         try {
             // Create the SessionFactory
-            SessionFactory sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
+            configuration = new Configuration().configure("hibernate.cfg.xml");
+            SessionFactory sessionFactory = configuration.buildSessionFactory();
             sessionFactoryMap.put(key, sessionFactory);
         } catch (Throwable ex) {
             log.error("Initial SessionFactory creation failed.", ex);
