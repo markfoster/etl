@@ -44,14 +44,24 @@ public class parse {
 
 	// Logger logger = Logger.getLogger(this.getClass().getName());
 	Logger logger = Logger.getLogger("stdout");
+        String basedir = "";
+        Properties sysprops = null;
 
 	private Session g_session;
 	private String g_nowAsString;
 
 	public static void main(String[] arg) throws IOException {
+		parse p = new parse();
+                p.run();
+        }
+
+	public void run() {
 
 		HibernateUtil.buildSessionFactory();
-		parse p = new parse();
+		sysprops = (Properties)SpringUtil.getApplicationContext().getBean("sysprops");
+                basedir = sysprops.getProperty("basedir");
+
+                //if (true) System.exit(0);
 
 		// p.saveEntity("Location");
 		// if (true) System.exit(0);
@@ -60,48 +70,51 @@ public class parse {
 		// if (p.checkXML(xml) != null)
 		// System.out.println("XML is well formed");
 
-		String xml = fileToString("xml/pp_audit_xml.xml");
-		String xsd = fileToString("xsd/PP_AUDIT_XML.xsd");
+		String xml = "";
+		String xsd = "";
 		String result = "";
 		try {
-			if (p.checkXML(xml) != null)
-				System.out.println("XML is well formed");
-			p.checkXSD(xsd);
-			p.validateXML(xml, xsd);
+                        System.out.println(basedir+"/xml/pp_audit_xml.xml");
+		        xml = fileToString(basedir+"/xml/pp_audit_xml.xml");
+		        xsd = fileToString(basedir+"/xsd/PP_AUDIT_XML.xsd");
+			if (checkXML(xml) != null)
+			    System.out.println("XML is well formed");
+			checkXSD(xsd);
+			validateXML(xml, xsd);
 		} catch (Exception ex) {
-			System.err.println("Audit XML issues: " + ex.getMessage());
+			System.out.println("Audit XML issues: " + ex.getMessage());
 			System.exit(0);
 		}
 
 		Map<String, Document> docs = new HashMap();
 
 		// Parse the audit file
-		Map audits = p.parse(xml);
+		Map audits = parse(xml);
 		Set keys = audits.keySet();
 		Iterator i = keys.iterator();
 		while (i.hasNext()) {
 			String key = (String) i.next();
 			// if (key != "Provider" && key != "Location") continue;
 			// if (key != "Provider") continue;
-			if (key != "Chapter")
+			if (key != "Outcome1")
 				continue;
-			String xmlFile = "xml/pp_" + key.toLowerCase() + "_xml.xml";
-			String xsdFile = "xsd/PP_" + key.toUpperCase() + "_XML.xsd";
+			String xmlFile = basedir+"/xml/pp_" + key.toLowerCase() + "_xml.xml";
+			String xsdFile = basedir+"/xsd/PP_" + key.toUpperCase() + "_XML.xsd";
 			// logger.info("Load and Validate (" + xmlFile + ", " + xsdFile +
 			// ")");
 			System.out.println("Load and Validate (" + xmlFile + ", " + xsdFile
 					+ ")");
-			xml = fileToString(xmlFile);
-			xsd = fileToString(xsdFile);
 			Document doc = null;
 			try {
-				doc = p.checkXML(xml);
+			        xml = fileToString(xmlFile);
+			        xsd = fileToString(xsdFile);
+				doc = checkXML(xml);
 				docs.put(key, doc);
-				p.checkXSD(xsd);
-				p.validateXML(xml, xsd);
+				checkXSD(xsd);
+				validateXML(xml, xsd);
 				// p.validateActions(key, xml, (Map)audits.get(key));
 				// p.test(doc, key);
-				p.loadXML(doc, key);
+				loadXML(doc, key);
 				// p.checkData(doc, (Map)audits.get(key));
 			} catch (Exception ex) {
 				System.err.println("Invalid XML: " + ex.getMessage());
@@ -110,10 +123,8 @@ public class parse {
 			// System.out.print(key + ": ");
 			// System.out.println(smap.get(key));
 		}
-
-		int updates = Integer.parseInt("1");
-		System.out.println("Updates = " + updates);
-
+		//int updates = Integer.parseInt("1");
+		//System.out.println("Updates = " + updates);
 		// p.saveEntity("Location");
 		// p.saveOutcomes();
 		// p.readGeocodes();
@@ -319,7 +330,7 @@ public class parse {
 		element.add(eUpdated);
 		try {
 			Transaction tx = g_session.beginTransaction();
-			// g_session.save(element);
+			g_session.saveOrUpdate(element);
 			tx.commit();
 			g_session.evict(element);
 			g_session.flush();
@@ -504,7 +515,7 @@ public class parse {
 	 *            The file to be turned into a String
 	 * @return The file as String encoded in the platform default encoding
 	 */
-	private static String fileToString(String file) throws IOException {
+	private String fileToString(String file) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line = null;
 		StringBuilder stringBuilder = new StringBuilder();

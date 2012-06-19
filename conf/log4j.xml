@@ -12,7 +12,7 @@
     <appender name="rolling-file" class="org.apache.log4j.RollingFileAppender">
         <param name="file" value="etl.log"/>
         <param name="Threshold" value="info"/>
-        <param name="MaxFileSize" value="1000KB"/>
+        <param name="MaxFileSize" value="6000KB"/>
         <param name="MaxBackupIndex" value="4"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d [%t] %-5p %l - %m%n"/>
@@ -20,12 +20,16 @@
     </appender>
 
   <category name="org.hibernate.SQL">  
-    <priority value="TRACE"/>  
+    <priority value="warn"/>  
   </category>  
    
   <category name="org.hibernate.type">  
-    <priority value="TRACE"/>  
+    <priority value="warn"/>  
   </category>  
+
+    <logger name="org.hibernate">
+        <level value="warn" />
+    </logger>
 
     <root>
         <priority value ="debug" />

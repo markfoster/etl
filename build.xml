@@ -94,6 +94,7 @@
         <java classname="${run.module}" fork="true">
         <classpath path="build"/>
         <classpath path="conf"/>
+        <classpath path="hbm"/>
         <classpath>
             <path refid="classpath" />
         </classpath>
