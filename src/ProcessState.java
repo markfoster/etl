@@ -13,9 +13,16 @@ public class ProcessState {
      public static final String SYSTEM 			= "System";
      public static final String LOCK   			= "Lock";
 
-     public static final String IDLE 			= "IDLE";
-     public static final String PREVIEW_DELTA_LOAD 	= "PREVIEW_DELTA_LOAD";
-     public static final String PREVIEW_DELTA_COMPLETE  = "PREVIEW_DELTA_COMPLETE";
+     public static final String IDLE 			      = "IDLE";
+     public static final String PREVIEW_DELTA_IN_PROGRESS     = "PREVIEW_DELTA_IN_PROGRESS";    
+     public static final String PREVIEW_DELTA_COMPLETE        = "PREVIEW_DELTA_COMPLETE";       
+     public static final String PREVIEW_DRUPAL_IN_PROGRESS    = "PREVIEW_DRUPAL_IN_PROGRESS";   
+     public static final String PREVIEW_DRUPAL_COMPLETE       = "PREVIEW_DRUPAL_COMPLETE";      
+     public static final String PRODUCTION_LOAD_TRIGGER       = "PRODUCTION_LOAD_TRIGGER";      
+     public static final String PRODUCTION_PP_IN_PROGRESS     = "PRODUCTION_PP_IN_PROGRESS";    
+     public static final String PRODUCTION_PP_COMPLETE        = "PRODUCTION_PP_COMPLETE";       
+     public static final String PRODUCTION_DRUPAL_IN_PROGRESS = "PRODUCTION_DRUPAL_IN_PROGRESS";
+     public static final String PRODUCTION_DRUPAL_COMPLETE    = "PRODUCTION_DRUPAL_COMPLETE";   
 
     public void test() {
         StopWatch sw = new StopWatch("a");
@@ -93,7 +100,7 @@ public class ProcessState {
         String state = ProcessState.getSystemState();
         System.out.println("State = " + state);
 
-        ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_LOAD);
+        ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_IN_PROGRESS);
         state = ProcessState.getSystemState();
         System.out.println("State = " + state);
 

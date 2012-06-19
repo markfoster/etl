@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 24-May-2012 10:56:36 by Hibernate Tools 3.2.2.GA -->
 <hibernate-mapping>
-    <class name="Registered_Manager" table="registered_manager" catalog="preview_delta">
+    <class name="Registered_Manager" table="registered_manager">
         <composite-id>
             <key-property name="providerId" type="string" node="Provider_Id">
                 <column name="provider_id" length="50" />

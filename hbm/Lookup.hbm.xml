@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 24-May-2012 10:56:36 by Hibernate Tools 3.2.2.GA -->
 <hibernate-mapping>
-    <class name="org.cqc.Lookup" table="lookup" catalog="preview_delta">
+    <class name="org.cqc.Lookup" table="lookup">
         <composite-id name="id" class="org.cqc.LookupId">
             <key-property name="providerId" type="string">
                 <column name="provider_id" length="50" />

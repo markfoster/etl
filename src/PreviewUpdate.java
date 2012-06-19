@@ -1,5 +1,6 @@
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.hibernate.*;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Iterator;
@@ -45,11 +46,37 @@ public class PreviewUpdate extends DeltaUpdate {
         return (rows == 1);
     }
 
+    public void test() {
+        HibernateUtil.buildSessionFactory("preview_delta", "hibernate.cfg.xml");
+        HibernateUtil.buildSessionFactory("preview_pp",    "hib.cfg.prev_pp.xml");
+        Session s_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
+        //Session s_pp    = HibernateUtil.currentSession("preview_pp").getSession(EntityMode.POJO);
+        Session s_pp    = HibernateUtil.currentSession("preview_pp");
+   
+        Query q = s_delta.createQuery("FROM Service_Type");
+        System.out.println("Query = " + q);
+        List results = q.list();
+        for (int i = 0; i < results.size(); i++) {
+             Object a = results.get(i);
+             if (a instanceof CQC_Entity) {
+                 System.out.println("Action code = " + ((CQC_Entity)a).getActionCode());
+             }
+             System.out.println(a);
+             System.out.println(a.getClass().getName());
+             Transaction tx = s_pp.beginTransaction();
+             //s_pp.delete(a);
+             s_pp.saveOrUpdate(a);
+             tx.commit();
+        }
+        
+    }
+
     /**
      * Test method
      */
     public static void main( String[] args ) {
         PreviewUpdate pu = new PreviewUpdate();
-        pu.geocode(Entity.PROVIDER);
+        //pu.geocode(Entity.PROVIDER);
+        pu.test();
     }
 }
