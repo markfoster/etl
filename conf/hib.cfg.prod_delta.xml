@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+      <!-- Database type & authorisation/connection settings -->
+      <property name="connection.url">jdbc:mysql://10.38.1.65:3306/preview_delta</property>
+      <property name="connection.username">cqcdms_p</property>
+      <property name="connection.password">ncZ1x6CWSDa</property>
+      <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+      <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+
+<!--
+      <property name="hibernate.show_sql">true</property> 
+      <property name="hibernate.format_sql">true</property> 
+-->
+      <property name="hibernate.default_entity_mode">dom4j</property> 
+
+      <!-- Mapping files -->
+     <!-- Mapping files -->
+      <mapping resource="Chapter.hbm.xml"/>
+      <mapping resource="Location.hbm.xml"/>
+      <mapping resource="LocationCondition.hbm.xml"/>
+      <mapping resource="LocationRegulatedActivity.hbm.xml"/>
+      <mapping resource="NominatedIndividual.hbm.xml"/>
+      <mapping resource="Outcome.hbm.xml"/>
+      <mapping resource="Partner.hbm.xml"/>
+      <mapping resource="Provider.hbm.xml"/>
+      <mapping resource="ProviderCondition.hbm.xml"/>
+      <mapping resource="ProviderRegulatedActivity.hbm.xml"/>
+      <mapping resource="RegisteredManager.hbm.xml"/> 
+      <mapping resource="RegisteredManagerCondition.hbm.xml"/>
+      <mapping resource="ReportSummary.hbm.xml"/>
+      <mapping resource="ServiceType.hbm.xml"/>
+      <mapping resource="ServiceUserBand.hbm.xml"/>
+      <mapping resource="VisitDate.hbm.xml"/>
+
+    </session-factory>
+</hibernate-configuration>
+

@@ -13,7 +13,12 @@ public class ProcessState {
      public static final String SYSTEM 			= "System";
      public static final String LOCK   			= "Lock";
 
+     public static final String LOCK_SET		= "SET";
+     public static final String LOCK_CLEAR              = "CLEAR";
+
      public static final String IDLE 			      = "IDLE";
+     public static final String PREVIEW_XML_IN_PROGRESS       = "PREVIEW_XML_IN_PROGRESS";    
+     public static final String PREVIEW_XML_COMPLETE          = "PREVIEW_XML_COMPLETE";       
      public static final String PREVIEW_DELTA_IN_PROGRESS     = "PREVIEW_DELTA_IN_PROGRESS";    
      public static final String PREVIEW_DELTA_COMPLETE        = "PREVIEW_DELTA_COMPLETE";       
      public static final String PREVIEW_DRUPAL_IN_PROGRESS    = "PREVIEW_DRUPAL_IN_PROGRESS";   
@@ -56,7 +61,7 @@ public class ProcessState {
         ApplicationContext context = SpringUtils.getApplicationContext();
         JdbcTemplate jt = new JdbcTemplate();
         jt.setDataSource((DataSource)context.getBean("common"));
-        int rows = jt.update("update process_state set state = ? where entity = ?", new Object[] {state, "System"});
+        int rows = jt.update("update process_state set state = ?, update_id=now() where entity = ?", new Object[] {state, "System"});
         return (rows == 1);
     }
 
@@ -76,11 +81,28 @@ public class ProcessState {
         return (rows == 1);
     }
 
+    public static String getLock() {
+        ApplicationContext context = SpringUtils.getApplicationContext();
+        JdbcTemplate jt = new JdbcTemplate();
+        jt.setDataSource((DataSource)context.getBean("common"));
+        String state = (String)jt.queryForObject("select state from process_state where entity = ?", new Object[]{"Lock"}, String.class);
+        return state;
+    }
+
+    public static boolean setLock(String lock) {
+        ApplicationContext context = SpringUtils.getApplicationContext();
+        JdbcTemplate jt = new JdbcTemplate();
+        jt.setDataSource((DataSource)context.getBean("common"));
+        int rows = jt.update("update process_state set state = ?, update_id = now() where entity = 'Lock'", new Object[] {lock});
+        return (rows == 1);
+    }
+
     public static String getEntityUniqueId(String entity) {
         ApplicationContext context = SpringUtils.getApplicationContext();
         JdbcTemplate jt = new JdbcTemplate();
         jt.setDataSource((DataSource)context.getBean("common"));
         String state = (String)jt.queryForObject("select update_id from process_state where entity = ?", new Object[]{entity}, String.class);
+        state = state.replace(".0", ""); // fudge to fix issue
         return state;
     }
 

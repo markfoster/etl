@@ -1,0 +1,48 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+ 
+	<bean id="preview-delta"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://10.38.1.65:3306/preview_delta" />
+		<property name="username" value="cqcdms_p" />
+		<property name="password" value="ncZ1x6CWSDa" />
+	</bean>
+
+	<bean id="preview-production"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://10.38.1.65:3306/production_delta" />
+		<property name="username" value="cqcdms_m" />
+		<property name="password" value="pcT1x5CXSD" />
+	</bean>
+
+<!--
+        <bean id="preview_pp"
+                class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+                <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/preview_pp" />
+		<property name="username" value="cqcdms_m" />
+		<property name="password" value="pcT1x5CXSD" />
+        </bean>
+
+        <bean id="production_pp"
+                class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+                <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/production_pp" />
+		<property name="username" value="cqcdms_m" />
+		<property name="password" value="pcT1x5CXSD" />
+        </bean>
+-->
+
+        <bean id="common"
+                class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+                <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://10.38.1.65:3306/common" />
+                <property name="username" value="cqcdms_p" />
+                <property name="password" value="ncZ1x6CWSDa" />
+        </bean>
+ 
+</beans>

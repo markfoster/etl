@@ -3,9 +3,23 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+        <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+            <property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+            <property name="targetMethod" value="initLogging" />
+	    <property name="staticMethod">
+	       <value>org.springframework.util.Log4jConfigurer.initLogging</value>
+	    </property>
+	    <property name="arguments">
+			<list>
+				<value>classpath:log4j.xml</value>
+			</list>
+		</property>
+	</bean>
+
 	<bean id="sysprops" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
             <property name="location" value="classpath:etl.properties"/>
         </bean>
 
 	<import resource="spring-db.xml" />
+
 </beans>

@@ -17,8 +17,23 @@ import org.w3c.dom.*;
 public class Entity {
 
 	// Entities
-	public static final String PROVIDER = "Provider";
-	public static final String LOCATION = "Location";
+        public static final String CHAPTER                      = "Chapter";
+        public static final String LOCATION                     = "Location";
+        public static final String LOCATION_CONDITION           = "Location_Condition";
+        public static final String LOCATION_REGULATED_ACTIVITY  = "Location_Regulated_Activity";
+        public static final String NOMINATED_INDIVIDUAL         = "Nominated_Individual";
+        public static final String OUTCOME                      = "Outcome";
+        public static final String PARTNER                      = "Partner";
+        public static final String PROVIDER                     = "Provider";
+        public static final String PROVIDER_CONDITION           = "Provider_Condition";
+        public static final String PROVIDER_REGULATED_ACTIVITY  = "Provider_Regulated_Activity";
+        public static final String REGISTERED_MANAGER           = "Registered_Manager";
+        public static final String REGISTERED_MANAGER_CONDITION = "Registered_Manager_Condition";
+        public static final String REPORT_SUMMARY               = "Report_Summary";
+        public static final String SERVICE_TYPE                 = "Service_Type";
+        public static final String SERVICE_USER_BAND            = "Service_User_Band";
+        public static final String VISIT_DATE                   = "Visit_Date";
+
 
         private static Map primaryKeys = new HashMap(); // map of primary key properties list
 

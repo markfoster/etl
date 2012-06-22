@@ -57,7 +57,7 @@
     </target>
 
     <target name="run" depends="build">
-        <java classname="parse" fork="true">
+        <java classname="ETLPreviewLoad" fork="true">
         <!-- <java classname="DBTest" fork="true"> -->
         <classpath path="build"/>
         <classpath path="conf"/>
