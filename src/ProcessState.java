@@ -33,6 +33,20 @@ public class ProcessState {
      public static final String PROD_DRUPAL_IN_PROGRESS        = "PROD_DRUPAL_IN_PROGRESS";
      public static final String PROD_DRUPAL_COMPLETE           = "PROD_DRUPAL_COMPLETE";   
 
+    public static List getEntitiesForUpdate () {
+        ApplicationContext context = SpringUtil.getApplicationContext();
+        JdbcTemplate jt = new JdbcTemplate();
+        jt.setDataSource((DataSource)context.getBean("common"));
+        List<String> entities = jt.query("select entity from process_state", new RowMapper() {
+            public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+                   return resultSet.getString(1);
+            }
+        });
+        entities.remove(ProcessState.SYSTEM);
+        entities.remove(ProcessState.LOCK);
+        return entities;
+    }
+
     public static String getSystemState() {
 	ApplicationContext context = SpringUtil.getApplicationContext();
 	JdbcTemplate jt = new JdbcTemplate();

@@ -22,22 +22,55 @@ import org.hibernate.Transaction;
 
 public class ProductionLoad {
 
-	Logger logger = Logger.getLogger(this.getClass().getName());
-        private Session g_session;
-        private String g_nowAsString;
-        private ETLContext context;
-        String basedir = "";
-        Properties sysprops = null;
+    Logger logger = Logger.getLogger(this.getClass().getName());
 
-	public void init() {
-		context = ETLContext.getContext();
-		HibernateUtil.buildSessionFactory();
-                g_session = HibernateUtil.getSessionFactory().openSession()
-                                .getSession(EntityMode.DOM4J);
-		sysprops = (Properties)SpringUtil.getApplicationContext().getBean("sysprops");
-                basedir = sysprops.getProperty("basedir");
+    public void init() {
+        HibernateUtil.buildSessionFactory("production_delta", "hib.cfg.prod_delta.xml");
+        HibernateUtil.buildSessionFactory("production_pp",    "hib.cfg.prod_delta.xml");
+    }
+
+    public void run() {
+        ETLContext eContext = ETLContext.getContext();
+        List entities = ProcessState.getEntitiesForUpdate();
+        Iterator i = entities.iterator();
+        while (i.hasNext()) {
+           String entity = (String)i.next();
+           if (entity.equals(Entity.PROVIDER) || entity.equals(Entity.LOCATION)) {
+                   continue;
+           }
+           updateProductionProfile(entity);
         }
+    }
 
-	public void run() {
-	}
+    public void updateProductionProfile(String entity) {
+        Session s_delta = HibernateUtil.currentSession("production_delta");
+        Session s_pp    = HibernateUtil.currentSession("production_pp");
+
+        Query q = s_delta.createQuery("FROM " + entity);
+        logger.info("Query = " + q);
+        List results = q.list();
+        for (int i = 0; i < results.size(); i++) {
+             String action = "";
+             Object prodObject = results.get(i);
+             if (prodObject instanceof CQC_Entity) {
+                 action = ((CQC_Entity)prodObject).getActionCode().toString();
+             } else {
+                 logger.warn("Unknown object in result set");
+             }
+             logger.info(prodObject);
+             logger.info(prodObject.getClass().getName());
+             try {
+                logger.info("Action = " + action);
+                Transaction tx = s_pp.beginTransaction();
+                if (action.equals("D")) {
+                    s_pp.delete(prodObject);
+                } else {
+                    s_pp.saveOrUpdate(prodObject);
+                }
+                tx.commit();
+             } catch (Exception ex) {
+                 logger.error(String.format("updateProductionProfile: %s", entity), ex);
+             }
+        }
+    }
 }

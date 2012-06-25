@@ -51,13 +51,18 @@ public class ETLProductionLoad {
 
 	public void run() {
 		
+                ProcessState.setSystemState(ProcessState.PROD_LOAD_TRIGGER);
+                ProcessState.setLock(ProcessState.LOCK_CLEAR);
+
+                // Check the process system status
                 String pState = ProcessState.getSystemState();
                 if (!pState.equals(ProcessState.PROD_LOAD_TRIGGER)) {
                     logger.error("Initiating Production Load but system state = " + pState);
                     WatchDog.log(500, WatchDog.WATCHDOG_ENV_PROD, "Production Load", "State != IDLE exiting", WatchDog.WATCHDOG_CRITICAL);
                     System.exit(1);
                 }
-
+ 
+                // Check the process lock status
                 String pLock = ProcessState.getLock();
                 if (!pLock.equals(ProcessState.LOCK_CLEAR)) {
                     logger.error("Initiating Production Load but lock state = " + pLock);
@@ -71,6 +76,7 @@ public class ETLProductionLoad {
 		ProductionLoad pl = new ProductionLoad();
                 pl.init();
                 pl.run();
+                ProcessState.setLock(ProcessState.LOCK_CLEAR);
                 ProcessState.setSystemState(ProcessState.PROD_DELTA_LOAD_COMPLETE);
 	}
 
