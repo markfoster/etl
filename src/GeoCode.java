@@ -55,7 +55,7 @@ public class GeoCode {
 
                	float lat = 0.0f;
                 float lng = 0.0f;
-                ApplicationContext context = SpringUtils.getApplicationContext();
+                ApplicationContext context = SpringUtil.getApplicationContext();
                 JdbcTemplate jT_Common = new JdbcTemplate();
                 jT_Common.setDataSource((DataSource)context.getBean("common"));
 
@@ -185,7 +185,7 @@ public class GeoCode {
         private static float[] getCache(String postcode) throws Exception {
                 float lat = 0.0f;
                 float lng = 0.0f;
-                ApplicationContext context = SpringUtils.getApplicationContext();
+                ApplicationContext context = SpringUtil.getApplicationContext();
                 JdbcTemplate jT_Common = new JdbcTemplate();
                 jT_Common.setDataSource((DataSource)context.getBean("common"));
                 String sql = "SELECT latitude, longitude FROM geocode_cache WHERE postcode = '" + postcode + "'";

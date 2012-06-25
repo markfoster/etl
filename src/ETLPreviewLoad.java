@@ -82,11 +82,11 @@ public class ETLPreviewLoad {
                 pl.run();
                 ProcessState.setSystemState(ProcessState.PREVIEW_XML_COMPLETE);
 
-                ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_IN_PROGRESS);
+                ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_LOAD_IN_PROGRESS);
                 PreviewUpdate pu = new PreviewUpdate();
                 pu.init();
                 pu.run();
-                ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_COMPLETE);
+                ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_LOAD_COMPLETE);
                 ProcessState.setLock(ProcessState.LOCK_CLEAR);
 	}
 

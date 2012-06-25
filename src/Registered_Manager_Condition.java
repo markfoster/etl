@@ -123,6 +123,13 @@ public class Registered_Manager_Condition implements java.io.Serializable, CQC_E
          return result;
    }
 
+   public String getPK() {
+         return String.format("%s/%s/%s/%s", getProviderId(), 
+                                          getLocationId(), 
+                                          getRegisteredManagerId(), 
+                                          getRegulatedActivityNumber());
+   }
+
 }
 
 

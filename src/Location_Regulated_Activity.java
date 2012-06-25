@@ -103,6 +103,11 @@ public class Location_Regulated_Activity implements java.io.Serializable, CQC_En
                 return result;
         }
 
+   public String getPK() {
+         return String.format("%s/%s/%s", getProviderId(), 
+                                          getLocationId(), 
+                                          getRegulatedActivityNumber());
+   }
 
 
 }

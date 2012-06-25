@@ -210,6 +210,13 @@ public class Outcome  implements java.io.Serializable, CQC_Entity {
    }
 
 
+   public String getPK() {
+         return String.format("%s/%s/%s/%s", getProviderId(), 
+                                          getLocationId(), 
+                                          getOutcomeNumber(), 
+                                          getReportPublicationDate());
+   }
+
 }
 
 

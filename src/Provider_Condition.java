@@ -113,6 +113,11 @@ public class Provider_Condition  implements java.io.Serializable, CQC_Entity {
                 return result;
         }
 
+   public String getPK() {
+         return String.format("%s/%s", getProviderId(), 
+                                          getRegulatedActivityNumber());
+   }
+
 }
 
 

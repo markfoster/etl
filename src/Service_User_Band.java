@@ -89,6 +89,10 @@ public class Service_User_Band  implements java.io.Serializable, CQC_Entity {
          return result;
    }
 
+   public String getPK() {
+         return String.format("%s/%s/%s", getProviderId(), getLocationId(), getServiceUserBandId());
+   }
+
 }
 
 

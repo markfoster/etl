@@ -112,6 +112,14 @@ public class Registered_Manager  implements java.io.Serializable, CQC_Entity {
          result = 37 * result + ( getRegulatedActivityNumber() == null ? 0 : this.getRegulatedActivityNumber().hashCode() );
          return result;
    }
+
+   public String getPK() {
+         return String.format("%s/%s/%s/%s", getProviderId(), 
+                                          getLocationId(), 
+                                          getRegisteredManagerId(), 
+                                          getRegulatedActivityNumber());
+   }
+
 }
 
 

@@ -330,6 +330,9 @@ public class Location implements java.io.Serializable, CQC_Entity {
 						.hashCode());
 		return result;
 	}
-	
+
+        public String getPK() {
+                return String.format("%s/%s", getProviderId(), getLocationId());
+        }
 	
 }

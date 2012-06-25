@@ -44,14 +44,10 @@ public class HibernateUtil {
             sessionMaps = new HashMap();
             sessionMapsThreadLocal.set(sessionMaps);
         }
-        System.out.println("SM = " + sessionMaps);
-        System.out.println("SFM = " + sessionFactoryMap);
         // Open a new Session, if this Thread has none yet
         Session s = (Session) sessionMaps.get(key);
         if (s == null) {
-            System.out.println("Opening Session...");
             s = ((SessionFactory)sessionFactoryMap.get(key)).openSession();
-            System.out.println("New session = " + s);
             sessionMaps.put(key, s);
         }
         return s;
@@ -92,7 +88,6 @@ public class HibernateUtil {
             }
  
         } catch (Exception ex) {
-            ex.printStackTrace(System.out);
             log.error("Initial SessionFactory creation failed.", ex);
             throw new ExceptionInInitializerError(ex);
  

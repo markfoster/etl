@@ -4,7 +4,7 @@
 <hibernate-configuration>
     <session-factory>
       <!-- Database type & authorisation/connection settings -->
-      <property name="connection.url">jdbc:mysql://10.38.1.65:3306/preview_delta</property>
+      <property name="connection.url">jdbc:mysql://10.38.1.65:3306/production_delta</property>
       <property name="connection.username">cqcdms_p</property>
       <property name="connection.password">ncZ1x6CWSDa</property>
       <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
@@ -14,7 +14,7 @@
       <property name="hibernate.show_sql">true</property> 
       <property name="hibernate.format_sql">true</property> 
 -->
-      <property name="hibernate.default_entity_mode">dom4j</property> 
+      <property name="hibernate.default_entity_mode">pojo</property> 
 
       <!-- Mapping files -->
      <!-- Mapping files -->

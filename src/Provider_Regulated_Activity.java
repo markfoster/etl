@@ -77,6 +77,12 @@ public class Provider_Regulated_Activity  implements java.io.Serializable, CQC_E
          result = 37 * result + ( getRegulatedActivityNumber() == null ? 0 : this.getRegulatedActivityNumber().hashCode() );
          return result;
    }
+
+   public String getPK() {
+         return String.format("%s/%s", getProviderId(), 
+                                          getRegulatedActivityNumber());
+   }
+
 }
 
 

@@ -115,6 +115,12 @@ return ( (this.getProviderId()==castOther.getProviderId()) || ( this.getProvider
          return result;
    }
 
+   public String getPK() {
+         return String.format("%s/%s/%s/%s/%s", getProviderId(), 
+                                          getLocationId(), getOutcomeNumber(),
+                                          getReportPublicationDate(), getVisitDate());
+   }
+
 }
 
 

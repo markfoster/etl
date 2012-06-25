@@ -22,7 +22,7 @@ public class WatchDog {
      * Log a message to the watchdog table
      */
     public static boolean log(int runId, String env, String type, String message, int severity) {
-        ApplicationContext context = SpringUtils.getApplicationContext();
+        ApplicationContext context = SpringUtil.getApplicationContext();
         JdbcTemplate jt = new JdbcTemplate();
         jt.setDataSource((DataSource)context.getBean("common"));
         int rows = jt.update("INSERT INTO watchdog (uid, type, message, severity, link) VALUES (?, ?, ?, ?, ?)", 
