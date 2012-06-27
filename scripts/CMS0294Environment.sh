@@ -40,6 +40,8 @@ fi
 
 export LOCKS_DIR="/mnt/www/locks"
 
+export BACKUP_DIR="/mnt/www/backups"
+
 export XML_IN_DIR="/mnt/www/etl"
 export XML_PROCESS_DIR="/opt/etl/xml"
 
@@ -51,7 +53,7 @@ export COMMON_CRED="pcT1x5CXSDw"
 export JAVA_OPTS="-Xms512m -Xmx2048m"
 
 #export EVENT_MAIL="xansa.club.environmentmgmt@steria.co.uk"    # Alert Email address
-export EVENT_MAIL="mark.foster@steria.co.uk"
+export EVENT_MAIL="mark.foster@steria.co.uk,pratibha.seth9521@steria.co.in,chi@hausolutions.com,jennifer.jordan@steria.co.uk"
 export REPORT_MAIL="mark.foster@steria.co.uk"
 export USER_ID="nginx:nginx"
 

@@ -280,6 +280,9 @@ HostName="$(hostname | sed -e 's/\..*//')"
 
         MailAlert XML_AVAILABLE
 
+        bDate=$(date '+%Y%m%d_%H%M%S')
+        tar zcvf ${BACKUP_DIR}_${bDate}.tgz ${XML_IN_DIR}/pp*
+
         rm -rf "${XML_PROCESS_DIR}"
         mkdir -p "${XML_PROCESS_DIR}" 2>/dev/null
         mv ${XML_IN_DIR}/pp_* "${XML_PROCESS_DIR}"
