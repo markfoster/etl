@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<List_Of_Service_User_Band xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Service_User_Band>
+    <Provider_Id>1-102642529</Provider_Id>
+    <Location_Id>1-121985379</Location_Id>
+    <Service_User_Band_Id>SUB12</Service_User_Band_Id>
+    <Action_Code>I</Action_Code>
+  </Service_User_Band>
+  <Service_User_Band>
+    <Provider_Id>1-118166100</Provider_Id>
+    <Location_Id>1-127585620</Location_Id>
+    <Service_User_Band_Id>SUB5</Service_User_Band_Id>
+    <Action_Code>I</Action_Code>
+  </Service_User_Band>
+  <Service_User_Band>
+    <Provider_Id>1-101648291</Provider_Id>
+    <Location_Id>1-118963297</Location_Id>
+    <Service_User_Band_Id>SUB5</Service_User_Band_Id>
+    <Action_Code>I</Action_Code>
+  </Service_User_Band>
+</List_Of_Service_User_Band>

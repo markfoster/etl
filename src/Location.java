@@ -28,7 +28,7 @@ public class Location implements java.io.Serializable, CQC_Entity {
 	private String postcode;
 	private String region;
 	private String segmentation;
-	private Date statementDate;
+	private String statementDate;
 	private String subtype;
 	private String telephone;
 	private String townCity;
@@ -51,7 +51,7 @@ public class Location implements java.io.Serializable, CQC_Entity {
 			String inProcess, Date lastUpdated, BigDecimal latitude,
 			String localAuthority, BigDecimal longitude, String name,
 			String postcode, String region, String segmentation,
-			Date statementDate, String subtype, String telephone,
+			String statementDate, String subtype, String telephone,
 			String townCity, String type, String underReviewText,
 			String userExperience, String website) {
 		this.providerId = providerId;
@@ -235,11 +235,11 @@ public class Location implements java.io.Serializable, CQC_Entity {
 		this.segmentation = segmentation;
 	}
 
-	public Date getStatementDate() {
+	public String getStatementDate() {
 		return this.statementDate;
 	}
 
-	public void setStatementDate(Date statementDate) {
+	public void setStatementDate(String statementDate) {
 		this.statementDate = statementDate;
 	}
 

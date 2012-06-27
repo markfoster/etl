@@ -20,6 +20,9 @@ public class ProcessState {
      public static final String LOCK_SET		= "SET";
      public static final String LOCK_CLEAR              = "CLEAR";
 
+     public static final String STATE_FULL              = "FULL";
+     public static final String STATE_DELTA             = "DELTA";
+
      public static final String IDLE 			       = "IDLE";
      public static final String PREVIEW_XML_IN_PROGRESS        = "PREVIEW_XML_IN_PROGRESS";    
      public static final String PREVIEW_XML_COMPLETE           = "PREVIEW_XML_COMPLETE";       
@@ -45,6 +48,23 @@ public class ProcessState {
         entities.remove(ProcessState.SYSTEM);
         entities.remove(ProcessState.LOCK);
         return entities;
+    }
+
+    public static int getRunId() {
+        ApplicationContext context = SpringUtil.getApplicationContext();
+        JdbcTemplate jt = new JdbcTemplate();
+        jt.setDataSource((DataSource)context.getBean("common"));
+        int nId = jt.queryForInt("select run_id process_state where entity = ?", new Object[]{"System"});
+        return nId;
+    }
+
+    public static boolean setRunId(int id) {
+        checkEntityExists(ProcessState.SYSTEM);
+        ApplicationContext context = SpringUtil.getApplicationContext();
+        JdbcTemplate jt = new JdbcTemplate();
+        jt.setDataSource((DataSource)context.getBean("common"));
+        int rows = jt.update("update process_state set run_id = ?, update_id=now() where entity = ?", new Object[] {new Integer(id), "System"} );
+        return (rows == 1);
     }
 
     public static String getSystemState() {

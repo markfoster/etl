@@ -1,1 +1,13 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><List_Of_Location_Condition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></List_Of_Location_Condition>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<List_Of_Location_Condition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Location_Condition>
+    <Provider_Id>1-101606400</Provider_Id>
+    <Location_Id>1-111111111</Location_Id>
+    <Regulated_Activity_Number>RB1</Regulated_Activity_Number>
+    <Condition_Id>1-2YYV60</Condition_Id>
+    <Text>This is for testing purpose</Text>
+    <Reason>Testing</Reason>
+    <Type>A</Type>
+    <Action_Code>I</Action_Code>
+  </Location_Condition>
+</List_Of_Location_Condition>

@@ -1,1 +1,9 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><List_Of_Nominated_Individual xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></List_Of_Nominated_Individual>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<List_Of_Nominated_Individual xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Nominated_Individual>
+    <Provider_Id>1-101606400</Provider_Id>
+    <Regulated_Activity_Number>RB1</Regulated_Activity_Number>
+    <Name>Testing</Name>
+    <Action_Code>I</Action_Code>
+  </Nominated_Individual>
+</List_Of_Nominated_Individual>

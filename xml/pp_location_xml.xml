@@ -1,1 +1,29 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><List_Of_Location xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></List_Of_Location>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<List_Of_Location xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Location>
+    <Provider_Id>1-101606400</Provider_Id>
+    <Location_Id>1-111111111</Location_Id>
+    <Name>Lanchester</Name>
+    <In_Process>N</In_Process>
+    <Type>Health Care ORG</Type>
+    <Local_Authority>Liverpool</Local_Authority>
+    <Region>London</Region>
+    <Also_Known_As/>
+    <Address_Line_1>21 Bolling Road</Address_Line_1>
+    <Address_Line_2>Kingston upon thames</Address_Line_2>
+    <Town_City>London</Town_City>
+    <County>UK</County>
+    <Postcode>LA1 1AA</Postcode>
+    <Subtype>Location</Subtype>
+    <Segmentation/>
+    <Telephone/>
+    <Email>pratibha.seth@gmail.com</Email>
+    <Website>www.thamesclinic.com</Website>
+    <Fax> </Fax>
+    <Under_Review_Text>test</Under_Review_Text>
+    <User_Experience/>
+    <About_Location/>
+    <Statement_Date>2012-06-27</Statement_Date>
+    <Action_Code>I</Action_Code>
+  </Location>
+</List_Of_Location>

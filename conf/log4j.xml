@@ -10,9 +10,9 @@
         </layout>
     </appender>
     <appender name="rolling-file" class="org.apache.log4j.RollingFileAppender">
-        <param name="file" value="etl.log"/>
-        <param name="Threshold" value="debug"/>
-        <param name="MaxFileSize" value="6000KB"/>
+        <param name="file" value="/var/log/etl.log"/>
+        <param name="Threshold" value="info"/>
+        <param name="MaxFileSize" value="9000KB"/>
         <param name="MaxBackupIndex" value="4"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d [%t] %-5p %l - %m%n"/>

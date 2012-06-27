@@ -57,21 +57,19 @@ public class ETLPreviewLoad {
 
 	public void run() {
 		
-                ProcessState.setSystemState(ProcessState.IDLE);
-                ProcessState.setLock(ProcessState.LOCK_CLEAR);
+                //ProcessState.setSystemState(ProcessState.IDLE);
+                //ProcessState.setLock(ProcessState.LOCK_CLEAR);
 
                 String pState = ProcessState.getSystemState();
                 if (!pState.equals(ProcessState.IDLE)) {
                     logger.error("Initiating Preview Load but system state = " + pState);
-                    WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Preview Load", "State != IDLE exiting", WatchDog.WATCHDOG_CRITICAL);
-                    System.exit(1);
+                    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview Load", "State != IDLE exiting", WatchDog.WATCHDOG_EMERG);
                 }
 
                 String pLock = ProcessState.getLock();
                 if (!pLock.equals(ProcessState.LOCK_CLEAR)) {
                     logger.error("Initiating Preview Load but lock state = " + pLock);
-                    WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Preview Load", "Lock != CLEAR exiting", WatchDog.WATCHDOG_CRITICAL);
-                    System.exit(1);
+                    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview Load", "Lock != CLEAR exiting", WatchDog.WATCHDOG_EMERG);
                 }
 
                 // Populate the preview delta from XML files	

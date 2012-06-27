@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<List_Of_Visit_Date xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Visit_Date>
+    <Provider_Id>1-101716895</Provider_Id>
+    <Location_Id>1-119726382</Location_Id>
+    <Outcome_Number>17</Outcome_Number>
+    <Report_Publication_Date>2011-03-04</Report_Publication_Date>
+    <Visit_Date>2011-10-10</Visit_Date>
+    <Action_Code>U</Action_Code>
+  </Visit_Date>
+  <Visit_Date>
+    <Provider_Id>ABC</Provider_Id>
+    <Location_Id>1-119726382</Location_Id>
+    <Outcome_Number>21</Outcome_Number>
+    <Report_Publication_Date>2011-03-04</Report_Publication_Date>
+    <Visit_Date>2011-01-31</Visit_Date>
+    <Action_Code>U</Action_Code>
+  </Visit_Date>
+</List_Of_Visit_Date>

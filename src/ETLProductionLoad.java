@@ -51,8 +51,8 @@ public class ETLProductionLoad {
 
 	public void run() {
 		
-                ProcessState.setSystemState(ProcessState.PROD_LOAD_TRIGGER);
-                ProcessState.setLock(ProcessState.LOCK_CLEAR);
+                //ProcessState.setSystemState(ProcessState.PROD_LOAD_TRIGGER);
+                //ProcessState.setLock(ProcessState.LOCK_CLEAR);
 
                 // Check the process system status
                 String pState = ProcessState.getSystemState();

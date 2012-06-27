@@ -58,101 +58,117 @@ public class PreviewLoad {
                 basedir = sysprops.getProperty("basedir");
         }
 
-	public void run() {
-                //if (true) System.exit(0);
+        public static void main(String[] args) throws Exception {
+                PreviewLoad pl = new PreviewLoad();
+                pl.init();
+                pl.test();
+        }
 
-		// p.saveEntity("Location");
-		// if (true) System.exit(0);
+	public void test() {
+                ETLContext.getContext().setRunId(0);
+                System.out.println(ETLContext.getContext().getRunId());
+                try {
+                  loadAudit();
+                  validateAudit();
+                } catch (Exception ex) { 
+                  logger.warn(ex);
+                }
+        }
 
-		// String xml = fileToString("hbm/Geocode.hbm.xml");
-		// if (p.checkXML(xml) != null)
-		// System.out.println("XML is well formed");
-
-		String xml = "";
-		String xsd = "";
-		String result = "";
-		try {
+        public void loadAudit() throws Exception {
+                String xml = "", xsd = "", result = "";
+                try {
                         logger.info(basedir+"/xml/pp_audit_xml.xml");
-		        xml = fileToString(basedir+"/xml/pp_audit_xml.xml");
-		        xsd = fileToString(basedir+"/xsd/PP_AUDIT_XML.xsd");
-			checkXML(xml);
-			checkXSD(xsd);
-			validateXML(xml, xsd);
-		} catch (Exception ex) {
-			System.out.println("Audit XML issues: " + ex.getMessage());
-			System.exit(0);
-		}
-
-		Map<String, Document> docs = new HashMap();
-
+                        xml = fileToString(basedir+"/xml/pp_audit_xml.xml");
+                        xsd = fileToString(basedir+"/xsd/PP_AUDIT_XML.xsd");
+                        checkXML(xml);
+                        checkXSD(xsd);
+                        validateXML(xml, xsd);
+                } catch (Exception ex) {
+                        WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Audit Load", ex.getMessage(), WatchDog.WATCHDOG_WARNING);
+                        throw new Exception("Audit Load or Validate issue: " + ex.getMessage());
+                }
 		// Parse the audit file
 		Map audits = parse(xml);
                 context.setAuditMap(audits);
-		Set keys = audits.keySet();
-		Iterator i = keys.iterator();
-		while (i.hasNext()) {
-			String key = (String)i.next();
+        }
 
-                        Map actions = (Map)audits.get(key);
-                        logger.info(String.format("Entity: %-30s, Actions: %s",key, actions));
-                        if (actions.get("active") == null) continue;
+        public boolean validateAudit() throws Exception {
+                Map aMap = context.getAuditMap();
+                Map rMap = context.readReport(basedir+"/xml/report.csv");
+                if (null == rMap) {
+                     throw new Exception("Cannot load actual metrics");
+                }
+                Iterator i = aMap.keySet().iterator();
+                while (i.hasNext()) {
+                     String key = (String)i.next();
+                     Map actions = (Map)aMap.get(key);
+                     List aList = new ArrayList();
+                     aList.add(actions.get("inserts"));
+                     aList.add(actions.get("updates"));
+                     aList.add(actions.get("deletes"));
+                     List rList = (List)rMap.get(key.toLowerCase());
+                     if (!aList.equals(rList)) {
+                         String err = String.format("Entity %s metrics issues: Audit=%s, Actual=%s", key, aList, rList);
+                         logger.warn(err);
+                         WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Audit Load", err, WatchDog.WATCHDOG_WARNING);
+                         throw new Exception("Audit metrics differ from actual");
+                     }
+                }
+                return true;
+        }
 
-			String xmlFile = basedir+"/xml/pp_" + key.toLowerCase() + "_xml.xml";
-			String xsdFile = basedir+"/xsd/PP_" + key.toUpperCase() + "_XML.xsd";
-			// logger.info("Load and Validate (" + xmlFile + ", " + xsdFile +
-			// ")");
-			logger.info("Load and Validate (" + xmlFile + ", " + xsdFile  + ")");
-			Document doc = null;
-			try {
-			        xml = fileToString(xmlFile);
-			        xsd = fileToString(xsdFile);
-				doc = checkXML(xml);
-				docs.put(key, doc);
-				checkXSD(xsd);
-				validateXML(xml, xsd);
-				// p.validateActions(key, xml, (Map)audits.get(key));
-				// p.test(doc, key);
+	public void run() {
 
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String nowAsString = df.format(new Date());
-                logger.info("Now = " + nowAsString);
-                g_nowAsString = nowAsString;
-                                ProcessState.setEntityState(key, (String)actions.get("load"));
-                                ProcessState.setEntityUniqueId(key, nowAsString);
+                Map docs = new HashMap();
 
-                                String sql = String.format("DELETE FROM %s", key.toLowerCase());
-                                g_session.createSQLQuery(sql).executeUpdate();
+                try {
+		     loadAudit();
+                     validateAudit();
+                } catch (Exception ex) {
+                     WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, 
+                                  "Audit Load", "Problem loading the audit: " + ex.getMessage(), 
+                                  WatchDog.WATCHDOG_EMERG);
+                }
 
-				loadXML(doc, key);
-				// p.checkData(doc, (Map)audits.get(key));
-			} catch (Exception ex) {
-                                logger.error("XML", ex);
-				System.exit(0);
-			}
-			// System.out.print(key + ": ");
-			// System.out.println(smap.get(key));
-		}
-		//int updates = Integer.parseInt("1");
-		//System.out.println("Updates = " + updates);
-		// p.saveEntity("Location");
-		// p.saveOutcomes();
-		// p.readGeocodes();
+                try {
+                     Map audits = context.getAuditMap();
+                     Set keys = audits.keySet();
+                     Iterator i = keys.iterator();
+                     while (i.hasNext()) {
+                             String key = (String)i.next();
+
+                             Map actions = (Map)audits.get(key);
+                             logger.info(String.format("Entity: %-30s, Actions: %s",key, actions));
+                             if (actions.get("active") == null) continue;
+
+                             String xmlFile = basedir+"/xml/pp_" + key.toLowerCase() + "_xml.xml";
+                             String xsdFile = basedir+"/xsd/PP_" + key.toUpperCase() + "_XML.xsd";
+                             logger.info("Load and Validate (" + xmlFile + ", " + xsdFile  + ")");
+                             Document doc = null;
+                             String xml = "", xsd = "", result = "";
+                             xml = fileToString(xmlFile);
+                             xsd = fileToString(xsdFile);
+                             doc = checkXML(xml);
+                             docs.put(key, doc);
+                             checkXSD(xsd);
+                             validateXML(xml, xsd);
+                             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                             String nowAsString = df.format(new Date());
+                             logger.info("Update ID = " + nowAsString);
+                             g_nowAsString = nowAsString;
+                             ProcessState.setEntityState(key, (String)actions.get("load"));
+                             ProcessState.setEntityUniqueId(key, nowAsString);
+                             String sql = String.format("DELETE FROM %s", key.toLowerCase());
+                             g_session.createSQLQuery(sql).executeUpdate();
+                             loadXML(doc, key);
+                     }
+                } catch (Exception ex) {
+                     WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV,
+                                  "XML Load", "Problem loading or validating xml data: " + ex.getMessage(),
+                                  WatchDog.WATCHDOG_EMERG);
+                }
 	}
-
-	/**
-	 * public void test(Document doc, String element) { Session session = null;
-	 * try { Configuration cfg = HibernateUtil.getConfiguration();
-	 * PersistentClass pc = cfg.getClassMapping("Chapter");
-	 * System.out.println(">> class: " + pc); KeyValue kv = pc.getIdentifier();
-	 * System.out.println(">> identifier simple : " + kv);
-	 * System.out.println(">> identifier simple : " + kv.isSimpleValue()); if
-	 * (kv instanceof Component) { Component comp = (Component)kv;
-	 * Iterator<Property> key_props = comp.getPropertyIterator(); while
-	 * (key_props.hasNext()) { Property p = key_props.next(); String name =
-	 * p.getName(); System.out.println(">> key-property name: " + name + " : " +
-	 * p.getNodeName()); } } } catch (Exception e) { e.printStackTrace();
-	 * System.out.println(e.getMessage()); } }
-	 **/
 
 	public void checkData(Document doc, Map checks) {
 		logger.info("In checkData()");
@@ -163,8 +179,6 @@ public class PreviewLoad {
 	public void readGeocodes() {
 		Session session = null;
 		try {
-			// session =
-			// HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
 			session = HibernateUtil.currentSession();
 			System.out.println("Session = " + session);
 
@@ -191,8 +205,6 @@ public class PreviewLoad {
 		System.out.println("In saveProviders()");
 		Session session = null;
 		try {
-			// session =
-			// HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
 			System.out.println("Session = " + session);
 			session = HibernateUtil.currentSession();
 			System.out.println("Session = " + session);

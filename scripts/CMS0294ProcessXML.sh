@@ -2,12 +2,9 @@
 #
 # ETL - Process any available XML files from the client
 #
-# Usage: CMS0294ProcessXML.sh [ -DFv ] -S Solr Version Number
+# Usage: CMS0294ProcessXML.sh [ -D ]
 #
 #    -D: Debug
-#    -v: Web Site
-#    -S: Solr Target Directory
-#    -F: First time
 #
 # $Id: CMS0294ProcessXML.sh,v 1.11 2012/05/01 11:09:03 appadmin Exp $
 #
@@ -27,7 +24,7 @@
 #
 
 Usage () {
-    echo "usage: CMS0294ProcessXML.sh [ -DFv ] [ -S Solr vesion number ]" 1>&2
+    echo "usage: CMS0294ProcessXML.sh [ -D ]" 1>&2
 
     CleanUp
     exit 1
@@ -99,81 +96,12 @@ RanSleep () {
 }
 
 #
-# Dump Jetty Process Info
-#
-
-JettyDump () {
-    PrintInfo "PID            : ${XPID}"
-    PrintInfo "PID_FILE       : ${JETTY_PID}"
-
-    if   [ -f "${JETTY_PID}" ]
-    then PrintInfo "PID_FILE Status:" $(ls -l "${JETTY_PID}")
-         PrintInfo "PID_FILE Value : [" $(<"${JETTY_PID}") "]"
-    else PrintInfo "PID_FILE Status: Not found"
-    fi
-
-    PrintInfo "Processes : ["
-    ps -ef
-    PrintInfo "]"
-}
-
-
-#
-# Stop the Jetty Process
-#
-
-StopJetty ()
-{
-    /etc/init.d/jetty stop
-    XPID="$(ps -eo pid,cmd | sed -e '/^ *[0-9][0-9]* \/usr\/bin\/java/!d' -e 's/^ *\([0-9][0-9]*\) .*/\1/')"
-
-    if   [ -f "${JETTY_PID}" -o "${XPID}" != "" ]
-    then JettyDump
-         MailAlert JETTYSTOP
-	 ErrorExit "Jetty does not appear to have stopped - pid file exists"
-    fi
-}
-
-#
-# Start the Jetty Process
-#
-
-StartJetty ()
-{
-    /etc/init.d/jetty start
-    XPID="$(ps -eo pid,cmd | sed -e '/^ *[0-9][0-9]* \/usr\/bin\/java/!d' -e 's/^ *\([0-9][0-9]*\) .*/\1/')"
-
-    if   [ ! -f "${JETTY_PID}" -o "${XPID}" = "" ]
-    then JettyDump
-         MailAlert JETTYSTART
-	 ErrorExit "Jetty does not appear to have restarted - pid file does not exist"
-    fi
-}
-
-#
-# Is Jetty active
-#
-
-ActiveJetty ()
-{
-    if   [ -s "${JETTY_PID}" ]
-    then JETTY_ON="$(ps -p $(<"${JETTY_PID}") -ocmd | fgrep -i jetty)"
-    fi
-}
-
-#
 # Verbose Check on index in use
 #
 
 VerboseCheck () {
     if   [ "${v_FLAG}" = "YES" ]
-    then PrintInfo "Check correct index in use ["
-         ls -ld "${HIP_SROOT}"
-	 /usr/bin/stat -c '%A I=%i (D=%d) %h %G %U S=%s %y %n' "${HIP_NROOT}/index"
-	 /usr/bin/stat -c '%A I=%i (D=%d) %h %G %U S=%s %y %n' "${HIP_SROOT}/index"
-	 echo "COMMAND     PID      USER   FD      TYPE             DEVICE      SIZE       NODE NAME"
-	 /usr/sbin/lsof	| fgrep "${HIP_SROOT}"
-	 PrintInfo "] - End of status info."
+    then PrintInfo "Verbose Check"
     fi
 }
 
@@ -193,15 +121,11 @@ MailAlert ()
 
 	case "${1}" in
 
-	"JETTYSTOP" )		echo "Subject: CRITICAL - CMS0294ProcessXML failed to stop JETTY on ${HostName}" ;;
-	"JETTYSTART" )		echo "Subject: CRITICAL - CMS0294ProcessXML failed to restart JETTY on ${HostName}" ;;
-	"FIRST" )		echo "Subject: CRITICAL - CMS0294ProcessXML failed to rename HIP_SOLR on ${HostName}" ;;
-	"LINK" )		echo "Subject: CRITICAL - CMS0294ProcessXML failed to create HIP_SOLR link on ${HostName}" ;;
-	"NAME_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294ProcessXML failed to find new HIP_SOLR link on ${HostName}" ;;
-	"LOCK_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294ProcessXML failed to get the Jetty lock on ${HostName}" ;;
-	"LOCK_CLEAR" )		echo "Subject: CRITICAL - CMS0294ProcessXML failed to clear the Jetty lock on ${HostName}" ;;
-	"NO_JETTY" )		echo "Subject: CRITICAL - CMS0294ProcessXML found No Jetty active on Master server ${HostName}" ;;
-	"NO_JETTY1" )		echo "Subject: WARNING - CMS0294ProcessXML No Jetty active on server ${HostName}" ;;
+	"LOCK_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294ProcessXML failed to get the Update lock on ${HostName}" ;;
+	"LOCK_CLEAR" )		echo "Subject: CRITICAL - CMS0294ProcessXML failed to clear the Update lock on ${HostName}" ;;
+	"XML_AVAILABLE" )       echo "Subject: INFORMATION - XML available on ${HostName}" ;;
+	"BAD_XML_FORMAT" )      echo "Subject: CRITICAL - XML format issues on ${HostName}" ;;
+	"INVALID_STATE" )       echo "Subject: ALERT - XML detected but not in IDLE state on ${HostName}" ;;
 
 	* )			echo "Subject: WARNING - CMS0294ProcessXML unknown mail alert on ${HostName}" ;;
 
@@ -209,7 +133,16 @@ MailAlert ()
 
 	echo
 
-        DumpFiles "Switch log content" "${LOG_FILE}"
+        #DumpFiles "Switch log content" "${LOG_FILE}"
+	if   [ "${1}" == "XML_AVAILABLE" ]
+	then DumpAudit 
+	fi
+
+	if   [ "${1}" == "BAD_XML_FORMAT" ]
+	then echo "Priority: Urgent"
+             echo "Importance: high"
+             DumpFiles "Log content" "${LOG_FILE}"
+	fi
 
 	if   [ "${LOCKDIR}" != "" ]
 	then DumpFiles "Lock file (${LOCKDIR}/owner}) content" "${LOCKDIR}/owner"
@@ -217,6 +150,20 @@ MailAlert ()
 	
 	echo
     ) | /usr/lib/sendmail -f "${MAIL_FROM}" -t
+}
+
+#
+# Check we are in IDLE state
+#
+
+CheckIdleState ()
+{
+    SQL="SELECT state FROM process_state WHERE entity='System'"
+    QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
+    if [ "$QUERY" == "IDLE" ]; then
+         return 1
+    fi
+    return 0
 }
 
 #
@@ -267,26 +214,19 @@ F_FLAG=""
 TMP_DIR="/var/tmp/CMS0294ProcessXML"
 mkdir -p "${TMP_DIR}" 2>/dev/null
 
-LOG_NAME="Switch.log"
+LOG_NAME="PreviewLoad.log"
 LOG_FILE="${TMP_DIR}/${LOG_NAME}"
-LOG_MASK='Transfer.????-??-??_??:??:??.log.gz'
-JETTY_PID="/var/run/jetty.pid"
-JETTY_ON=""
+LOG_MASK='PreviewLoad.????-??-??_??:??:??.log.gz'
 
 # Check Options
 
-while getopts "FDvS:" op
+while getopts "FDv" op
 do
     case "${op}" in
 
     "D" ) D_FLAG="YES" ;;
     "F" ) F_FLAG="YES" ;;
     "v" ) v_FLAG="YES" ;;
-
-    "S" ) S_FLAG="${OPTARG}"
-          CheckNumericValue "${OPTARG}" "Solr verison number"
-	  HIP_NROOT="${HIP_SROOT}${OPTARG}"
-	  ;;
 
     * ) Usage ;;
 
@@ -295,9 +235,9 @@ done
 
 shift $((OPTIND - 1))
 
-if   [ $# -ne 0 -o "${S_FLAG}" = "" ]
-then Usage
-fi
+#if   [ $# -ne 0 -o "${S_FLAG}" = "" ]
+#then Usage
+#fi
 
 # Save the old log files
 
@@ -313,123 +253,78 @@ if   [ "${D_FLAG}" = "" ]
 then exec >"${LOG_FILE}" 2>&1
 fi
 
-echo "Starting Solr Switch at $(date)"
+echo "Starting Production Update at $(date)"
 
 HostName="$(hostname | sed -e 's/\..*//')"
-ActiveJetty
 
-# Master process
-
-if   [ "${HostName}" = "evl3300675" ]
-then if   [ "${JETTY_ON}" = "" ]
-     then MailAlert NO_JETTY
-	  ErrorExit "No active Jetty on this host"
-     fi
-
-# Lock the process and restart jetty
-
-     LOCKDIR="${HIP_SROOT}.lock"
+# Lock the process
+     LOCKDIR="${XML_IN_DIR}_xml.lock"
 
      if   LockProcess
      then MailAlert LOCK_TIMEOUT
-	  ErrorExit "Did not get the Jetty lock"
+	  ErrorExit "Did not get the XML Update lock"
      fi
 
-     StopJetty
+     # The pp_audit_xml.* file should be the last one written in an upload
+     # We wait until this file is at least 5 minutes old before processing
+     PP_AUDIT="pp_audit_xml*"
+     MMIN="+5"
 
-# Do we need to rename hip_solr?
+     if [ $(find ${XML_IN_DIR} -maxdepth 1 -type f -mmin ${MMIN} -iname "${PP_AUDIT}" | wc -l) -gt 0 ]; then
 
-     if  [ "${F_FLAG}" = "YES" ]
-     then PrintVerboseInfo "Renaming ${HIP_SROOT} to ${HIP_ROOT}/hip_solr1"
-	  mv "${HIP_SROOT}" "${HIP_ROOT}/hip_solr1"
+        CheckIdleState
+        if [ "$?" -eq "0" ]
+        then MailAlert INVALID_STATE
+             ErrorExit "XML detected, but not at IDLE"
+        fi
 
-	  if   [ "$?" -ne 0 ]
-	  then MailAlert FIRST
-	       ErrorExit "Cannot rename ${HIP_SROOT} to ${HIP_ROOT}/hip_solr1"
-	  fi
+        MailAlert XML_AVAILABLE
+
+        rm -rf "${XML_PROCESS_DIR}"
+        mkdir -p "${XML_PROCESS_DIR}" 2>/dev/null
+        mv ${XML_IN_DIR}/pp_* "${XML_PROCESS_DIR}"
+
+        # Convert pp*.xml* files to pp*.xml ready for import
+        ls ${XML_PROCESS_DIR}/pp_* | while read FILE; do mv "$FILE" "${FILE%%.*}.xml"; done
+
+        # format the XML (optional step)
+        formatIssue=0
+        rm -f ${XML_PROCESS_DIR}/report.csv
+        for FILE in $(find ${XML_PROCESS_DIR} -type f -iname "pp_*.xml")
+        do
+           FBASE=$(basename ${FILE%%.*})
+           echo "Validating and formating XML ${FBASE}:"
+           xmllint --format "$FILE" -o "$FILE"
+           result=$?
+           if [ $result -gt 0 ]; then
+              formatIssue=1
+           else
+              EBASE=$(echo ${FBASE} | sed -e 's/pp_//g' | sed -e 's/_xml//g')
+              iI=$(cat $FILE | grep "<Action_Code>I" | wc -l)
+              iU=$(cat $FILE | grep "<Action_Code>U" | wc -l)
+              iD=$(cat $FILE | grep "<Action_Code>D" | wc -l)
+              echo "${EBASE},${iI},${iU},${iD}" >> ${XML_PROCESS_DIR}/report.csv
+           fi
+        done
+        if [ $formatIssue -gt 0 ]; then
+           MailAlert BAD_XML_FORMAT
+           ErrorExit "XML Formatting issues" 
+        fi
+
+        # ...if available then run the upload task
+        JAVA_CLASSPATH="/opt/etl/build:/opt/etl/lib/*:/opt/etl/conf:/opt/etl/hbm"
+        JAVA_STUB="ETLPreviewLoad"
+        echo "java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}"
+        java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}
      fi
-
-# Create the link
-
-     PrintVerboseInfo "Creating new link ${HIP_NROOT} to ${HIP_SROOT}"
-
-     ln -sTf "${HIP_NROOT}" "${HIP_SROOT}"
-
-     if   [ "$?" -ne 0 ]
-     then MailAlert LINK
-	  ErrorExit "Cannot link ${HIP_NROOT} to ${HIP_SROOT}"
-     fi
-
-     StartJetty
-
-     sleep 30					# it takes Jetty around 30 seconds to get ready
 
 # Remove the lock
-
      UnLockProcess
      LOCKDIR=""
 
      VerboseCheck 
 
      PrintVerboseInfo "Master [${HostName}] update complete"
-
-#
-# Non Master - wait
-#
-
-elif [ "${JETTY_ON}" = "" ]
-then MailAlert NO_JETTY1
-
-else stime=$(date "+%s")
-     stime=$((stime + 600))
-
-# Has the master completed?
-
-     while [ "$(find  "${HIP_SROOT}" -maxdepth 0 -printf "%y > %l > %p\n")" != "l > ${HIP_NROOT} > ${HIP_SROOT}" ]
-     do
-	   sleep 10
-	   etime=$(date "+%s")
-
-	   if  [ "${etime}" -ge "${stime}" ]
-	   then MailAlert NAME_TIMEOUT
-	        ErrorExit "Did not find new link within 10 minutes"
-	   fi
-     done
-
-     PrintVerboseInfo "Master update complete detected"
-
-# Now get in and restart Jetty
-
-     stime=$(date "+%s")
-     stime=$((stime + 600))
-
-     LOCKDIR="${HIP_SROOT}.lock"
-
-     while LockProcess
-     do
-	   RanSleep 60 10
-	   etime=$(date "+%s")
-
-	   if  [ "${etime}" -ge "${stime}" ]
-	   then MailAlert LOCK_TIMEOUT
-	        ErrorExit "Did not get the Jetty lock within 10 minutes"
-	   fi
-     done
-
-     StopJetty
-     StartJetty
-
-     sleep 30					# it takes Jetty around 30 seconds to get ready
-
-# Remove the lock
-
-     UnLockProcess
-     LOCKDIR=""
-
-     VerboseCheck 
-
-     PrintVerboseInfo "Slave [${HostName}] update complete"
-fi
 
 # Completed
 
@@ -445,6 +340,6 @@ do
     rm -f $i
 done
 
-echo "Completed Solr Switch at $(date)"
+echo "Completed Production Update at $(date)"
 
 exit 0;

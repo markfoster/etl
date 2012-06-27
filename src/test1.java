@@ -1,21 +1,26 @@
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.Source;
-import javax.xml.transform.Result;
-import javax.xml.transform.OutputKeys;
+import java.io.*;
+import java.util.*;
 
 public class test1 {
 
   public static void main(String[] args) throws Exception {
-  Source source = new StreamSource("input.xml");
-  Source xsl = new StreamSource("xfer.xsl");
-  Result result = new StreamResult(System.out);
 
-  TransformerFactory factory = TransformerFactory.newInstance();
-  Transformer transformer = factory.newTransformer(xsl);
-  transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-  transformer.transform(xsl, result);
+String[] commandArray = {
+    "/bin/bash",
+    "/usr/local/bin/CMS0294Alert.sh",
+    "-c 3", "-s 'abc'", "-m 'def'"
+};
+System.out.println(commandArray);
+Process process = Runtime.getRuntime().exec(commandArray);
+System.out.println(process);
+
+int exitValue = process.waitFor();  
+            System.out.println("exit value: " + exitValue);  
+            BufferedReader buf = new BufferedReader(new InputStreamReader(process.getInputStream()));  
+            String line = "";  
+            while ((line = buf.readLine()) != null) {  
+                System.out.println("exec response: " + line);  
+            } 
+
   }
 }    

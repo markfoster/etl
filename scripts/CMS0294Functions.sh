@@ -89,3 +89,15 @@ DumpFiles ()
 	echo
     done
 }
+
+DumpAudit ()
+{
+    audit_file=$(find ${XML_PROCESS_DIR} -type f -iname "pp_audit_xml*")
+    echo "Audit = $audit_file"
+    DumpFiles "Audit" $audit_file
+}
+
+Alert ()
+{
+    echo "Alert"
+}

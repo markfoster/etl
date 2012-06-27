@@ -14,7 +14,7 @@
             </key-property>
         </composite-id>
 
-        <property name="actionCode" type="string" node="Action_Code">
+        <property name="actionCode" type="java.lang.Character" node="Action_Code">
             <column name="action_code" length="1" />
         </property>
 

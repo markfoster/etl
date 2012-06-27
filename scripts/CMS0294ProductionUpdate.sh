@@ -2,12 +2,9 @@
 #
 # ETL - Process any available XML files from the client
 #
-# Usage: CMS0294ProductionUpdate.sh [ -DFv ] -S Solr Version Number
+# Usage: CMS0294ProductionUpdate.sh [ -D ]
 #
 #    -D: Debug
-#    -v: Web Site
-#    -S: Solr Target Directory
-#    -F: First time
 #
 # $Id: CMS0294ProductionUpdate.sh,v 1.11 2012/05/01 11:09:03 appadmin Exp $
 #
@@ -27,7 +24,7 @@
 #
 
 Usage () {
-    echo "usage: CMS0294ProductionUpdate.sh [ -DFv ] [ -S Solr vesion number ]" 1>&2
+    echo "usage: CMS0294ProductionUpdate.sh [ -D ]" 1>&2
 
     CleanUp
     exit 1
@@ -99,81 +96,12 @@ RanSleep () {
 }
 
 #
-# Dump Jetty Process Info
-#
-
-JettyDump () {
-    PrintInfo "PID            : ${XPID}"
-    PrintInfo "PID_FILE       : ${JETTY_PID}"
-
-    if   [ -f "${JETTY_PID}" ]
-    then PrintInfo "PID_FILE Status:" $(ls -l "${JETTY_PID}")
-         PrintInfo "PID_FILE Value : [" $(<"${JETTY_PID}") "]"
-    else PrintInfo "PID_FILE Status: Not found"
-    fi
-
-    PrintInfo "Processes : ["
-    ps -ef
-    PrintInfo "]"
-}
-
-
-#
-# Stop the Jetty Process
-#
-
-StopJetty ()
-{
-    /etc/init.d/jetty stop
-    XPID="$(ps -eo pid,cmd | sed -e '/^ *[0-9][0-9]* \/usr\/bin\/java/!d' -e 's/^ *\([0-9][0-9]*\) .*/\1/')"
-
-    if   [ -f "${JETTY_PID}" -o "${XPID}" != "" ]
-    then JettyDump
-         MailAlert JETTYSTOP
-	 ErrorExit "Jetty does not appear to have stopped - pid file exists"
-    fi
-}
-
-#
-# Start the Jetty Process
-#
-
-StartJetty ()
-{
-    /etc/init.d/jetty start
-    XPID="$(ps -eo pid,cmd | sed -e '/^ *[0-9][0-9]* \/usr\/bin\/java/!d' -e 's/^ *\([0-9][0-9]*\) .*/\1/')"
-
-    if   [ ! -f "${JETTY_PID}" -o "${XPID}" = "" ]
-    then JettyDump
-         MailAlert JETTYSTART
-	 ErrorExit "Jetty does not appear to have restarted - pid file does not exist"
-    fi
-}
-
-#
-# Is Jetty active
-#
-
-ActiveJetty ()
-{
-    if   [ -s "${JETTY_PID}" ]
-    then JETTY_ON="$(ps -p $(<"${JETTY_PID}") -ocmd | fgrep -i jetty)"
-    fi
-}
-
-#
 # Verbose Check on index in use
 #
 
 VerboseCheck () {
     if   [ "${v_FLAG}" = "YES" ]
-    then PrintInfo "Check correct index in use ["
-         ls -ld "${HIP_SROOT}"
-	 /usr/bin/stat -c '%A I=%i (D=%d) %h %G %U S=%s %y %n' "${HIP_NROOT}/index"
-	 /usr/bin/stat -c '%A I=%i (D=%d) %h %G %U S=%s %y %n' "${HIP_SROOT}/index"
-	 echo "COMMAND     PID      USER   FD      TYPE             DEVICE      SIZE       NODE NAME"
-	 /usr/sbin/lsof	| fgrep "${HIP_SROOT}"
-	 PrintInfo "] - End of status info."
+    then PrintInfo "Verbose Check"
     fi
 }
 
@@ -186,6 +114,7 @@ VerboseCheck () {
 MailAlert ()
 {
     MAIL_FROM="CMS0294ProductionUpdate@$(hostname)"
+    LOCK_ALERT=""
 
     (
 	echo "To: ${EVENT_MAIL}"
@@ -193,26 +122,31 @@ MailAlert ()
 
 	case "${1}" in
 
-	"JETTYSTOP" )		echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to stop JETTY on ${HostName}" ;;
-	"JETTYSTART" )		echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to restart JETTY on ${HostName}" ;;
-	"FIRST" )		echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to rename HIP_SOLR on ${HostName}" ;;
-	"LINK" )		echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to create HIP_SOLR link on ${HostName}" ;;
-	"NAME_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to find new HIP_SOLR link on ${HostName}" ;;
-	"LOCK_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to get the Jetty lock on ${HostName}" ;;
-	"LOCK_CLEAR" )		echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to clear the Jetty lock on ${HostName}" ;;
-	"NO_JETTY" )		echo "Subject: CRITICAL - CMS0294ProductionUpdate found No Jetty active on Master server ${HostName}" ;;
-	"NO_JETTY1" )		echo "Subject: WARNING - CMS0294ProductionUpdate No Jetty active on server ${HostName}" ;;
+	"LOCK_TIMEOUT" )	    echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to get the Update lock on ${HostName}"
+                                    LOCK_ALERT="LOCK"
+                                    ;;
+	"LOCK_CLEAR" )		    echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to clear the Update lock on ${HostName}" 
+                                    LOCK_ALERT="LOCK"
+                                    ;;
+	"DRUPAL_PREVIEW_UPDATED" )  echo "Subject: ALERT - Preview instance update has completed"
+                                    echo "Priority: Urgent"
+                                    echo "Importance: high"
+                                    ;;
+	"DRUPAL_PROD_UPDATED" )     echo "Subject: ALERT - Production instance update has completed" 
+                                    echo "Priority: Urgent"
+                                    echo "Importance: high"
+                                    ;;
 
-	* )			echo "Subject: WARNING - CMS0294ProductionUpdate unknown mail alert on ${HostName}" ;;
+	* )			    echo "Subject: WARNING - CMS0294ProductionUpdate unknown mail alert on ${HostName}" ;;
 
 	esac
 
 	echo
 
-        DumpFiles "Switch log content" "${LOG_FILE}"
-
-	if   [ "${LOCKDIR}" != "" ]
-	then DumpFiles "Lock file (${LOCKDIR}/owner}) content" "${LOCKDIR}/owner"
+        if   [ "${LOCK_ALERT}" == "LOCK" ]; then
+	  if   [ "${LOCKDIR}" != "" ]
+	  then DumpFiles "Lock file (${LOCKDIR}/owner}) content" "${LOCKDIR}/owner"
+	  fi
 	fi
 	
 	echo
@@ -267,26 +201,19 @@ F_FLAG=""
 TMP_DIR="/var/tmp/CMS0294ProductionUpdate"
 mkdir -p "${TMP_DIR}" 2>/dev/null
 
-LOG_NAME="Switch.log"
+LOG_NAME="ProductionUpdate.log"
 LOG_FILE="${TMP_DIR}/${LOG_NAME}"
-LOG_MASK='Transfer.????-??-??_??:??:??.log.gz'
-JETTY_PID="/var/run/jetty.pid"
-JETTY_ON=""
+LOG_MASK='ProductionUpdate.????-??-??_??:??:??.log.gz'
 
 # Check Options
 
-while getopts "FDvS:" op
+while getopts "FDv" op
 do
     case "${op}" in
 
     "D" ) D_FLAG="YES" ;;
     "F" ) F_FLAG="YES" ;;
     "v" ) v_FLAG="YES" ;;
-
-    "S" ) S_FLAG="${OPTARG}"
-          CheckNumericValue "${OPTARG}" "Solr verison number"
-	  HIP_NROOT="${HIP_SROOT}${OPTARG}"
-	  ;;
 
     * ) Usage ;;
 
@@ -295,9 +222,9 @@ done
 
 shift $((OPTIND - 1))
 
-if   [ $# -ne 0 -o "${S_FLAG}" = "" ]
-then Usage
-fi
+#if   [ $# -ne 0 -o "${S_FLAG}" = "" ]
+#then Usage
+#fi
 
 # Save the old log files
 
@@ -313,51 +240,22 @@ if   [ "${D_FLAG}" = "" ]
 then exec >"${LOG_FILE}" 2>&1
 fi
 
-echo "Starting Solr Switch at $(date)"
+echo "Starting Production Update at $(date)"
 
 HostName="$(hostname | sed -e 's/\..*//')"
 
-# Master process
-if   [ "${HostName}" = "evl3300675" ]
-then 
-
 # Lock the process and restart jetty
 
-     LOCKDIR="${HIP_SROOT}.lock"
+     LOCKDIR="${XML_IN_DIR}.lock"
 
      if   LockProcess
      then MailAlert LOCK_TIMEOUT
-	  ErrorExit "Did not get the Jetty lock"
+	  ErrorExit "Did not get the Update lock"
      fi
 
-     StopJetty
-
-# Do we need to rename hip_solr?
-
-     if  [ "${F_FLAG}" = "YES" ]
-     then PrintVerboseInfo "Renaming ${HIP_SROOT} to ${HIP_ROOT}/hip_solr1"
-	  mv "${HIP_SROOT}" "${HIP_ROOT}/hip_solr1"
-
-	  if   [ "$?" -ne 0 ]
-	  then MailAlert FIRST
-	       ErrorExit "Cannot rename ${HIP_SROOT} to ${HIP_ROOT}/hip_solr1"
-	  fi
-     fi
-
-# Create the link
-
-     PrintVerboseInfo "Creating new link ${HIP_NROOT} to ${HIP_SROOT}"
-
-     ln -sTf "${HIP_NROOT}" "${HIP_SROOT}"
-
-     if   [ "$?" -ne 0 ]
-     then MailAlert LINK
-	  ErrorExit "Cannot link ${HIP_NROOT} to ${HIP_SROOT}"
-     fi
-
-     StartJetty
-
-     sleep 30					# it takes Jetty around 30 seconds to get ready
+     JAVA_CLASSPATH="/opt/etl/build:/opt/etl/lib/*:/opt/etl/conf:/opt/etl/hbm"
+     JAVA_STUB="ETLProductionLoad"
+     java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}
 
 # Remove the lock
 
@@ -367,64 +265,6 @@ then
      VerboseCheck 
 
      PrintVerboseInfo "Master [${HostName}] update complete"
-
-#
-# Non Master - wait
-#
-
-elif [ "${JETTY_ON}" = "" ]
-then MailAlert NO_JETTY1
-
-else stime=$(date "+%s")
-     stime=$((stime + 600))
-
-# Has the master completed?
-
-     while [ "$(find  "${HIP_SROOT}" -maxdepth 0 -printf "%y > %l > %p\n")" != "l > ${HIP_NROOT} > ${HIP_SROOT}" ]
-     do
-	   sleep 10
-	   etime=$(date "+%s")
-
-	   if  [ "${etime}" -ge "${stime}" ]
-	   then MailAlert NAME_TIMEOUT
-	        ErrorExit "Did not find new link within 10 minutes"
-	   fi
-     done
-
-     PrintVerboseInfo "Master update complete detected"
-
-# Now get in and restart Jetty
-
-     stime=$(date "+%s")
-     stime=$((stime + 600))
-
-     LOCKDIR="${HIP_SROOT}.lock"
-
-     while LockProcess
-     do
-	   RanSleep 60 10
-	   etime=$(date "+%s")
-
-	   if  [ "${etime}" -ge "${stime}" ]
-	   then MailAlert LOCK_TIMEOUT
-	        ErrorExit "Did not get the Jetty lock within 10 minutes"
-	   fi
-     done
-
-     StopJetty
-     StartJetty
-
-     sleep 30					# it takes Jetty around 30 seconds to get ready
-
-# Remove the lock
-
-     UnLockProcess
-     LOCKDIR=""
-
-     VerboseCheck 
-
-     PrintVerboseInfo "Slave [${HostName}] update complete"
-fi
 
 # Completed
 
@@ -440,6 +280,6 @@ do
     rm -f $i
 done
 
-echo "Completed Solr Switch at $(date)"
+echo "Completed Production Update at $(date)"
 
 exit 0;

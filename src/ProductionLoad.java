@@ -20,6 +20,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import org.apache.commons.beanutils.*;
+
 public class ProductionLoad {
 
     Logger logger = Logger.getLogger(this.getClass().getName());
@@ -39,6 +41,12 @@ public class ProductionLoad {
                    continue;
            }
            updateProductionProfile(entity);
+
+           // if we are processing a FULL upload then cleanup...
+           String eState = ProcessState.getEntityState(entity);
+           if (eState.equals(ProcessState.STATE_FULL)) {
+               updateProductionCleanup(entity, ProcessState.getEntityUniqueId(entity));
+           }
         }
     }
 
@@ -72,5 +80,9 @@ public class ProductionLoad {
                  logger.error(String.format("updateProductionProfile: %s", entity), ex);
              }
         }
+    }
+
+    public void updateProductionCleanup(String entity, String uid) {
+        logger.warn(String.format("updateProductionCleanup: %s, '%s' - TO DO", entity, uid));
     }
 }
