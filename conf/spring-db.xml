@@ -22,17 +22,25 @@
         <bean id="preview-pp"
                 class="org.springframework.jdbc.datasource.DriverManagerDataSource">
                 <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-                <property name="url" value="jdbc:mysql://localhost:3306/preview_pp" />
-		<property name="username" value="cqcdms_m" />
-		<property name="password" value="pcT1x5CXSD" />
+                <property name="url" value="jdbc:mysql://10.38.1.65:3306/preview_pp" />
+		<property name="username" value="cqcdms_p" />
+		<property name="password" value="ncZ1x6CWSDa" />
+        </bean>
+
+        <bean id="preview-cqcdms"
+                class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+                <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://10.38.1.65:3306/preview_cqcdms" />
+                <property name="username" value="cqcdms_p" />
+                <property name="password" value="ncZ1x6CWSDa" />
         </bean>
 
         <bean id="production-pp"
                 class="org.springframework.jdbc.datasource.DriverManagerDataSource">
                 <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-                <property name="url" value="jdbc:mysql://localhost:3306/production_pp" />
-		<property name="username" value="cqcdms_m" />
-		<property name="password" value="pcT1x5CXSD" />
+                <property name="url" value="jdbc:mysql://10.38.1.65:3306/production_pp" />
+		<property name="username" value="cqcdms_p" />
+		<property name="password" value="ncZ1x6CWSDa" />
         </bean>
 
         <bean id="common"

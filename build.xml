@@ -150,7 +150,7 @@
   </hibernatetool>
 </target>
 
-<target name="download-jars">
+<target name="dependancies">
     <ivy:retrieve/>
 </target>
 
