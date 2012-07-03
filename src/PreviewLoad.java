@@ -85,7 +85,7 @@ public class PreviewLoad {
                         checkXSD(xsd);
                         validateXML(xml, xsd);
                 } catch (Exception ex) {
-                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Audit Load", ex.getMessage(), WatchDog.WATCHDOG_WARNING);
+                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "auditload", ex.getMessage(), WatchDog.WATCHDOG_WARNING);
                         throw new Exception("Audit Load or Validate issue: " + ex.getMessage());
                 }
 		// Parse the audit file
@@ -111,7 +111,7 @@ public class PreviewLoad {
                      if (!aList.equals(rList)) {
                          String err = String.format("Entity %s metrics issues: Audit=%s, Actual=%s", key, aList, rList);
                          logger.warn(err);
-                         WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Audit Load", err, WatchDog.WATCHDOG_WARNING);
+                         WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "auditload", err, WatchDog.WATCHDOG_WARNING);
                          throw new Exception("Audit metrics differ from actual");
                      }
                 }
@@ -127,9 +127,11 @@ public class PreviewLoad {
                      validateAudit();
                 } catch (Exception ex) {
                      WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, 
-                                  "Audit Load", "Problem loading the audit: " + ex.getMessage(), 
+                                  "auditload", "Problem loading the audit: " + ex.getMessage(), 
                                   WatchDog.WATCHDOG_EMERG);
                 }
+
+                if (true) return;
 
                 try {
                      Map audits = context.getAuditMap();
@@ -139,7 +141,8 @@ public class PreviewLoad {
                              String key = (String)i.next();
 
                              Map actions = (Map)audits.get(key);
-                             logger.info(String.format("Entity: %-30s, Actions: %s",key, actions));
+                             String metric = String.format("Entity: %s, Actions: %s", key, actions);
+                             WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "auditload", metric, WatchDog.WATCHDOG_INFO);
                              if (actions.get("active") == null) continue;
 
                              String xmlFile = basedir+"/xml/pp_" + key.toLowerCase() + "_xml.xml";
@@ -323,7 +326,7 @@ public class PreviewLoad {
 				Element e = (Element) node;
 				if (e.getName().equals(entity)) {
 					// org.hibernate.util.XMLHelper.dump(e);
-					System.out.println(entity + " PK = "
+					logger.debug(entity + " PK = "
 							+ Entity.getPrimaryKey(e, entity));
 					treeProcess(e, entity);
 				} else {

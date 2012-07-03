@@ -27,7 +27,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.*;
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
+
 public class GeoCode {
+
+        static Logger logger = Logger.getLogger("GeoCode");
 
         private static final String googleKey = "Y6D95O6w_dXHs58ve2ixLrSV8tU=";
         private static final String googleID  = "gme-carequalitycommission";
@@ -55,11 +59,16 @@ public class GeoCode {
         */
         public static float[] getAddress(String postcode) {
                 float[] latlng = {0.0f, 0.0f};
+                if (postcode.equals("Unspecified")) return latlng;
                 try {
                     latlng = getCache(postcode);
                 } catch (Exception ex) {
+                    logger.info("Calling Web API for " + postcode);
+	            latlng = getAddress("", "", "", "", postcode, "");
                 }
+                return latlng;
 
+/****
                	float lat = 0.0f;
                 float lng = 0.0f;
                 ApplicationContext context = SpringUtil.getApplicationContext();
@@ -78,6 +87,7 @@ public class GeoCode {
                     lng = ilatlng[1];
                 }
                 return latlng;
+**/
         }
 
         public static float[] getAddress(String address1, 
@@ -99,19 +109,20 @@ public class GeoCode {
                     return coord;
 		}                    
 
-		String address = postcode + " " + country;
+		String address = postcode + " UK";
 
                 // prepare a URL to the geocoder
             	String request = " ";
             	URL url = null;
                 try {
 			// curl "http://maps.googleapis.com/maps/api/geocode/xml?address=+DA14+4EG&sensor=false&region=gb"
-			address = postcode;
-            		url = new URL(GEOCODER_REQUEST_PREFIX_FOR_XML + "?address=" + URLEncoder.encode(address, "UTF-8") + "&client=" + googleID + "&sensor=false");
+            		url = new URL(GEOCODER_REQUEST_PREFIX_FOR_XML + "?address=" + URLEncoder.encode(address, "UTF-8") + "&client=" + googleID + "&sensor=false&region=gb");
+                        logger.info("Google URL = " + url);
                 	UrlSigner signer = new UrlSigner(googleKey);
                 	request = signer.signRequest(url.getPath(),url.getQuery());
                 } catch (Exception e) {
-                	System.out.println(e);
+                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "geocode",
+                                     e.getMessage(), WatchDog.WATCHDOG_WARNING);
                 }
 
                 URL signedUrl = null;
@@ -124,14 +135,13 @@ public class GeoCode {
                 	// Open the connection and get results as InputSource.
                         httpUrlConn.connect();
                         InputSource geocoderResultInputSource = new InputSource(httpUrlConn.getInputStream());
-
                         // read result and parse into XML Document
                         geocoderResultDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(geocoderResultInputSource);
-
                 } catch (Exception e) {
                         // unable to connect to api - need to put error handling in here
                         String errorMsg = "Unable to connect to Google API : " + e.toString();
-                        System.out.println(e);
+                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "geocode",
+                                     errorMsg, WatchDog.WATCHDOG_WARNING);
                 }
                 finally {
                         httpUrlConn.disconnect();
@@ -145,7 +155,6 @@ public class GeoCode {
                 // b) extract the locality for the first result
                 try {
 			resultNodeList = (NodeList)xpath.evaluate("/GeocodeResponse/status", geocoderResultDocument, XPathConstants.NODESET);
-			System.out.println(resultNodeList.item(0).getTextContent());
 			if ("OK".equals(resultNodeList.item(0).getTextContent())) {
 				// Extract the coordinates of the first result
 				resultNodeList = (NodeList) xpath.evaluate("/GeocodeResponse/result[1]/geometry/location/*", 
@@ -158,18 +167,16 @@ public class GeoCode {
 					if("lat".equals(node.getNodeName())) lat = Float.parseFloat(node.getTextContent());
 					if("lng".equals(node.getNodeName())) lng = Float.parseFloat(node.getTextContent());
 				}
-				System.out.println("lat/lng=" + lat + "," + lng);
-
 				coord[0] = lat;
 				coord[1] = lng;
 			} else {
 				String googleError = resultNodeList.item(0).getTextContent();
-                                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Geocode",
+                                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "geocode",
                                      String.format("Google Geocode returned an issue for %s: %s", postcode, googleError), 
                                      WatchDog.WATCHDOG_ALERT);
 			}
 		} catch (Exception e) {
-                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Geocode",
+                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "geocode",
                                      String.format("Failed to get coords for %s", postcode), WatchDog.WATCHDOG_WARNING);
 		}
 
@@ -185,6 +192,7 @@ public class GeoCode {
                 // check the internal map
                 if (geoMap.size() == 0) {
                     geoMap = populateCache(); 
+                    logger.info("Populating cache, size : " + geoMap.size());
                 }
 
                 List cCoords = (List)geoMap.get(postcode);
@@ -210,6 +218,26 @@ public class GeoCode {
         }
 
         private static void setCache(String postcode, float[] coords) {
+                ApplicationContext context = SpringUtil.getApplicationContext();
+                JdbcTemplate jT_Common = new JdbcTemplate();
+                jT_Common.setDataSource((DataSource)context.getBean("common"));
+                BigDecimal lat = new BigDecimal(coords[0]);
+                BigDecimal lng = new BigDecimal(coords[1]);
+                logger.info(String.format("Caching geocode: '%s' = %s : %s", postcode, lat.toString(), lng.toString()));
+                List latlng = new ArrayList();  
+                latlng.add(lat);
+                latlng.add(lng);
+                geoMap.put(postcode, latlng);
+                try {
+                    jT_Common.update("INSERT INTO geocode_cache (postcode, location_id, country, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
+                                new Object[] { postcode, "0", "UK", lat, lng } );
+                } catch (Exception ex) {
+                    logger.error("Failed to cache coords for " + postcode + " " + latlng);
+                    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "geocode",
+                                     String.format("Failed to cache coords for %s :%s", postcode, latlng.toString()), 
+                                     WatchDog.WATCHDOG_WARNING);
+
+                }
         }
 
         private static Map populateCache() {
@@ -234,9 +262,7 @@ public class GeoCode {
                             latlng.add(rs.getBigDecimal("latitude"));
                             latlng.add(rs.getBigDecimal("longitude"));
                             map.put(postcode, latlng);  
-                            //System.out.println(latlng + " = " + latlng.size());  
                         }  
-                        System.out.println("Geocode map size = " + map.size());  
                         return map;  
                     };  
                 });  

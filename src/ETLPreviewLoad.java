@@ -60,36 +60,40 @@ public class ETLPreviewLoad {
                 //ProcessState.setSystemState(ProcessState.IDLE);
                 //ProcessState.setLock(ProcessState.LOCK_CLEAR);
 
+if (true) {
+
                 String pState = ProcessState.getSystemState();
                 if (!pState.equals(ProcessState.IDLE)) {
                     logger.error("Initiating Preview Load but system state = " + pState);
-                    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview Load", "State != IDLE exiting", WatchDog.WATCHDOG_EMERG);
+                    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", "State != IDLE exiting", WatchDog.WATCHDOG_EMERG);
                 }
 
                 String pLock = ProcessState.getLock();
                 if (!pLock.equals(ProcessState.LOCK_CLEAR)) {
                     logger.error("Initiating Preview Load but lock state = " + pLock);
-                    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview Load", "Lock != CLEAR exiting", WatchDog.WATCHDOG_EMERG);
+                    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", "Lock != CLEAR exiting", WatchDog.WATCHDOG_EMERG);
                 }
+}
 
                 // Populate the preview delta from XML files	
                 ProcessState.setLock(ProcessState.LOCK_SET);
-                ProcessState.setSystemState(ProcessState.PREVIEW_XML_IN_PROGRESS);
+                ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_LOAD_IN_PROGRESS);
                 WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
-                                  "Acquired lock and changed process state to PREVIEW_XML_IN_PROGRESS",
+                                  "Acquired lock and changed process state to PREVIEW_DELTA_LOAD_IN_PROGRESS",
                                   WatchDog.WATCHDOG_INFO);
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
+                                  "Changed internal process state to PREVIEW_XML_IN_PROGRESS", 
+                                  WatchDog.WATCHDOG_DEBUG);
 		PreviewLoad pl = new PreviewLoad();
                 pl.init();
                 pl.run();
-                ProcessState.setSystemState(ProcessState.PREVIEW_XML_COMPLETE);
                 WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
-                                  "Changed process state to PREVIEW_XML_COMPLETE", 
-                                  WatchDog.WATCHDOG_INFO);
+                                  "Changed internal process state to PREVIEW_XML_COMPLETE", 
+                                  WatchDog.WATCHDOG_DEBUG);
 
-                ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_LOAD_IN_PROGRESS);
                 WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
-                                  "Changed process state to PREVIEW_DELTA_LOAD_IN_PROGRESS", 
-                                  WatchDog.WATCHDOG_INFO);
+                                  "Changed internal process state to PREVIEW_DELTA_LOAD_IN_PROGRESS", 
+                                  WatchDog.WATCHDOG_DEBUG);
                 PreviewUpdate pu = new PreviewUpdate();
                 pu.init();
                 pu.run();

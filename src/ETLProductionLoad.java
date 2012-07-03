@@ -73,7 +73,7 @@ public class ETLProductionLoad {
                 // Populate the preview delta from XML files	
                 ProcessState.setLock(ProcessState.LOCK_SET);
                 ProcessState.setSystemState(ProcessState.PROD_DELTA_LOAD_IN_PROGRESS);
-                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "prodload",
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodload",
                                   "Acquired lock and changed process state to PROD_DELTA_LOAD_IN_PROGRESS",
                                   WatchDog.WATCHDOG_INFO);
 		ProductionLoad pl = new ProductionLoad();
@@ -81,7 +81,7 @@ public class ETLProductionLoad {
                 pl.run();
                 ProcessState.setLock(ProcessState.LOCK_CLEAR);
                 ProcessState.setSystemState(ProcessState.PROD_DELTA_LOAD_COMPLETE);
-                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "prodload",
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodload",
                                   "Released lock and changed process state to PROD_DELTA_LOAD_COMPLETE",
                                   WatchDog.WATCHDOG_INFO);
 	}

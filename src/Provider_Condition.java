@@ -12,6 +12,7 @@ public class Provider_Condition  implements java.io.Serializable, CQC_Entity {
      private String providerId;
      private String conditionId;
      private String regulatedActivityNumber;
+     private Character type;
      private String text;
      private String reason;
      private Character actionCode;
@@ -20,14 +21,16 @@ public class Provider_Condition  implements java.io.Serializable, CQC_Entity {
     public Provider_Condition() {
     }
 	
-    public Provider_Condition(String providerId, String regulatedActivityNumber) {
+    public Provider_Condition(String providerId, String regulatedActivityNumber, String conditionId) {
         this.providerId = providerId;
         this.regulatedActivityNumber = regulatedActivityNumber;
+       this.conditionId = conditionId;
     }
-    public Provider_Condition(String providerId, String conditionId, String regulatedActivityNumber, String text, String reason, Character actionCode, Date lastUpdated) {
+    public Provider_Condition(String providerId, String conditionId, String regulatedActivityNumber, Character type, String text, String reason, Character actionCode, Date lastUpdated) {
        this.providerId = providerId;
        this.conditionId = conditionId;
        this.regulatedActivityNumber = regulatedActivityNumber;
+       this.type = type;
        this.text = text;
        this.reason = reason;
        this.actionCode = actionCode;
@@ -57,6 +60,15 @@ public class Provider_Condition  implements java.io.Serializable, CQC_Entity {
     public void setRegulatedActivityNumber(String regulatedActivityNumber) {
         this.regulatedActivityNumber = regulatedActivityNumber;
     }
+
+        public Character getType() {
+                return this.type;
+        }
+
+        public void setType(Character type) {
+                this.type = type;
+        }
+
     public String getText() {
         return this.text;
     }
@@ -96,7 +108,8 @@ public class Provider_Condition  implements java.io.Serializable, CQC_Entity {
                 Provider_Condition castOther = (Provider_Condition) other;
 
                 return ((this.getProviderId() == castOther.getProviderId()) || (this.getProviderId() != null && castOther.getProviderId() != null && this.getProviderId().equals(castOther.getProviderId())))
-                    && ((this.getRegulatedActivityNumber() == castOther.getRegulatedActivityNumber()) || (this.getRegulatedActivityNumber() != null && castOther.getRegulatedActivityNumber() != null && this.getRegulatedActivityNumber().equals(castOther.getRegulatedActivityNumber())));
+                    && ((this.getRegulatedActivityNumber() == castOther.getRegulatedActivityNumber()) || (this.getRegulatedActivityNumber() != null && castOther.getRegulatedActivityNumber() != null && this.getRegulatedActivityNumber().equals(castOther.getRegulatedActivityNumber())))
+                    && ((this.getConditionId() == castOther.getConditionId()) || (this.getConditionId() != null && castOther.getConditionId() != null && this.getConditionId().equals(castOther.getConditionId())));
         }
 
         public int hashCode() {
@@ -110,12 +123,16 @@ public class Provider_Condition  implements java.io.Serializable, CQC_Entity {
                                 * result
                                 + (getRegulatedActivityNumber() == null ? 0 : this.getRegulatedActivityNumber()
                                                 .hashCode());
+                result = 37
+                                * result
+                                + (getConditionId() == null ? 0 : this.getConditionId()
+                                                .hashCode());
                 return result;
         }
 
    public String getPK() {
-         return String.format("%s/%s", getProviderId(), 
-                                          getRegulatedActivityNumber());
+         return String.format("%s/%s/%s", getProviderId(), 
+                                          getRegulatedActivityNumber(), getConditionId());
    }
 
 }

@@ -63,7 +63,6 @@ public class UrlSigner {
     // Convert the key from 'web safe' base 64 to binary
     keyString = keyString.replace('-', '+');
     keyString = keyString.replace('_', '/');
-    System.out.println("Key: " + keyString);
     this.key = Base64.decode(keyString);
   }
 

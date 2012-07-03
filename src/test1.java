@@ -5,6 +5,13 @@ public class test1 {
 
   public static void main(String[] args) throws Exception {
 
+/**
+      BigDecimal d = new 
+
+2.9788620471954345703125, 101.7407684326171875
+**/
+
+/**
 String[] commandArray = {
     "/bin/bash",
     "/usr/local/bin/CMS0294Alert.sh",
@@ -21,6 +28,7 @@ int exitValue = process.waitFor();
             while ((line = buf.readLine()) != null) {  
                 System.out.println("exec response: " + line);  
             } 
+**/
 
   }
 }    

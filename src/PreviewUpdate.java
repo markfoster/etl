@@ -30,6 +30,7 @@ public class PreviewUpdate extends DeltaUpdate {
         while (i.hasNext()) {
            String entity = (String)i.next();
            Map actions = (Map)aMap.get(entity);
+           // TEST CODE: if (!entity.equals("Provider")) { continue; }
            // if active then update the profile databases...
            if (actions.get("active") != null) {
                if (entity.equals(Entity.PROVIDER) || entity.equals(Entity.LOCATION)) {
@@ -81,7 +82,7 @@ public class PreviewUpdate extends DeltaUpdate {
 
     public void updatePreviewProfile(String entity) {
 
-        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview PP Load",
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
                      String.format("Updating Preview PP for %s", entity), WatchDog.WATCHDOG_INFO);
 
         Session s_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
@@ -89,10 +90,14 @@ public class PreviewUpdate extends DeltaUpdate {
 
         int iInserts = 0, iDeletes = 0, iUpdates = 0;
 
-        Query q = s_delta.createQuery("FROM " + entity);
-        logger.info("Query = " + q);
+        SQLQuery squery = s_delta.createSQLQuery("SELECT * FROM " + entity.toLowerCase());
+        squery.addEntity(entity);
+        logger.info("Query = " + squery);
+        //Query q = s_delta.createQuery("FROM " + entity);
+        //logger.info("Query = " + q);
         try {
-        List results = q.list();
+        List results = squery.list();
+        logger.info("Processing " + results.size() + " records.");
         for (int i = 0; i < results.size(); i++) {
              String action = "";
              Object previewObject = results.get(i);
@@ -102,7 +107,6 @@ public class PreviewUpdate extends DeltaUpdate {
                  logger.warn("Unknown object in result set");
              }
              try {
-                logger.info("Action = " + action);
                 Transaction tx = s_pp.beginTransaction();
                 if  (action.equals("D")) {
                     iDeletes++;
@@ -121,11 +125,11 @@ public class PreviewUpdate extends DeltaUpdate {
         }
         } catch (Exception ex) {
              logger.error(String.format("updatePreviewProfile: %s", entity), ex);
-             WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview PP Load",
+             WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
                      String.format("Exception detected: %s", ex.getMessage()), 
                      WatchDog.WATCHDOG_EMERG);
         }
-        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview PP Load",
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
                      String.format("%s... Deleted: %d, Updated: %d, Inserted: %d", entity, iDeletes, iUpdates, iInserts), 
                      WatchDog.WATCHDOG_INFO);
     }
@@ -138,7 +142,7 @@ public class PreviewUpdate extends DeltaUpdate {
         Session s_prev_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
         Session s_prod_delta = HibernateUtil.currentSession("production_delta");
         
-        WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "Prod Delta Load", 
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "proddeltaload", 
                      String.format("Processing DELETE records for %s", entity), 
                      WatchDog.WATCHDOG_DEBUG);
 
@@ -161,7 +165,7 @@ public class PreviewUpdate extends DeltaUpdate {
                 if (productionObject instanceof CQC_Entity) {
                     productionAction = ((CQC_Entity)productionObject).getActionCode().toString();
                 }
-                logger.info("Production delta object found, action code = " + productionAction);
+                //logger.info("Production delta object found, action code = " + productionAction);
              } catch (Exception ex) {
                 productionObject = null;
              }
@@ -182,18 +186,22 @@ public class PreviewUpdate extends DeltaUpdate {
              }
         }
 
-        WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "Prod Delta Load", 
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "proddeltaload", 
                      String.format("Processing UPDATE and INSERT records for %s", entity), 
                      WatchDog.WATCHDOG_DEBUG);
 
-        query = s_prev_delta.createQuery("FROM " + entity + " WHERE action_code IN ('I', 'U')");
-        logger.info("Query = " + query);
-        results = query.list();
+        //query = s_prev_delta.createSQLQuery("FROM " + entity + " WHERE action_code IN ('I', 'U') limit 1000");
+        SQLQuery squery = s_prev_delta.createSQLQuery("SELECT * FROM " + entity.toLowerCase() + " WHERE action_code IN ('I', 'U')");
+        squery.addEntity(entity);
+        logger.info("Query = " + squery);
+        results = squery.list();
+        logger.info("Processing " + results.size() + " records.");
         for (int i = 0; i < results.size(); i++) {
              String action = "";
              Object previewObject = results.get(i);
              if (previewObject instanceof CQC_Entity) {
                  action = ((CQC_Entity)previewObject).getActionCode().toString();
+                 logger.debug(String.format("Found %s : %s", entity, ((CQC_Entity)previewObject).getPK())); 
              } else {
                  logger.warn("Unknown object in result set");
              }
@@ -207,14 +215,14 @@ public class PreviewUpdate extends DeltaUpdate {
                     productionAction = ((CQC_Entity)productionObject).getActionCode().toString();
                     changeAction = "U";
                 }
-                logger.info("Production delta object found, action code = " + productionAction);
+                //logger.info("Production delta object found, action code = " + productionAction);
              } catch (Exception ex) {
                 productionObject = null;
              }
 
-             if (!action.equals(changeAction))
-                 logger.warn(String.format("updateProductionDelta:%s", entity) + " " + 
-                             String.format("Update Action:%s, Change Action:%s", action, changeAction));
+             //if (!action.equals(changeAction))
+             //    logger.warn(String.format("updateProductionDelta: %s", entity) + " " + 
+             //                String.format("Update Action:%s, Change Action:%s", action, changeAction));
 
              try {
                 Transaction tx = null;
@@ -239,8 +247,8 @@ public class PreviewUpdate extends DeltaUpdate {
                         s_prod_delta.delete(productionObject);
                         tx.commit();
                     } else {
-                        logger.info(String.format("Preview Obj : %s", ((CQC_Entity)previewObject).getPK()));
-                        logger.info(String.format("Prod    Obj : %s", ((CQC_Entity)productionObject).getPK()));
+                        //logger.info(String.format("Preview Obj : %s", ((CQC_Entity)previewObject).getPK()));
+                        //logger.info(String.format("Prod    Obj : %s", ((CQC_Entity)productionObject).getPK()));
 /**
                         tx = s_prod_delta.beginTransaction();
                         s_prod_delta.delete(productionObject);
@@ -287,7 +295,7 @@ public class PreviewUpdate extends DeltaUpdate {
 
         String ent_table = entity.toLowerCase();
 
-        String sql = String.format("SELECT %s, postcode FROM %s WHERE action_code IN ('I', 'U') AND postcode IS NOT NULL AND last_updated = '%s'",
+        String sql = String.format("SELECT %s, postcode FROM %s WHERE action_code IN ('I', 'U') AND postcode IS NOT NULL AND latitude IS NULL AND last_updated = '%s'",
                           (entity.equals(Entity.PROVIDER)) ? "provider_id" : "provider_id, location_id",
                           ent_table,
                           ProcessState.getEntityUniqueId(entity));
@@ -310,6 +318,7 @@ public class PreviewUpdate extends DeltaUpdate {
         while (itr.hasNext()) {
              Map element = (Map)itr.next(); 
              String postcode = (String)element.get("postcode");
+             try {
              latlng = GeoCode.getAddress(postcode);
              int rows = 0;
              if (entity.equals(Entity.PROVIDER)) {
@@ -323,6 +332,9 @@ public class PreviewUpdate extends DeltaUpdate {
                  rows = jT_PreviewDelta.update(sql, new Object[] {
                                        new BigDecimal(latlng[0]), new BigDecimal(latlng[1]), 
                                        element.get("provider_id"), element.get("location_id")} );
+             }
+             } catch (Exception ex) {
+                 logger.error(String.format("updateGeocoding: %s", entity), ex);
              }
         }  
         return true;

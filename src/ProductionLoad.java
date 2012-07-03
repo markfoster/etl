@@ -54,6 +54,11 @@ public class ProductionLoad {
         Session s_delta = HibernateUtil.currentSession("production_delta");
         Session s_pp    = HibernateUtil.currentSession("production_pp");
 
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodppload",
+                     String.format("Updating Production PP for %s", entity), WatchDog.WATCHDOG_INFO);
+
+        int iInserts = 0, iDeletes = 0, iUpdates = 0;
+
         Query q = s_delta.createQuery("FROM " + entity);
         logger.info("Query = " + q);
         List results = q.list();
@@ -65,14 +70,16 @@ public class ProductionLoad {
              } else {
                  logger.warn("Unknown object in result set");
              }
-             logger.info(prodObject);
-             logger.info(prodObject.getClass().getName());
              try {
-                logger.info("Action = " + action);
                 Transaction tx = s_pp.beginTransaction();
-                if (action.equals("D")) {
+                if  (action.equals("D")) {
+                    iDeletes++;
                     s_pp.delete(prodObject);
-                } else {
+                } else if (action.equals("I")) {
+                    iInserts++;
+                    s_pp.saveOrUpdate(prodObject);
+                } else if (action.equals("U")) {
+                    iUpdates++;
                     s_pp.saveOrUpdate(prodObject);
                 }
                 tx.commit();
@@ -80,6 +87,9 @@ public class ProductionLoad {
                  logger.error(String.format("updateProductionProfile: %s", entity), ex);
              }
         }
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodppload",
+                     String.format("%s... Deleted: %d, Updated: %d, Inserted: %d", entity, iDeletes, iUpdates, iInserts),
+                     WatchDog.WATCHDOG_INFO);
     }
 
     public void updateProductionCleanup(String entity, String uid) {

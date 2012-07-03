@@ -14,7 +14,7 @@ public class Registered_Manager_Condition implements java.io.Serializable, CQC_E
      private String registeredManagerId;
      private String regulatedActivityNumber;
      private String conditionId;
-     private String conditionText;
+     private String text;
      private Character actionCode;
      private Date lastUpdated;
 
@@ -29,13 +29,13 @@ public class Registered_Manager_Condition implements java.io.Serializable, CQC_E
        this.conditionId = conditionId;
     }
 
-    public Registered_Manager_Condition(String providerId, String locationId, String registeredManagerId, String regulatedActivity, String conditionId, String conditionText, Character actionCode, Date lastUpdated) {
+    public Registered_Manager_Condition(String providerId, String locationId, String registeredManagerId, String regulatedActivity, String conditionId, String text, Character actionCode, Date lastUpdated) {
        this.providerId = providerId;
        this.locationId = locationId;
        this.registeredManagerId = registeredManagerId;
        this.regulatedActivityNumber = regulatedActivityNumber;
        this.conditionId = conditionId;
-       this.conditionText = conditionText;
+       this.text = text;
        this.actionCode = actionCode;
        this.lastUpdated = lastUpdated;
     }
@@ -79,12 +79,12 @@ public class Registered_Manager_Condition implements java.io.Serializable, CQC_E
     public void setConditionId(String conditionId) {
         this.conditionId = conditionId;
     }
-    public String getConditionText() {
-        return this.conditionText;
+    public String getText() {
+        return this.text;
     }
     
-    public void setConditionText(String conditionText) {
-        this.conditionText = conditionText;
+    public void setText(String text) {
+        this.text = text;
     }
     public Character getActionCode() {
         return this.actionCode;
