@@ -43,9 +43,45 @@ public class PreviewUpdate extends DeltaUpdate {
         }
     }
 
+   public void cleanup() {
+        String[] tables = {
+             "chapter",
+             "location_condition",
+             "location_regulated_activity",
+             "nominated_individual",
+             "outcome",
+             "partner",
+             "provider_condition",
+             "provider_regulated_activity",
+             "registered_manager",
+             "registered_manager_condition",
+             "report_summary",
+             "service_type",
+             "service_user_band",
+             "visit_date"};
+        try {
+           ApplicationContext context = SpringUtil.getApplicationContext();
+           JdbcTemplate jt = new JdbcTemplate();
+           jt.setDataSource((DataSource)context.getBean("preview-delta"));
+           for (String table : tables) {
+                try { 
+                     jt.execute("TRUNCATE TABLE " + table);
+                } catch (Exception ex) {
+                     WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "cleanup",
+                                  String.format("Cannot truncate table : %s", table),
+                                  WatchDog.WATCHDOG_WARNING);
+                }
+           }
+        } catch (Exception ex) {
+           WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "cleanup",
+                     String.format("Problem with the delete table truncation: %s", ex.getMessage()),
+                     WatchDog.WATCHDOG_WARNING);
+        }
+    }
+
     public void updatePreviewProfile(String entity) {
 
-        WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Preview PP Load",
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview PP Load",
                      String.format("Updating Preview PP for %s", entity), WatchDog.WATCHDOG_INFO);
 
         Session s_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
@@ -85,25 +121,26 @@ public class PreviewUpdate extends DeltaUpdate {
         }
         } catch (Exception ex) {
              logger.error(String.format("updatePreviewProfile: %s", entity), ex);
-             WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Preview PP Load",
+             WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview PP Load",
                      String.format("Exception detected: %s", ex.getMessage()), 
                      WatchDog.WATCHDOG_EMERG);
         }
-        WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Preview PP Load",
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Preview PP Load",
                      String.format("%s... Deleted: %d, Updated: %d, Inserted: %d", entity, iDeletes, iUpdates, iInserts), 
                      WatchDog.WATCHDOG_INFO);
     }
 
     public void updateProductionDelta(String entity) {
 
-        WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Prod Delta Load",
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Prod Delta Load",
                      String.format("Updating Production Delta for %s", entity), WatchDog.WATCHDOG_INFO);
 
         Session s_prev_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
         Session s_prod_delta = HibernateUtil.currentSession("production_delta");
         
-        WatchDog.log(500, WatchDog.WATCHDOG_ENV_PROD, "Prod Delta Load", 
-                     String.format("Processing DELETE records for %s", entity), WatchDog.WATCHDOG_INFO);
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "Prod Delta Load", 
+                     String.format("Processing DELETE records for %s", entity), 
+                     WatchDog.WATCHDOG_DEBUG);
 
         Query query = s_prev_delta.createQuery("FROM " + entity + " WHERE action_code = 'D'");
         logger.info("Query = " + query);
@@ -145,8 +182,9 @@ public class PreviewUpdate extends DeltaUpdate {
              }
         }
 
-        WatchDog.log(500, WatchDog.WATCHDOG_ENV_PROD, "Prod Delta Load", 
-                     String.format("Processing UPDATE and INSERT records for %s", entity), WatchDog.WATCHDOG_INFO);
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "Prod Delta Load", 
+                     String.format("Processing UPDATE and INSERT records for %s", entity), 
+                     WatchDog.WATCHDOG_DEBUG);
 
         query = s_prev_delta.createQuery("FROM " + entity + " WHERE action_code IN ('I', 'U')");
         logger.info("Query = " + query);

@@ -85,7 +85,7 @@ public class PreviewLoad {
                         checkXSD(xsd);
                         validateXML(xml, xsd);
                 } catch (Exception ex) {
-                        WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Audit Load", ex.getMessage(), WatchDog.WATCHDOG_WARNING);
+                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Audit Load", ex.getMessage(), WatchDog.WATCHDOG_WARNING);
                         throw new Exception("Audit Load or Validate issue: " + ex.getMessage());
                 }
 		// Parse the audit file
@@ -111,7 +111,7 @@ public class PreviewLoad {
                      if (!aList.equals(rList)) {
                          String err = String.format("Entity %s metrics issues: Audit=%s, Actual=%s", key, aList, rList);
                          logger.warn(err);
-                         WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Audit Load", err, WatchDog.WATCHDOG_WARNING);
+                         WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Audit Load", err, WatchDog.WATCHDOG_WARNING);
                          throw new Exception("Audit metrics differ from actual");
                      }
                 }
@@ -126,7 +126,7 @@ public class PreviewLoad {
 		     loadAudit();
                      validateAudit();
                 } catch (Exception ex) {
-                     WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, 
+                     WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, 
                                   "Audit Load", "Problem loading the audit: " + ex.getMessage(), 
                                   WatchDog.WATCHDOG_EMERG);
                 }
@@ -164,7 +164,7 @@ public class PreviewLoad {
                              loadXML(doc, key);
                      }
                 } catch (Exception ex) {
-                     WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV,
+                     WatchDog.log(WatchDog.WATCHDOG_ENV_PREV,
                                   "XML Load", "Problem loading or validating xml data: " + ex.getMessage(),
                                   WatchDog.WATCHDOG_EMERG);
                 }
