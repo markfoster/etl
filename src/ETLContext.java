@@ -37,6 +37,7 @@ public class ETLContext {
 	}
 
         public int getRunId () {
+                if (this.id == 0) setRunId(0);
                 return this.id;
         }
 

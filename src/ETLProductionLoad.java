@@ -58,7 +58,7 @@ public class ETLProductionLoad {
                 String pState = ProcessState.getSystemState();
                 if (!pState.equals(ProcessState.PROD_LOAD_TRIGGER)) {
                     logger.error("Initiating Production Load but system state = " + pState);
-                    WatchDog.log(500, WatchDog.WATCHDOG_ENV_PROD, "Production Load", "State != IDLE exiting", WatchDog.WATCHDOG_CRITICAL);
+                    WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodload", "State != PROD_LOAD_TRIGGER", WatchDog.WATCHDOG_CRITICAL);
                     System.exit(1);
                 }
  
@@ -66,18 +66,24 @@ public class ETLProductionLoad {
                 String pLock = ProcessState.getLock();
                 if (!pLock.equals(ProcessState.LOCK_CLEAR)) {
                     logger.error("Initiating Production Load but lock state = " + pLock);
-                    WatchDog.log(500, WatchDog.WATCHDOG_ENV_PROD, "Production Load", "Lock != CLEAR exiting", WatchDog.WATCHDOG_CRITICAL);
+                    WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodload", "Lock != CLEAR exiting", WatchDog.WATCHDOG_CRITICAL);
                     System.exit(1);
                 }
 
                 // Populate the preview delta from XML files	
                 ProcessState.setLock(ProcessState.LOCK_SET);
                 ProcessState.setSystemState(ProcessState.PROD_DELTA_LOAD_IN_PROGRESS);
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "prodload",
+                                  "Acquired lock and changed process state to PROD_DELTA_LOAD_IN_PROGRESS",
+                                  WatchDog.WATCHDOG_INFO);
 		ProductionLoad pl = new ProductionLoad();
                 pl.init();
                 pl.run();
                 ProcessState.setLock(ProcessState.LOCK_CLEAR);
                 ProcessState.setSystemState(ProcessState.PROD_DELTA_LOAD_COMPLETE);
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "prodload",
+                                  "Released lock and changed process state to PROD_DELTA_LOAD_COMPLETE",
+                                  WatchDog.WATCHDOG_INFO);
 	}
 
 }

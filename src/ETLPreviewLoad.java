@@ -75,17 +75,30 @@ public class ETLPreviewLoad {
                 // Populate the preview delta from XML files	
                 ProcessState.setLock(ProcessState.LOCK_SET);
                 ProcessState.setSystemState(ProcessState.PREVIEW_XML_IN_PROGRESS);
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
+                                  "Acquired lock and changed process state to PREVIEW_XML_IN_PROGRESS",
+                                  WatchDog.WATCHDOG_INFO);
 		PreviewLoad pl = new PreviewLoad();
                 pl.init();
                 pl.run();
                 ProcessState.setSystemState(ProcessState.PREVIEW_XML_COMPLETE);
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
+                                  "Changed process state to PREVIEW_XML_COMPLETE", 
+                                  WatchDog.WATCHDOG_INFO);
 
                 ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_LOAD_IN_PROGRESS);
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
+                                  "Changed process state to PREVIEW_DELTA_LOAD_IN_PROGRESS", 
+                                  WatchDog.WATCHDOG_INFO);
                 PreviewUpdate pu = new PreviewUpdate();
                 pu.init();
                 pu.run();
                 ProcessState.setSystemState(ProcessState.PREVIEW_DELTA_LOAD_COMPLETE);
                 ProcessState.setLock(ProcessState.LOCK_CLEAR);
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
+                                  "Released lock and changed process state to PREVIEW_DELTA_LOAD_COMPLETE", 
+                                  WatchDog.WATCHDOG_INFO);
+                //pu.cleanup();
 	}
 
 	/**

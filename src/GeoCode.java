@@ -15,14 +15,16 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.*;
+import java.math.BigDecimal;
 
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
 
+import org.springframework.util.*;
 import org.springframework.context.ApplicationContext;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.*;
 import javax.sql.DataSource;
 
 public class GeoCode {
@@ -33,11 +35,16 @@ public class GeoCode {
 	// URL prefix to the geocoder
         private static final String GEOCODER_REQUEST_PREFIX_FOR_XML = "http://maps.googleapis.com/maps/api/geocode/xml";
 
+        private static Map<String, List> geoMap = new HashMap();
+
         public static void main(String[] args) {
 		GeoCode gc = new GeoCode();
+                //gc.test();
+/**
                 String postcode = "RG263DN";
                 float[] latlng  = gc.getAddress("", "", "", "", postcode, "");
 		System.out.println("Coords for '" + postcode + "' = " + latlng);
+**/
 	}
 
         /**
@@ -66,19 +73,14 @@ public class GeoCode {
                     lat = ((java.math.BigDecimal)map.get("latitude")).floatValue();
                     lng = ((java.math.BigDecimal)map.get("longitude")).floatValue();
                 } else {
-	            //float[] ilatlng = getAddress("", "", "", "", postcode, "");
-	            float[] ilatlng = {1.0f, 2.0f};
+	            float[] ilatlng = getAddress("", "", "", "", postcode, "");
                     lat = ilatlng[0];
                     lng = ilatlng[1];
-	            //latlng = getAddress("", "", "", "", postcode, "");
                 }
-                //System.out.println("Coords = " + coords);
-	        //float[] latlng = getAddress("", "", "", "", postcode, "");
-	        //float[] latlng = {lat, lng};
                 return latlng;
         }
 
-        public float[] getAddress(String address1, 
+        public static float[] getAddress(String address1, 
                                   String address2, 
                                   String city, 
                                   String county, 
@@ -112,8 +114,6 @@ public class GeoCode {
                 	System.out.println(e);
                 }
 
-                // System.out.println("Signed URL :" + url.getProtocol() + "://" + url.getHost() + request);
-                // prepare an HTTP connection to the geocoder
                 URL signedUrl = null;
                 HttpURLConnection httpUrlConn = null;
 
@@ -160,21 +160,17 @@ public class GeoCode {
 				}
 				System.out.println("lat/lng=" + lat + "," + lng);
 
-				//writeData(adr1, adr2, city, county, Pcode, country, lat, lng,conndb);
-
 				coord[0] = lat;
 				coord[1] = lng;
 			} else {
-
-				StringBuffer mess = new StringBuffer("Error in java module geocodeAddress - Google unable to geocode address : ");
-				mess.append(address);
-				mess.append (" , ");
-				mess.append(resultNodeList.item(0).getTextContent());
-				//watchdog.watchdogUpdate("GeocodeAddress",mess.toString(),1,"n/a"," "," ","localhost", conndb);
-
+				String googleError = resultNodeList.item(0).getTextContent();
+                                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Geocode",
+                                     String.format("Google Geocode returned an issue for %s: %s", postcode, googleError), 
+                                     WatchDog.WATCHDOG_ALERT);
 			}
 		} catch (Exception e) {
-			System.out.println(e);
+                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Geocode",
+                                     String.format("Failed to get coords for %s", postcode), WatchDog.WATCHDOG_WARNING);
 		}
 
                 // update the cache
@@ -185,6 +181,17 @@ public class GeoCode {
         private static float[] getCache(String postcode) throws Exception {
                 float lat = 0.0f;
                 float lng = 0.0f;
+
+                // check the internal map
+                if (geoMap.size() == 0) {
+                    geoMap = populateCache(); 
+                }
+
+                List cCoords = (List)geoMap.get(postcode);
+                if (cCoords != null) {
+                    lat = ((BigDecimal)cCoords.get(0)).floatValue();
+                    lng = ((BigDecimal)cCoords.get(1)).floatValue();
+                } else {
                 ApplicationContext context = SpringUtil.getApplicationContext();
                 JdbcTemplate jT_Common = new JdbcTemplate();
                 jT_Common.setDataSource((DataSource)context.getBean("common"));
@@ -197,11 +204,46 @@ public class GeoCode {
                 } else {
                     throw new Exception("no cache value found");
                 }
+                }
                 float[] latlng = {lat, lng};
                 return latlng;
         }
 
         private static void setCache(String postcode, float[] coords) {
+        }
+
+        private static Map populateCache() {
+                float lat = 0.0f;
+                float lng = 0.0f;
+                
+                ApplicationContext context = SpringUtil.getApplicationContext();
+                JdbcTemplate jT_Common = new JdbcTemplate();
+                jT_Common.setDataSource((DataSource)context.getBean("common"));
+                
+                StopWatch sw = new StopWatch("a");
+                sw.start("test 1");
+
+                String sql = "SELECT postcode, latitude, longitude FROM geocode_cache";
+                
+                Map<String, List> geoMap = (Map)jT_Common.query(sql, new ResultSetExtractor() {  
+                    public Object extractData(ResultSet rs) throws SQLException { 
+                        Map map = new HashMap();  
+                        while (rs.next()) {  
+                            List latlng = new ArrayList();  
+                            String postcode = rs.getString("postcode");  
+                            latlng.add(rs.getBigDecimal("latitude"));
+                            latlng.add(rs.getBigDecimal("longitude"));
+                            map.put(postcode, latlng);  
+                            //System.out.println(latlng + " = " + latlng.size());  
+                        }  
+                        System.out.println("Geocode map size = " + map.size());  
+                        return map;  
+                    };  
+                });  
+
+                sw.stop();
+                System.out.println(sw.prettyPrint());
+                return geoMap;
         }
 
 }
