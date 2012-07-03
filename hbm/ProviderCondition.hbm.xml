@@ -13,10 +13,14 @@
             <key-property name="conditionId" type="string" node="Condition_Id">
                 <column name="condition_id" length="50" />
             </key-property>
+
+            <key-property name="regulatedActivityNumber" type="string" node="Regulated_Activity_Number">
+                <column name="regulated_activity_number" length="10" not-null="true" />
+            </key-property>
         </composite-id>
 
-        <property name="regulatedActivityNumber" type="string" node="Regulated_Activity_Number">
-            <column name="regulated_activity_number" length="10" not-null="true" />
+        <property name="type" type="java.lang.Character" node="Type">
+            <column name="type" length="1" />
         </property>
 
         <property name="text" type="string" node="Text">

@@ -27,8 +27,8 @@
             </key-property>
         </composite-id>
 
-        <property name="conditionText" type="string" node="Text">
-            <column name="condition_text" />
+        <property name="text" type="string" node="Text">
+            <column name="text" />
         </property>
 
         <property name="actionCode" type="java.lang.Character" node="Action_Code">
