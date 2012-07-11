@@ -54,7 +54,7 @@ public class ProcessState {
         ApplicationContext context = SpringUtil.getApplicationContext();
         JdbcTemplate jt = new JdbcTemplate();
         jt.setDataSource((DataSource)context.getBean("common"));
-        int nId = jt.queryForInt("select run_id process_state where entity = ?", new Object[]{"System"});
+        int nId = jt.queryForInt("select run_id from process_state where entity = ?", new Object[]{"System"});
         return nId;
     }
 

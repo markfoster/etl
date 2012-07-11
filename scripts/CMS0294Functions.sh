@@ -96,8 +96,3 @@ DumpAudit ()
     echo "Audit = $audit_file"
     DumpFiles "Audit" $audit_file
 }
-
-Alert ()
-{
-    echo "Alert"
-}

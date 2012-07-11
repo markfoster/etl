@@ -84,6 +84,7 @@ public class ETLProductionLoad {
                 WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodload",
                                   "Released lock and changed process state to PROD_DELTA_LOAD_COMPLETE",
                                   WatchDog.WATCHDOG_INFO);
+                pl.cleanup();
 	}
 
 }

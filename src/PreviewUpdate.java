@@ -1,6 +1,7 @@
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.hibernate.*;
+import org.hibernate.stat.*;
 import javax.sql.DataSource;
 import java.util.*;
 import java.math.*;
@@ -33,13 +34,27 @@ public class PreviewUpdate extends DeltaUpdate {
            // TEST CODE: if (!entity.equals("Provider")) { continue; }
            // if active then update the profile databases...
            if (actions.get("active") != null) {
-               if (entity.equals(Entity.PROVIDER) || entity.equals(Entity.LOCATION)) {
-                   updateGeocoding(entity);
-                   updateProductionDelta(entity);
-                   continue;
+               try {
+               	   if (entity.equals(Entity.PROVIDER) || entity.equals(Entity.LOCATION)) {
+               	       updateGeocoding(entity);
+               	       updateProductionDelta(entity);
+               	       continue;
+               	   }
+               	   updatePreviewProfile(entity);
+               	   updateProductionDelta(entity);
+
+                   // if we are processing a FULL upload then cleanup...
+                   String eState = ProcessState.getEntityState(entity);
+                   if (eState.equals(ProcessState.STATE_FULL)) {
+                       updatePreviewCleanup(entity, ProcessState.getEntityUniqueId(entity));
+                   }
+               } catch (Exception ex) {
+               	   logger.error("Preview Load error", ex);
+                   WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload",
+                                  ex.getMessage(),
+                                  WatchDog.WATCHDOG_WARNING);
+               
                }
-               updatePreviewProfile(entity);
-               updateProductionDelta(entity);
            }
         }
     }
@@ -80,6 +95,22 @@ public class PreviewUpdate extends DeltaUpdate {
         }
     }
 
+    public void updatePreviewCleanup(String entity, String uid) {
+        logger.info(String.format("updatePreviewCleanup: %s, '%s'", entity, uid));
+        try {
+           ApplicationContext context = SpringUtil.getApplicationContext();
+           JdbcTemplate jt = new JdbcTemplate();
+           jt.setDataSource((DataSource)context.getBean("preview-pp"));
+           String sql = String.format("DELETE FROM %s WHERE last_updated != ?", entity.toLowerCase());
+           logger.info("updatePreviewCleanup: SQL = " + sql);
+           jt.update(sql, new Object[] { uid });
+        } catch (Exception ex) {
+           WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "fullcleanup",
+                     String.format("Problem with the delete table: %s", ex.getMessage()),
+                     WatchDog.WATCHDOG_WARNING);
+        }
+    }
+
     public void updatePreviewProfile(String entity) {
 
         WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
@@ -87,6 +118,9 @@ public class PreviewUpdate extends DeltaUpdate {
 
         Session s_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
         Session s_pp    = HibernateUtil.currentSession("preview_pp");
+
+        Statistics stats = HibernateUtil.getSessionFactory("preview_pp").getStatistics();
+        stats.setStatisticsEnabled(true);
 
         int iInserts = 0, iDeletes = 0, iUpdates = 0;
 
@@ -97,17 +131,35 @@ public class PreviewUpdate extends DeltaUpdate {
         //logger.info("Query = " + q);
         try {
         List results = squery.list();
-        logger.info("Processing " + results.size() + " records.");
+        int iTotal = results.size(), iCount = 0;
+        logger.info("Processing " + iTotal + " records.");
+
+        Transaction tx = null;
+         
         for (int i = 0; i < results.size(); i++) {
              String action = "";
+             
+             if (tx == null) 
+                 tx = s_pp.beginTransaction();
+
              Object previewObject = results.get(i);
              if (previewObject instanceof CQC_Entity) {
                  action = ((CQC_Entity)previewObject).getActionCode().toString();
              } else {
                  logger.warn("Unknown object in result set");
              }
+             int iDelta = 1;
+             iCount++;
+             if      (iTotal > 10000) iDelta = 1000;
+             else if (iTotal > 1000) iDelta = 200;
+             if (iCount % iDelta == 0) {
+                 logger.info(String.format("-> Processing item %d / %d", iCount, iTotal));
+                 //logger.info("Open SC   = " + stats.getSessionOpenCount());
+                 //logger.info("Open QEMT = " + stats.getQueryExecutionMaxTime());
+                 //logger.info("Open QEC  = " + stats.getQueryExecutionCount());
+                 //stats.logSummary();
+             }
              try {
-                Transaction tx = s_pp.beginTransaction();
                 if  (action.equals("D")) {
                     iDeletes++;
                     s_pp.delete(previewObject);
@@ -118,11 +170,24 @@ public class PreviewUpdate extends DeltaUpdate {
                     iUpdates++;
                     s_pp.saveOrUpdate(previewObject);
                 }
-                tx.commit();
+
+                if (tx != null && iTotal < 100) {
+                    tx.commit();
+                    tx = null;
+                }
+                if (tx != null && iCount % 100 == 0) {
+                    tx.commit();
+                    tx = null;
+                }
+
              } catch (Exception ex) {
                  logger.error(String.format("updatePreviewProfile: %s", entity), ex);
              }
         }
+
+        if (tx != null)
+            tx.commit();
+
         } catch (Exception ex) {
              logger.error(String.format("updatePreviewProfile: %s", entity), ex);
              WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
@@ -130,13 +195,18 @@ public class PreviewUpdate extends DeltaUpdate {
                      WatchDog.WATCHDOG_EMERG);
         }
         WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
-                     String.format("%s... Deleted: %d, Updated: %d, Inserted: %d", entity, iDeletes, iUpdates, iInserts), 
+                     String.format("%s... Deleted: %d/%d, Updated: %d/%d, Inserted: %d/%d", 
+                            entity, iDeletes, iDeletes, iUpdates, iUpdates, iInserts, iInserts), 
                      WatchDog.WATCHDOG_INFO);
     }
 
-    public void updateProductionDelta(String entity) {
 
-        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "Prod Delta Load",
+    /**
+    * 
+    */
+    public void updateProductionDelta(String entity) throws Exception {
+
+        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "proddeltaload",
                      String.format("Updating Production Delta for %s", entity), WatchDog.WATCHDOG_INFO);
 
         Session s_prev_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
@@ -145,6 +215,9 @@ public class PreviewUpdate extends DeltaUpdate {
         WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "proddeltaload", 
                      String.format("Processing DELETE records for %s", entity), 
                      WatchDog.WATCHDOG_DEBUG);
+
+        Statistics stats = HibernateUtil.getSessionFactory().getStatistics();
+        stats.setStatisticsEnabled(true);
 
         Query query = s_prev_delta.createQuery("FROM " + entity + " WHERE action_code = 'D'");
         logger.info("Query = " + query);
@@ -195,8 +268,25 @@ public class PreviewUpdate extends DeltaUpdate {
         squery.addEntity(entity);
         logger.info("Query = " + squery);
         results = squery.list();
-        logger.info("Processing " + results.size() + " records.");
-        for (int i = 0; i < results.size(); i++) {
+        int iTotal = results.size(), iCount = 0;
+        logger.info("Processing " + iTotal + " records.");
+
+        Transaction tx = null; 
+
+        for (int i = 0; i < iTotal; i++) {
+
+             iCount++;
+ 
+             if (tx == null) {
+                 tx = s_prod_delta.beginTransaction();
+             }
+
+             int iDelta = 1;
+             if      (iTotal > 10000) iDelta = 1000;
+             else if (iTotal > 1000)  iDelta = 50;
+             if (i % iDelta == 0) 
+                 logger.info(String.format(" -> Record %d / %d", iCount, iTotal));
+
              String action = "";
              Object previewObject = results.get(i);
              if (previewObject instanceof CQC_Entity) {
@@ -225,57 +315,45 @@ public class PreviewUpdate extends DeltaUpdate {
              //                String.format("Update Action:%s, Change Action:%s", action, changeAction));
 
              try {
-                Transaction tx = null;
                 if (productionObject == null) {
-                    tx = s_prod_delta.beginTransaction();
                     s_prod_delta.saveOrUpdate(previewObject);
                     //s_prod_delta.merge(previewObject);
-                    tx.commit();
                 } else {
                     if        (action.equals("U") && productionAction.equals("I") ) {
-                        tx = s_prod_delta.beginTransaction();
                         ((CQC_Entity)previewObject).setActionCode('I');
                         s_prod_delta.merge(previewObject);
-                        tx.commit();
                         logger.info(String.format("updateProductionDelta: %s", entity) + " " + 
                              String.format("UA: %s, PA: %s", action, productionAction));
                     } else if (action.equals("D") && productionAction.equals("I") ) {
                         logger.warn(String.format("updateProductionDelta: %s", entity) + " " + 
                              String.format("UA: %s, PA: %s", action, productionAction));
                         logger.info("Deleting Production Delta record: " + ((CQC_Entity)previewObject).getPK());
-                        tx = s_prod_delta.beginTransaction();
                         s_prod_delta.delete(productionObject);
-                        tx.commit();
                     } else {
-                        //logger.info(String.format("Preview Obj : %s", ((CQC_Entity)previewObject).getPK()));
-                        //logger.info(String.format("Prod    Obj : %s", ((CQC_Entity)productionObject).getPK()));
-/**
-                        tx = s_prod_delta.beginTransaction();
-                        s_prod_delta.delete(productionObject);
-                        tx.commit();
-                        
-                        logger.info("Prod o : " + productionObject.getClass().getName());
-                        if (productionObject instanceof Provider) {
-                            Provider p = (Provider)productionObject;
-                            logger.info("Prod P : " + p.getEmail());
-                        }
-
-                        if (previewObject instanceof Provider) {
-                            Provider p = (Provider)previewObject;
-                            logger.info("Prev Prev : " + p.getEmail());
-                        }
-**/
-                        tx = s_prod_delta.beginTransaction();
                         s_prod_delta.merge(previewObject);
-                        //s_prod_delta.saveOrUpdate(previewObject);
-                        tx.commit();
                     }
                 }
+
+                if (tx != null && iTotal < 100) {
+                    tx.commit();
+                    tx = null;
+                }
+                if (tx != null && iCount % 100 == 0) {
+                    tx.commit();
+                    tx = null;
+                }
+
              } catch (Exception ex) {
                  logger.error(String.format("updateProductionDelta: %s", entity), ex);
                  productionObject = null;
              }
+
         }
+            try {
+                 if (tx != null)
+                     tx.commit();
+             } catch (Exception ex) { }
+
     }
 
     /**

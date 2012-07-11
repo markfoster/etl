@@ -77,4 +77,53 @@ public class ETLContext {
                 }
                 return report;
         }
+
+        public void alertMail(int category, String subject, String message) {
+		String[] commandArray = {
+		    "/bin/bash",
+		    "/usr/local/bin/CMS0294Alert.sh",
+		    String.format("-c%d", category), 
+		    String.format("-s'%s'", subject), 
+		    String.format("-m'%s'", message)
+		};
+                try {
+		    Process process = Runtime.getRuntime().exec(commandArray);
+                    int exitValue = process.waitFor();
+/**
+                    BufferedReader buf = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    String line = "";
+                    while ((line = buf.readLine()) != null) {
+                        logger.info("exec response: " + line);
+                    }
+**/
+                } catch (Exception ex) {
+                    logger.error("Failed to send alertMail: ", ex);
+                }
+        }
+
+        public void reportMail(String subject, String message) {
+                String[] commandArray = {
+                    "/bin/bash",
+                    "/usr/local/bin/CMS0294Report.sh",
+                    String.format("-s'%s'", subject),
+                    String.format("-m'%s'", message)
+                };
+                try {
+                    Process process = Runtime.getRuntime().exec(commandArray);
+                    int exitValue = process.waitFor();
+/**
+                    BufferedReader buf = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    String line = "";
+                    while ((line = buf.readLine()) != null) {
+                        logger.info("exec response: " + line);
+                    }
+**/
+                } catch (Exception ex) {
+                    logger.error("Failed to send alertMail: ", ex);
+                }
+        }
+
+        public static void main(String[] args) {
+                ETLContext.getContext().alertMail(1, "Test notification", "Message to be put in the alert");
+        }
 }

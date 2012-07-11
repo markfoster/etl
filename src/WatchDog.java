@@ -42,6 +42,8 @@ public class WatchDog {
                           new Object[] {new Integer(runId), WatchDog.ellipsize(type,16), message, new Integer(severity), env} );
 
         if (severity == WATCHDOG_EMERG) {
+            ProcessState.setSystemState(ProcessState.IDLE);
+            ProcessState.setLock(ProcessState.LOCK_CLEAR);
             logger.fatal(message);
             System.exit(-1);
         } else {

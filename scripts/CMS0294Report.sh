@@ -54,16 +54,12 @@ else echo "CMS0294Alert.sh: Environment file missing."
      exit 1
 fi
 
-category=0
 subject=""
 message=""
 
-while getopts ":c:s:m:" optname
+while getopts ":s:m:" optname
   do
     case "$optname" in
-      "c")
-        category=$OPTARG
-        ;;
       "s")
         subject=$OPTARG
         ;;
@@ -83,28 +79,14 @@ while getopts ":c:s:m:" optname
     esac
   done
 
-if [ "$category" == "0" ]; then
-  exit -1
-fi
-
-# Determine the suject line depending on the category
-case "$category" in 
-   "1")
-     esubject="P1 SEV1 CQC - "
-     ;;
-   "2")
-     esubject="P2 WARN CQC - "
-     ;;
-   *)
-     esubject="P3 INFO CQC - "
-     ;;
-esac
+subject=$(echo -e $subject | sed -e "s/^'//g" | sed -e "s/'$//g")
+message=$(echo "$message" | sed -e "s/^'//g" | sed -e "s/'$//g")
 
 #recipients="mark.foster@steria.co.uk"
-subject="${esubject} ${subject} - ${SERVER} - ${DATE}"
+subject="P3 CQC ETL Report - ${subject} - ${DATE}"
 cat <<! | /usr/lib/sendmail -t
-From:${MAIL_FROM}
-To:${EVENT_MAIL}
+From:${REPORT_MAIL_FROM}
+To:${REPORT_MAIL}
 Subject: ${subject}
 Priority: Urgent
 Importance: high

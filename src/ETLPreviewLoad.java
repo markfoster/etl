@@ -57,10 +57,8 @@ public class ETLPreviewLoad {
 
 	public void run() {
 		
-                //ProcessState.setSystemState(ProcessState.IDLE);
-                //ProcessState.setLock(ProcessState.LOCK_CLEAR);
-
-if (true) {
+                ProcessState.setSystemState(ProcessState.IDLE);
+                ProcessState.setLock(ProcessState.LOCK_CLEAR);
 
                 String pState = ProcessState.getSystemState();
                 if (!pState.equals(ProcessState.IDLE)) {
@@ -73,7 +71,6 @@ if (true) {
                     logger.error("Initiating Preview Load but lock state = " + pLock);
                     WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", "Lock != CLEAR exiting", WatchDog.WATCHDOG_EMERG);
                 }
-}
 
                 // Populate the preview delta from XML files	
                 ProcessState.setLock(ProcessState.LOCK_SET);
@@ -102,23 +99,8 @@ if (true) {
                 WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
                                   "Released lock and changed process state to PREVIEW_DELTA_LOAD_COMPLETE", 
                                   WatchDog.WATCHDOG_INFO);
-                //pu.cleanup();
+                pu.cleanup();
 	}
-
-	/**
-	 * public void test(Document doc, String element) { Session session = null;
-	 * try { Configuration cfg = HibernateUtil.getConfiguration();
-	 * PersistentClass pc = cfg.getClassMapping("Chapter");
-	 * System.out.println(">> class: " + pc); KeyValue kv = pc.getIdentifier();
-	 * System.out.println(">> identifier simple : " + kv);
-	 * System.out.println(">> identifier simple : " + kv.isSimpleValue()); if
-	 * (kv instanceof Component) { Component comp = (Component)kv;
-	 * Iterator<Property> key_props = comp.getPropertyIterator(); while
-	 * (key_props.hasNext()) { Property p = key_props.next(); String name =
-	 * p.getName(); System.out.println(">> key-property name: " + name + " : " +
-	 * p.getNodeName()); } } } catch (Exception e) { e.printStackTrace();
-	 * System.out.println(e.getMessage()); } }
-	 **/
 
 	public void checkData(Document doc, Map checks) {
 		logger.info("In checkData()");

@@ -10,6 +10,22 @@
       <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
       <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 
+      <property name="hibernate.connection.autoReconnect">true</property>
+
+<!--
+    <property name="hibernate.connection.autocommit">false</property>
+
+    <property name="hibernate.jdbc.batch_size">5</property>
+    <property name="hibernate.jdbc.fetch_size">5</property>
+    <property name="hibernate.jdbc.batch_versioned_data">true</property>
+
+    <property name="hibernate.order_inserts">true</property>
+    <property name="hibernate.order_updates">true</property>
+
+    <property name="hibernate.cache.use_query_cache">false</property>
+    <property name="hibernate.cache.use_second_level_cache">false</property>
+-->
+
 <!--
 <property name="hibernate.c3p0.acquire_increment">1</property> 
 <property name="hibernate.c3p0.idle_test_period">100</property>

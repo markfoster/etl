@@ -10,11 +10,14 @@
       <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
       <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 
+      <property name="hibernate.connection.autoReconnect">true</property>
+
       <!-- SQL show -->
       <!--
       <property name="hibernate.show_sql">true</property> 
       <property name="hibernate.format_sql">true</property> 
       -->
+      <property name="hibernate.generate_statistics">true</property> 
 
       <property name="hibernate.default_entity_mode">pojo</property> 
 

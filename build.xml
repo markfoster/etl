@@ -92,6 +92,7 @@
 
    <target name="runp" depends="build">
         <java classname="${run.module}" fork="true">
+        <sysproperty key="org.dom4j.verbose" value="true" />
         <classpath path="build"/>
         <classpath path="conf"/>
         <classpath path="hbm"/>

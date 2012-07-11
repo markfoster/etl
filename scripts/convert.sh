@@ -12,3 +12,4 @@ while read FILE; do
    echo $(cat $FILE | grep "<Action_Code>D" | wc -l); 
 done > /var/tmp/report
 
+xmllint -noout --schema xsd/PP_CHAPTER_XML.xsd --stream xml/pp_chapter_xml.xml 2>&1 >/dev/null || echo "Invalid"

@@ -5,6 +5,17 @@ public class test1 {
 
   public static void main(String[] args) throws Exception {
 
+      int iTotal = 21222;
+
+      for (int i=0; i < iTotal; i++) {
+
+           if (iTotal > 10000) {
+               if (i % 500 == 0) System.out.println(String.format("Record %d / %d", i, iTotal));
+           }
+
+      }
+
+
 /**
       BigDecimal d = new 
 

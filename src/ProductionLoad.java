@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
+import javax.sql.DataSource;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
@@ -22,13 +23,16 @@ import org.hibernate.Transaction;
 
 import org.apache.commons.beanutils.*;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 public class ProductionLoad {
 
     Logger logger = Logger.getLogger(this.getClass().getName());
 
     public void init() {
         HibernateUtil.buildSessionFactory("production_delta", "hib.cfg.prod_delta.xml");
-        HibernateUtil.buildSessionFactory("production_pp",    "hib.cfg.prod_delta.xml");
+        HibernateUtil.buildSessionFactory("production_pp",    "hib.cfg.prod_pp.xml");
     }
 
     public void run() {
@@ -50,6 +54,42 @@ public class ProductionLoad {
         }
     }
 
+    public void cleanup() {
+        String[] tables = {
+             "chapter",
+             "location_condition",
+             "location_regulated_activity",
+             "nominated_individual",
+             "outcome",
+             "partner",
+             "provider_condition",
+             "provider_regulated_activity",
+             "registered_manager",
+             "registered_manager_condition",
+             "report_summary",
+             "service_type",
+             "service_user_band",
+             "visit_date"};
+        try {
+           ApplicationContext context = SpringUtil.getApplicationContext();
+           JdbcTemplate jt = new JdbcTemplate();
+           jt.setDataSource((DataSource)context.getBean("production-delta"));
+           for (String table : tables) {
+                try {
+                     jt.execute("TRUNCATE TABLE " + table);
+                } catch (Exception ex) {
+                     WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "cleanup",
+                                  String.format("Cannot truncate table : %s %s", table, ex.getMessage()),
+                                  WatchDog.WATCHDOG_WARNING);
+                }
+           }
+        } catch (Exception ex) {
+           WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "cleanup",
+                     String.format("Problem with the delete table truncation: %s", ex.getMessage()),
+                     WatchDog.WATCHDOG_WARNING);
+        }
+    }
+
     public void updateProductionProfile(String entity) {
         Session s_delta = HibernateUtil.currentSession("production_delta");
         Session s_pp    = HibernateUtil.currentSession("production_pp");
@@ -59,40 +99,83 @@ public class ProductionLoad {
 
         int iInserts = 0, iDeletes = 0, iUpdates = 0;
 
+        Transaction tx = null;
+
         Query q = s_delta.createQuery("FROM " + entity);
         logger.info("Query = " + q);
         List results = q.list();
-        for (int i = 0; i < results.size(); i++) {
+        int iTotal = results.size(), iCount = 0;
+        for (int i = 0; i < iTotal; i++) {
+
+             iCount++;
+
+             int iDelta = 1;
+             if      (iTotal > 10000) iDelta = 500;
+             else if (iTotal > 1000)  iDelta = 50;
+             if (i % iDelta == 0)
+                 logger.info(String.format(" -> Record %d / %d", iCount, iTotal));
+
+             if (tx == null)
+                 tx = s_pp.beginTransaction();
+
              String action = "";
              Object prodObject = results.get(i);
              if (prodObject instanceof CQC_Entity) {
                  action = ((CQC_Entity)prodObject).getActionCode().toString();
+                 logger.debug("Object (" + action + ") = " + ((CQC_Entity)prodObject).getPK());
              } else {
                  logger.warn("Unknown object in result set");
              }
              try {
-                Transaction tx = s_pp.beginTransaction();
                 if  (action.equals("D")) {
                     iDeletes++;
                     s_pp.delete(prodObject);
                 } else if (action.equals("I")) {
                     iInserts++;
+                    //s_pp.merge(prodObject);
                     s_pp.saveOrUpdate(prodObject);
                 } else if (action.equals("U")) {
                     iUpdates++;
                     s_pp.saveOrUpdate(prodObject);
                 }
-                tx.commit();
              } catch (Exception ex) {
                  logger.error(String.format("updateProductionProfile: %s", entity), ex);
              }
+
+             if (tx != null && iTotal < 100) {
+                 tx.commit();
+                 tx = null;
+             }
+             if (tx != null && iCount % 100 == 0) {
+                 tx.commit();
+                 tx = null;
+             }
         }
+
+        if (tx != null) {
+            logger.warn("Performing final / drop-through commit");
+            tx.commit();
+        }
+
         WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodppload",
-                     String.format("%s... Deleted: %d, Updated: %d, Inserted: %d", entity, iDeletes, iUpdates, iInserts),
+                     String.format("%s... Deleted: %d/%d, Updated: %d/%d, Inserted: %d/%d", 
+                              entity, iDeletes, iDeletes, iUpdates, iUpdates, iInserts, iInserts),
                      WatchDog.WATCHDOG_INFO);
     }
 
     public void updateProductionCleanup(String entity, String uid) {
-        logger.warn(String.format("updateProductionCleanup: %s, '%s' - TO DO", entity, uid));
+        logger.warn(String.format("updateProductionCleanup: %s, '%s'", entity, uid));
+        try {
+           ApplicationContext context = SpringUtil.getApplicationContext();
+           JdbcTemplate jt = new JdbcTemplate();
+           jt.setDataSource((DataSource)context.getBean("production-pp"));
+           String sql = String.format("DELETE FROM %s WHERE last_updated != ?", entity.toLowerCase());
+           logger.info("updateProductionCleanup: SQL = " + sql);
+           jt.update(sql, new Object[] { uid });
+        } catch (Exception ex) {
+           WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "fullcleanup",
+                     String.format("Problem with the delete table: %s", ex.getMessage()),
+                     WatchDog.WATCHDOG_WARNING);
+        }
     }
 }

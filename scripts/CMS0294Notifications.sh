@@ -86,7 +86,6 @@ UnLockProcess ()
 
 CheckDrupalPreviewUpdated ()
 {
-    PrintInfo "CheckDrupalPreviewUpdated" 
     SQL="SELECT state FROM process_state WHERE entity='System'"
     QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
     if [ "$QUERY" == "PREVIEW_DRUPAL_COMPLETE" ]; then
@@ -102,7 +101,7 @@ CheckDrupalPreviewUpdated ()
 
 CheckWatchdog ()
 {
-    SQL="SELECT link, severity, type, message, timestamp FROM watchdog WHERE severity < 3 AND timestamp > (NOW() - INTERVAL 10 MINUTE)"
+    SQL="SELECT timestamp, link, type, message FROM watchdog WHERE severity < 3 AND timestamp > (NOW() - INTERVAL 10 MINUTE)"
     QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
     if [ "$QUERY" != "" ]; then
          echo "Watchdog Alerts detected:"
@@ -113,13 +112,34 @@ CheckWatchdog ()
     fi
 }
 
+CheckStuckState()
+{
+    SQL="SELECT state FROM process_state WHERE entity='System' AND state != 'IDLE' AND update_id <= (NOW() - INTERVAL 1 HOUR);"
+    QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
+    if [ "$QUERY" == "" ]; then
+         return 0
+    fi
+    LOCK_STATE=$QUERY
+    return 1
+}
+
+CheckStuckLock()
+{
+    SQL="SELECT state FROM process_state WHERE entity='Lock' AND state = 'SET' AND update_id <= (NOW() - INTERVAL 1 HOUR);"
+    QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
+    if [ "$QUERY" == "" ]; then
+         return 0
+    fi
+    return 1
+}
+
 #
 # Tidy up the Watchdog table
 #
 
 TidyWatchdog ()
 {
-    SQL="DELETE FROM watchdog WHERE timestamp < (NOW() - INTERVAL 30 DAY)"
+    SQL="DELETE FROM watchdog WHERE timestamp < (NOW() - INTERVAL 5 DAY)"
     QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
 }
 
@@ -129,7 +149,6 @@ TidyWatchdog ()
 
 CheckDrupalProdUpdated ()
 {
-    PrintInfo "CheckDrupalProdUpdated" 
     SQL="SELECT state FROM process_state WHERE entity='System'"
     QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
     if [ "$QUERY" == "PROD_DRUPAL_COMPLETE" ]; then
@@ -172,8 +191,6 @@ MailAlert ()
     MAIL_FROM="CMS0294Notifications@$(hostname)"
     LOCK_ALERT=""
 
-    echo "MailAlert ${1}:"
-
     (
 	echo "To: ${EVENT_MAIL}"
 	echo "From: ${MAIL_FROM}"
@@ -195,6 +212,18 @@ MailAlert ()
                                     echo "Importance: high"
                                     ;;
         "WATCHDOG_ALERT" )          echo "Subject: ALERT - Watchdog Alert detected"
+                                    echo "Priority: Urgent"
+                                    echo "Importance: high"
+                                    DumpFiles "Context" ${LOG_FILE}
+                                    ;;
+
+        "STATE_STUCK" )             echo "Subject: ALERT - State has been at ${LOCK_STATE} for more than one hour"
+                                    echo "Priority: Urgent"
+                                    echo "Importance: high"
+                                    DumpFiles "Context" ${LOG_FILE}
+                                    ;;
+
+        "LOCK_STUCK" )              echo "Subject: ALERT - Process lock has been SET for more than one hour"
                                     echo "Priority: Urgent"
                                     echo "Importance: high"
                                     DumpFiles "Context" ${LOG_FILE}
@@ -261,7 +290,7 @@ CheckLockNotification ()
 
     if [ -f "${LOCKS_DIR}/${LOCK}" ]; then
        PrintInfo "exists"
-       return 0;
+       return 1;
     fi
       
     return 1
@@ -296,6 +325,10 @@ D_FLAG=""
 v_FLAG=""
 S_FLAG=""
 F_FLAG=""
+
+# Lock notifications
+
+LOCK_STATE=""
 
 # Set up log names, directories and masks
 
@@ -355,11 +388,15 @@ HostName="$(hostname | sed -e 's/\..*//')"
           #ErrorExit "Watchdog alert detected"
      fi
 
+     JAVA_CLASSPATH="/opt/etl/build:/opt/etl/lib/*:/opt/etl/conf:/opt/etl/hbm"
+     JAVA_STUB="ETLReport"
+
      CheckDrupalPreviewUpdated
      if [ "$?" -eq "1" ]
      then CheckLockNotification DRUPAL_PREVIEW_UPDATED
           if [ "$?" -eq "1" ]
           then MailAlert DRUPAL_PREVIEW_UPDATED 
+               java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}
                #LockNotification DRUPAL_PREVIEW_UPDATED
                "/usr/local/bin/CMS0294ClearLocks.sh"
 	       ErrorExit "Drupal Preview Database updated"
@@ -371,9 +408,21 @@ HostName="$(hostname | sed -e 's/\..*//')"
      then CheckLockNotification DRUPAL_PROD_UPDATED
           if [ "$?" -eq "1" ]
           then MailAlert DRUPAL_PROD_UPDATED 
-               LockNotification DRUPAL_PROD_UPDATED
+               java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}
+               #LockNotification DRUPAL_PROD_UPDATED
+               "/usr/local/bin/CMS0294ClearLocks.sh"
 	       ErrorExit "Drupal Production Database updated"
           fi
+     fi
+
+     CheckStuckState
+     if [ "$?" -eq "1" ]; then
+        MailAlert STATE_STUCK
+     fi
+
+     CheckStuckLock
+     if [ "$?" -eq "1" ]; then
+        MailAlert LOCK_STUCK
      fi
 
      VerboseCheck 

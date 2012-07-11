@@ -37,6 +37,10 @@ public class HibernateUtil {
 
          getSessionFactory().close();
      }
+
+     public static SessionFactory getSessionFactory(String key) {
+         return sessionFactoryMap.get(key);
+     }
  
     public static Session currentSession(String key) throws HibernateException {
         HashMap<String, Session> sessionMaps = (HashMap<String, Session>) sessionMapsThreadLocal.get();

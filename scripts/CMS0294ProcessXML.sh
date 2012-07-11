@@ -126,6 +126,7 @@ MailAlert ()
 	"XML_AVAILABLE" )       echo "Subject: INFORMATION - XML available on ${HostName}" ;;
 	"BAD_XML_FORMAT" )      echo "Subject: CRITICAL - XML format issues on ${HostName}" ;;
 	"INVALID_STATE" )       echo "Subject: ALERT - XML detected but not in IDLE state on ${HostName}" ;;
+	"SIZE_EXCEEDED_IN_OFFICE_HOURS" )  echo "Subject: ALERT - XML file size exceeds maximum ${HostName}" ;;
 
 	* )			echo "Subject: WARNING - CMS0294ProcessXML unknown mail alert on ${HostName}" ;;
 
@@ -143,6 +144,12 @@ MailAlert ()
              echo "Importance: high"
              DumpFiles "Log content" "${LOG_FILE}"
 	fi
+
+        if   [ "${1}" == "SIZE_EXCEEDED_IN_OFFICE_HOURS" ]
+        then echo "Priority: Urgent"
+             echo "Importance: high"
+             DumpFiles "Log content" "${LOG_FILE}"
+        fi
 
 	if   [ "${LOCKDIR}" != "" ]
 	then DumpFiles "Lock file (${LOCKDIR}/owner}) content" "${LOCKDIR}/owner"
@@ -253,7 +260,7 @@ if   [ "${D_FLAG}" = "" ]
 then exec >"${LOG_FILE}" 2>&1
 fi
 
-echo "Starting Production Update at $(date)"
+echo "Starting Preview Update at $(date)"
 
 HostName="$(hostname | sed -e 's/\..*//')"
 
@@ -281,11 +288,29 @@ HostName="$(hostname | sed -e 's/\..*//')"
         MailAlert XML_AVAILABLE
 
         bDate=$(date '+%Y%m%d_%H%M%S')
-        tar zcvf ${BACKUP_DIR}_${bDate}.tgz ${XML_IN_DIR}/pp*
+        tar zcvf ${BACKUP_DIR}/xml_in_${bDate}.tgz ${XML_IN_DIR}/pp* > /dev/null 2>&1
 
         rm -rf "${XML_PROCESS_DIR}"
         mkdir -p "${XML_PROCESS_DIR}" 2>/dev/null
-        mv ${XML_IN_DIR}/pp_* "${XML_PROCESS_DIR}"
+        mv ${XML_IN_DIR}/pp_* "${XML_PROCESS_DIR}" > /dev/null 2>&1
+
+        # Check the maximum file size and whether we are running in office hours
+	MAX_TMP=`du -k ${XML_PROCESS_DIR}/* | sort -r -n | head -n 1`
+	MAX_SIZE=`echo "${MAX_TMP}" | cut -f 1`
+	MAX_FILE=`echo "${MAX_TMP}" | cut -f 2`
+        MAX_FILE=$(basename ${MAX_FILE})
+	if [[ $MAX_SIZE -gt $SizeLimit ]]; then
+	   HOUR=$(date +%k)
+	   if [[ $HOUR -ge $OfficeHoursStart ]] && [[ $HOUR -le $OfficeHoursEnd ]]; then
+	     echo "Attempt to run large XML ETL during office hours."
+	     echo "XML file '${MAX_FILE}' size, ${MAX_SIZE}k, exceeds max size of ${SizeLimit}k"
+	     dS=$(date --date="${OfficeHoursStart}:00" +%H:%M%p)
+	     dE=$(date --date="${OfficeHoursEnd}:00" +%H:%M%p)
+	     echo "Office hours are currently set to Monday to Friday ${dS} to ${dE}"
+             MailAlert SIZE_EXCEEDED_IN_OFFICE_HOURS
+             ErrorExit "Max file size exceeded, in office hours"
+	   fi
+	fi
 
         # Convert pp*.xml* files to pp*.xml ready for import
         ls ${XML_PROCESS_DIR}/pp_* | while read FILE; do mv "$FILE" "${FILE%%.*}.xml"; done
@@ -314,6 +339,25 @@ HostName="$(hostname | sed -e 's/\..*//')"
            ErrorExit "XML Formatting issues" 
         fi
 
+        # validate the XML against the XSD
+        formatIssue=0
+        for FILE in $(find ${XML_PROCESS_DIR} -type f -iname "pp_*.xml")
+        do
+           FBASE=$(basename ${FILE%%.*})
+           XSD=$(echo $FBASE | tr '[a-z]' '[A-Z]')
+           XSD="/opt/etl/xsd/$XSD.xsd"
+           echo "Validating XML ${FBASE} against XSD:"
+           xmllint -noout --schema "$XSD" --stream "$FILE"
+           result=$?
+           if [ $result -gt 0 ]; then
+              formatIssue=1
+           fi
+        done
+        if [ $formatIssue -gt 0 ]; then
+           MailAlert BAD_XML_FORMAT
+           ErrorExit "XML Formatting issues"
+        fi
+
         # ...if available then run the upload task
         JAVA_CLASSPATH="/opt/etl/build:/opt/etl/lib/*:/opt/etl/conf:/opt/etl/hbm"
         JAVA_STUB="ETLPreviewLoad"
@@ -327,10 +371,7 @@ HostName="$(hostname | sed -e 's/\..*//')"
 
      VerboseCheck 
 
-     PrintVerboseInfo "Master [${HostName}] update complete"
-
 # Completed
-
 CleanUp
 
 #
@@ -343,6 +384,6 @@ do
     rm -f $i
 done
 
-echo "Completed Production Update at $(date)"
+echo "Completed Preview Update at $(date)"
 
 exit 0;

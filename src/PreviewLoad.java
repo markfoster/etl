@@ -39,6 +39,7 @@ import org.hibernate.EntityMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.util.StopWatch;
 
 public class PreviewLoad {
 
@@ -85,6 +86,7 @@ public class PreviewLoad {
                         checkXSD(xsd);
                         validateXML(xml, xsd);
                 } catch (Exception ex) {
+                        ETLContext.getContext().alertMail(3, "Audit XML load failure", ex.getMessage());
                         WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "auditload", ex.getMessage(), WatchDog.WATCHDOG_WARNING);
                         throw new Exception("Audit Load or Validate issue: " + ex.getMessage());
                 }
@@ -97,7 +99,7 @@ public class PreviewLoad {
                 Map aMap = context.getAuditMap();
                 Map rMap = context.readReport(basedir+"/xml/report.csv");
                 if (null == rMap) {
-                     throw new Exception("Cannot load actual metrics");
+                     throw new Exception("Cannot load actual metrics from " + basedir+"/xml/report.csv");
                 }
                 Iterator i = aMap.keySet().iterator();
                 while (i.hasNext()) {
@@ -111,8 +113,9 @@ public class PreviewLoad {
                      if (!aList.equals(rList)) {
                          String err = String.format("Entity %s metrics issues: Audit=%s, Actual=%s", key, aList, rList);
                          logger.warn(err);
+                         ETLContext.getContext().alertMail(3, "Audit XML Metrics validation failure", err);
                          WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "auditload", err, WatchDog.WATCHDOG_WARNING);
-                         throw new Exception("Audit metrics differ from actual");
+                         throw new Exception(err);
                      }
                 }
                 return true;
@@ -131,8 +134,6 @@ public class PreviewLoad {
                                   WatchDog.WATCHDOG_EMERG);
                 }
 
-                if (true) return;
-
                 try {
                      Map audits = context.getAuditMap();
                      Set keys = audits.keySet();
@@ -145,17 +146,20 @@ public class PreviewLoad {
                              WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "auditload", metric, WatchDog.WATCHDOG_INFO);
                              if (actions.get("active") == null) continue;
 
+                             //if (!key.equals("Chapter")) continue;
+
                              String xmlFile = basedir+"/xml/pp_" + key.toLowerCase() + "_xml.xml";
                              String xsdFile = basedir+"/xsd/PP_" + key.toUpperCase() + "_XML.xsd";
                              logger.info("Load and Validate (" + xmlFile + ", " + xsdFile  + ")");
                              Document doc = null;
                              String xml = "", xsd = "", result = "";
-                             xml = fileToString(xmlFile);
-                             xsd = fileToString(xsdFile);
-                             doc = checkXML(xml);
-                             docs.put(key, doc);
-                             checkXSD(xsd);
-                             validateXML(xml, xsd);
+                             //xml = fileToString(xmlFile);
+                             //xsd = fileToString(xsdFile);
+                             //doc = checkXML(xml);
+                             //docs.put(key, doc);
+                             //checkXSD(xsd);
+                             //validateXML(xml, xsd);
+
                              DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                              String nowAsString = df.format(new Date());
                              logger.info("Update ID = " + nowAsString);
@@ -164,11 +168,12 @@ public class PreviewLoad {
                              ProcessState.setEntityUniqueId(key, nowAsString);
                              String sql = String.format("DELETE FROM %s", key.toLowerCase());
                              g_session.createSQLQuery(sql).executeUpdate();
-                             loadXML(doc, key);
+
+                             loadXML(xmlFile, key);
                      }
                 } catch (Exception ex) {
                      WatchDog.log(WatchDog.WATCHDOG_ENV_PREV,
-                                  "XML Load", "Problem loading or validating xml data: " + ex.getMessage(),
+                                  "xmlload", "Problem loading or validating xml data: " + ex.getMessage(),
                                   WatchDog.WATCHDOG_EMERG);
                 }
 	}
@@ -285,63 +290,66 @@ public class PreviewLoad {
 		}
 	}
 
-	public boolean loadXML(String xml, String entity) {
-		System.out.println("Loading XML " + entity);
+	public boolean loadXML(String xmlfile, String entity) {
+                StopWatch sw = new StopWatch();
+                sw.start("XML load");
 		Document doc = null;
 		try {
-			SAXReader sax = new SAXReader();
-			doc = sax.read(new StringReader(xml));
-			return loadXML(doc, xml);
+			SAXReader reader = new SAXReader();
+                        Map attrMap = (Map)ETLContext.getContext().getAuditMap().get(entity);
+                        int iTotal =  Integer.parseInt((String)attrMap.get("total"));
+		        logger.info(String.format("XML load for %s, %d elements", entity, iTotal));
+                        String elementPath = String.format("/List_Of_%s/%s", entity, entity);
+                        logger.info("ElementPath = '" + elementPath + "'");
+                        reader.addHandler(elementPath, new CQCEventHandler(this, entity, iTotal));
+                        doc = reader.read(new File(xmlfile));
 		} catch (Exception e) {
 			logger.error("Error", e);
-			return false;
 		}
+                sw.stop();
+                double sTime = sw.getTotalTimeSeconds();
+		logger.info(String.format("XML load for %s, completed in %f seconds", entity, sTime));
+                return true;
 	}
 
-	public boolean loadXML(Document doc, String entity) {
-		treeWalk(doc, entity);
-		return true;
-	}
+  private class CQCEventHandler implements ElementHandler {
 
-	/**
-	 * Walk the tree
-	 * 
-	 * @param document
-	 * @param entity
-	 */
-	private void treeWalk(Document document, String entity) {
-		treeWalk(document.getRootElement(), entity);
-	}
+Logger logger = Logger.getLogger(this.getClass().getName());
+        int iCount = 0;
+        int iTotal = 0;
+        int iDelta = 1;
+        String entity = "";
+        PreviewLoad instance = null;
 
-	/**
-	 * Walk the tree
-	 * 
-	 * @param document
-	 * @param entity
-	 */
-	private void treeWalk(Element element, String entity) {
-		for (int i = 0, size = element.nodeCount(); i < size; i++) {
-			Node node = element.node(i);
-			if (node instanceof Element) {
-				Element e = (Element) node;
-				if (e.getName().equals(entity)) {
-					// org.hibernate.util.XMLHelper.dump(e);
-					logger.debug(entity + " PK = "
-							+ Entity.getPrimaryKey(e, entity));
-					treeProcess(e, entity);
-				} else {
-					treeWalk((Element) node, entity);
-				}
-			}
-		}
-	}
+        public CQCEventHandler(PreviewLoad instance, String entity, int iTotal) {
+            this.iTotal = iTotal;
+            this.instance = instance;
+            this.entity = entity;
+            if      (iTotal > 10000) iDelta = 2000;
+            else if (iTotal > 1000) iDelta = 200;
+        }
 
-	/**
-	 * Process the targeted element
-	 * 
-	 * @param element
-	 */
-	private void treeProcess(Element element, String entity) {
+        public void onStart(ElementPath path) {
+            // do nothing here...
+            Element element = path.getCurrent();
+            //logger.info("onStart " + element);
+        }
+
+        public void onEnd(ElementPath path) {
+            iCount++;
+            // process a ROW element
+            Element row = path.getCurrent();
+            if (iCount % iDelta == 0 || iCount == iTotal) {
+                String string = String.format("Processing XML element: %s %d / %d", row.getName(), iCount, iTotal);
+                logger.info(string);
+            }
+            // prune the tree
+            instance.treeProcess(row, entity);
+            row.detach();
+        }
+  }
+
+	public void treeProcess(Element element, String entity) {
 		Element eUpdated = DocumentHelper.createElement("Last_Updated");
 		eUpdated.setText(g_nowAsString);
 		element.add(eUpdated);
@@ -356,62 +364,6 @@ public class PreviewLoad {
 		}
 	}
 
-	public boolean loadXML(Document doc, String entity, int i) {
-		logger.info("Loading XML into delta database : " + entity);
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String nowAsString = df.format(new Date());
-		logger.info("Now = " + nowAsString);
-		try {
-			Session session = HibernateUtil.getSessionFactory().openSession()
-					.getSession(EntityMode.DOM4J);
-			// Session session = HibernateUtil.currentSession();
-			logger.info("Node selection starts");
-			List list = doc.selectNodes("//" + entity);
-			logger.info("Node selection complete");
-			logger.info("Load starting...");
-			for (Iterator iter = list.iterator(); iter.hasNext();) {
-				Object obj = iter.next();
-				Element e = (Element) obj;
-
-				// org.hibernate.util.XMLHelper.dump(e);
-
-				Element eUpdated = DocumentHelper.createElement("Last_Updated");
-				eUpdated.setText(nowAsString);
-				e.add(eUpdated);
-
-				/**
-				 * Element eAction = e.element("Action_Code");
-				 * System.out.println("Action Code = " + eAction.getName() +
-				 * "; " + eAction.getText());
-				 * 
-				 * eAction = e.element("Provider_Id"); //eAction.setText("T-" +
-				 * eAction.getText()); System.out.println("Provider Id = " +
-				 * eAction.getName() + "; " + eAction.getText());
-				 * 
-				 * //org.hibernate.util.XMLHelper.dump(e); //for (Iterator iter1
-				 * = e.elementIterator(); iter1.hasNext(); ) { // e1 =
-				 * (Element)iter1.next(); // System.out.println("Element : " +
-				 * e1.getName() + "; " + e1.getText()); //}
-				 **/
-
-				// try {
-				Transaction tx = session.beginTransaction();
-				session.save(obj);
-				tx.commit();
-				// session.evict(obj);
-				// session.flush();
-				// } catch (Exception ex) {
-				// logger.error("Error", ex);
-				// }
-			}
-		} catch (Exception e) {
-			logger.error("Error", e);
-			return false;
-		}
-		logger.info("Load complete : " + entity);
-		return true;
-	}
-
 	public Map parse(String xml) {
 		Document doc = null;
 		try {
@@ -423,11 +375,6 @@ public class PreviewLoad {
 		}
 		TreeMap<String, Map<String, String>> smap = new TreeMap<String, Map<String, String>>();
 		visit(smap, doc.getRootElement(), 0);
-		/**
-		 * Set keys = smap.keySet(); Iterator i = keys.iterator(); while
-		 * (i.hasNext()) { String key = (String)i.next(); System.out.print(key +
-		 * ": "); System.out.println(smap.get(key)); }
-		 **/
 		return smap;
 	}
 
@@ -443,6 +390,7 @@ public class PreviewLoad {
 
 	private void getAttributes(Map map, Element e) {
 		Map<String, String> attrMap = new HashMap<String, String>();
+                int iTotal = 0;
 		for (Iterator i = e.attributeIterator(); i.hasNext();) {
 			Attribute attribute = (Attribute) i.next();
 			//logger.info(e.getName() + " : " + attribute.getName() + "="
@@ -451,9 +399,11 @@ public class PreviewLoad {
 			attrMap.put((String) attribute.getName(), value);
                         try {
                           int iVal = Integer.parseInt(value);
+                          iTotal += iVal;
                           if (iVal > 0) attrMap.put("active", "1");
                         } catch (Exception ex) { }
 		}
+                attrMap.put("total", (new Integer(iTotal)).toString());
 		map.put(e.getName(), attrMap);
 	}
 

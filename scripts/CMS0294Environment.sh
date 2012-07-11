@@ -18,7 +18,7 @@
 
 ENV_PATH=$(dirname "${0}")
 
-if  [ "${ENV_PATH1}" = "." ]
+if  [ "${ENV_PATH}" = "." ]
 then ENV_PATH="${PWD}"
 elif [ "${ENV_PATH}" = ".." ]
 then ENV_PATH="${PWD}/.."
@@ -50,12 +50,20 @@ export COMMON_DB="common"
 export COMMON_USER="cqcdms_m"
 export COMMON_CRED="pcT1x5CXSDw"
 
+export PROD_HOST="10.38.1.65"
+export PROD_DB="production_pp"
+export PROD_USER="cqcdms_p"
+export PROD_CRED="ncZ1x6CWSDa"
+
 export JAVA_OPTS="-Xms512m -Xmx2048m"
 
 #export EVENT_MAIL="xansa.club.environmentmgmt@steria.co.uk"    # Alert Email address
 export EVENT_MAIL="mark.foster@steria.co.uk,pratibha.seth9521@steria.co.in,chi@hausolutions.com,jennifer.jordan@steria.co.uk"
-export REPORT_MAIL="mark.foster@steria.co.uk"
-export USER_ID="nginx:nginx"
+export MAIL_FROM="CMS0294Alert@steria.co.uk"
+#export EVENT_MAIL="mark.foster@steria.co.uk"
+export REPORT_MAIL="mark.foster@steria.co.uk,pratibha.seth9521@steria.co.in,chi@hausolutions.com,jennifer.jordan@steria.co.uk"
+#export REPORT_MAIL="mark.foster@steria.co.uk"
+export REPORT_MAIL_FROM="CMS0294Report@steria.co.uk"
 
 #
 # Health Check Info
@@ -74,6 +82,8 @@ export ZipSizeLimitM=500				# Maximim size of files to be zipped.
 export AuditTimeOut=2
 export FileStabilityTimeOut=2
 export LockTimeOut=1
-export SizeLimit=3000
-export OfficeHours=""
+export SizeLimit=5000
+export OfficeHoursStart=2
+export OfficeHoursEnd=4
+
 

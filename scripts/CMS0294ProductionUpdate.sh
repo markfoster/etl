@@ -106,6 +106,28 @@ VerboseCheck () {
 }
 
 #
+# Check we are in IDLE state
+#
+
+CheckTriggerState ()
+{
+    SQL="SELECT state FROM process_state WHERE entity='System'"
+    QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
+    if [ "$QUERY" == "PROD_LOAD_TRIGGER" ]; then
+         return 1
+    fi
+    return 0
+}
+
+BackupProduction()
+{
+    PrintInfo "BackupProduction"
+    bDate=$(date '+%Y%m%d_%H%M%S')
+    QUERY=`mysqldump --skip-extended-insert -h ${PROD_HOST} -u ${PROD_USER} --password=${PROD_CRED} ${PROD_DB} > ${BACKUP_DIR}/PROD_DB_${bDate}.sql`
+    return 0
+}
+
+#
 # Send Mail Alert
 #
 # 1: SOLR or WEB message
@@ -246,7 +268,7 @@ HostName="$(hostname | sed -e 's/\..*//')"
 
 # Lock the process and restart jetty
 
-     LOCKDIR="${XML_IN_DIR}.lock"
+     LOCKDIR="${XML_IN_DIR}_prod.lock"
 
      if   LockProcess
      then MailAlert LOCK_TIMEOUT
@@ -255,19 +277,20 @@ HostName="$(hostname | sed -e 's/\..*//')"
 
      JAVA_CLASSPATH="/opt/etl/build:/opt/etl/lib/*:/opt/etl/conf:/opt/etl/hbm"
      JAVA_STUB="ETLProductionLoad"
-     java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}
+
+     CheckTriggerState
+     if [ "$?" -eq "1" ]
+     then BackupProduction
+          java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}
+     fi
 
 # Remove the lock
-
      UnLockProcess
      LOCKDIR=""
 
      VerboseCheck 
 
-     PrintVerboseInfo "Master [${HostName}] update complete"
-
 # Completed
-
 CleanUp
 
 #

@@ -2,11 +2,11 @@
 #
 # ETL - Clear any active locks
 #
-# Usage: CMS0294CheckLocks.sh [ -D ]
+# Usage: CMS0294CheckDBs.sh [ -D ]
 #
 #    -D: Debug
 #
-# $Id: CMS0294CheckLocks.sh,v 1.11 2012/05/01 11:09:03 appadmin Exp $
+# $Id: CMS0294CheckDBs.sh,v 1.11 2012/05/01 11:09:03 appadmin Exp $
 #
 #   Date	Version	Who	Description
 #   ====	=======	===	===========
@@ -19,14 +19,14 @@
 #
 
 Usage () {
-    echo "usage: CMS0294CheckLocks.sh [ -D ]" 1>&2
+    echo "usage: CMS0294CheckDBs.sh [ -D ]" 1>&2
 
     CleanUp
     exit 1
 }
 
 ErrorExit () {
-    echo "CMS0294CheckLocks.sh:" "$*" 1>&2;
+    echo "CMS0294CheckDBs.sh:" "$*" 1>&2;
 
     CleanUp
     exit 1
@@ -107,12 +107,10 @@ RanSleep () {
 VerboseCheck () {
     if   [ "${v_FLAG}" = "YES" ]
     then # Unlock the database locks and reset the system state
-         SQL="select state from process_state where entity='Lock'"
+         DB="production_delta"
+         SQL="select count(*) from chapter"
          QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
-         PrintInfo "Lock status = ${QUERY}"
-         SQL="select state from process_state where entity='System'"
-         QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
-         PrintInfo "System status = ${QUERY}"
+         PrintInfo "Chapter = ${QUERY}"
     fi
 }
 
@@ -124,7 +122,7 @@ VerboseCheck () {
 
 MailAlert ()
 {
-    MAIL_FROM="CMS0294CheckLocks@$(hostname)"
+    MAIL_FROM="CMS0294CheckDBs@$(hostname)"
 
     (
 	echo "To: ${EVENT_MAIL}"
@@ -132,10 +130,10 @@ MailAlert ()
 
 	case "${1}" in
 
-	"LOCK_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294CheckLocks failed to get the Update lock on ${HostName}" ;;
-	"LOCK_CLEAR" )		echo "Subject: CRITICAL - CMS0294CheckLocks failed to clear the Update lock on ${HostName}" ;;
+	"LOCK_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294CheckDBs failed to get the Update lock on ${HostName}" ;;
+	"LOCK_CLEAR" )		echo "Subject: CRITICAL - CMS0294CheckDBs failed to clear the Update lock on ${HostName}" ;;
 
-	* )			echo "Subject: WARNING - CMS0294CheckLocks unknown mail alert on ${HostName}" ;;
+	* )			echo "Subject: WARNING - CMS0294CheckDBs unknown mail alert on ${HostName}" ;;
 
 	esac
 
@@ -183,7 +181,7 @@ if   [ -f "${CMD_PATH}/CMS0294Environment.sh" ]
 then . "${CMD_PATH}/CMS0294Environment.sh"
 elif [ -f "/usr/local/bin/CMS0294Environment.sh" ]
 then . "/usr/local/bin/CMS0294Environment.sh"
-else echo "CMS0294CheckLocks.sh: Environment file missing."
+else echo "CMS0294CheckDBs.sh: Environment file missing."
      exit 1
 fi
 
@@ -196,12 +194,12 @@ F_FLAG=""
 
 # Set up log names, directories and masks
 
-TMP_DIR="/var/tmp/CMS0294CheckLocks"
+TMP_DIR="/var/tmp/CMS0294CheckDBs"
 mkdir -p "${TMP_DIR}" 2>/dev/null
 
-LOG_NAME="CheckLocks.log"
+LOG_NAME="CheckDBs.log"
 LOG_FILE="${TMP_DIR}/${LOG_NAME}"
-LOG_MASK='CheckLocks.????-??-??_??:??:??.log.gz'
+LOG_MASK='CheckDBs.????-??-??_??:??:??.log.gz'
 
 # Check Options
 
@@ -238,7 +236,7 @@ if   [ "${D_FLAG}" = "" ]
 then exec >"${LOG_FILE}" 2>&1
 fi
 
-echo "Starting Check Locks at $(date)"
+echo "Starting Clear Locks at $(date)"
 
 HostName="$(hostname | sed -e 's/\..*//')"
 
@@ -263,6 +261,6 @@ do
     rm -f $i
 done
 
-echo "Completed Check Locks at $(date)"
+echo "Completed Clear Locks at $(date)"
 
 exit 0;
