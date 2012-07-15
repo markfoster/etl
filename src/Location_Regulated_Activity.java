@@ -1,6 +1,5 @@
-//package org.cqc;
+// package org.cqc;
 // Generated 24-May-2012 12:01:54 by Hibernate Tools 3.2.2.GA
-
 
 import java.util.Date;
 
@@ -9,107 +8,97 @@ import java.util.Date;
  */
 public class Location_Regulated_Activity implements java.io.Serializable, CQC_Entity {
 
-     private String providerId;
-     private String locationId;
-     private String regulatedActivityNumber;
-     private Character actionCode;
-     private Date lastUpdated;
+    private String    providerId;
+    private String    locationId;
+    private String    regulatedActivityNumber;
+    private Character actionCode;
+    private Date      lastUpdated;
 
     public Location_Regulated_Activity() {
     }
-	
+
     public Location_Regulated_Activity(String providerId, String locationId, String regulatedActivity) {
-       this.providerId = providerId;
-       this.locationId = locationId;
-       this.regulatedActivityNumber = regulatedActivityNumber;
+	this.providerId = providerId;
+	this.locationId = locationId;
+	this.regulatedActivityNumber = regulatedActivityNumber;
     }
 
     public Location_Regulated_Activity(String providerId, String locationId, String regulatedActivityNumber, Character actionCode, Date lastUpdated) {
-       this.providerId = providerId;
-       this.locationId = locationId;
-       this.regulatedActivityNumber = regulatedActivityNumber;
-       this.actionCode = actionCode;
-       this.lastUpdated = lastUpdated;
+	this.providerId = providerId;
+	this.locationId = locationId;
+	this.regulatedActivityNumber = regulatedActivityNumber;
+	this.actionCode = actionCode;
+	this.lastUpdated = lastUpdated;
     }
-  
+
     public String getProviderId() {
-        return this.providerId;
+	return this.providerId;
     }
 
     public void setProviderId(String providerId) {
-        this.providerId = providerId;
+	this.providerId = providerId;
     }
 
     public String getLocationId() {
-        return this.locationId;
+	return this.locationId;
     }
 
     public void setLocationId(String locationId) {
-        this.locationId = locationId;
+	this.locationId = locationId;
     }
 
     public String getRegulatedActivityNumber() {
-        return this.regulatedActivityNumber;
+	return this.regulatedActivityNumber;
     }
 
     public void setRegulatedActivityNumber(String regulatedActivityNumber) {
-        this.regulatedActivityNumber = regulatedActivityNumber;
+	this.regulatedActivityNumber = regulatedActivityNumber;
     }
- 
+
     public Character getActionCode() {
-        return this.actionCode;
+	return this.actionCode;
     }
-    
+
     public void setActionCode(Character actionCode) {
-        this.actionCode = actionCode;
+	this.actionCode = actionCode;
     }
+
     public Date getLastUpdated() {
-        return this.lastUpdated;
+	return this.lastUpdated;
     }
-    
+
     public void setLastUpdated(Date lastUpdated) {
-        this.lastUpdated = lastUpdated;
+	this.lastUpdated = lastUpdated;
     }
 
-        public boolean equals(Object other) {
-                if ((this == other))
-                        return true;
-                if ((other == null))
-                        return false;
-                if (!(other instanceof Location_Regulated_Activity))
-                        return false;
-                Location_Regulated_Activity castOther = (Location_Regulated_Activity) other;
+    public boolean equals(Object other) {
+	if ((this == other))
+	    return true;
+	if ((other == null))
+	    return false;
+	if (!(other instanceof Location_Regulated_Activity))
+	    return false;
+	Location_Regulated_Activity castOther = (Location_Regulated_Activity) other;
 
-                return ((this.getProviderId() == castOther.getProviderId()) || (this.getProviderId() != null && castOther.getProviderId() != null && this.getProviderId().equals(castOther.getProviderId())))
-                    && ((this.getLocationId() == castOther.getLocationId()) || (this.getLocationId() != null && castOther.getLocationId() != null && this.getLocationId().equals(castOther.getLocationId())))
-                    && ((this.getRegulatedActivityNumber() == castOther.getRegulatedActivityNumber()) || (this.getRegulatedActivityNumber() != null && castOther.getRegulatedActivityNumber() != null && this.getRegulatedActivityNumber().equals(castOther.getRegulatedActivityNumber())));
-        }
+	return ((this.getProviderId() == castOther.getProviderId()) || (this.getProviderId() != null && castOther.getProviderId() != null && this.getProviderId().equals(
+	        castOther.getProviderId())))
+	        && ((this.getLocationId() == castOther.getLocationId()) || (this.getLocationId() != null && castOther.getLocationId() != null && this.getLocationId().equals(
+	                castOther.getLocationId())))
+	        && ((this.getRegulatedActivityNumber() == castOther.getRegulatedActivityNumber()) || (this.getRegulatedActivityNumber() != null
+	                && castOther.getRegulatedActivityNumber() != null && this.getRegulatedActivityNumber().equals(castOther.getRegulatedActivityNumber())));
+    }
 
-        public int hashCode() {
-                int result = 17;
+    public int hashCode() {
+	int result = 17;
 
-                result = 37
-                                * result
-                                + (getProviderId() == null ? 0 : this.getProviderId()
-                                                .hashCode());
-                result = 37
-                                * result
-                                + (getLocationId() == null ? 0 : this.getLocationId()
-                                                .hashCode());
-                result = 37
-                                * result
-                                + (getRegulatedActivityNumber() == null ? 0 : this.getRegulatedActivityNumber()
-                                                .hashCode());
-                return result;
-        }
+	result = 37 * result + (getProviderId() == null ? 0 : this.getProviderId().hashCode());
+	result = 37 * result + (getLocationId() == null ? 0 : this.getLocationId().hashCode());
+	result = 37 * result + (getRegulatedActivityNumber() == null ? 0 : this.getRegulatedActivityNumber().hashCode());
+	return result;
+    }
 
-   public String getPK() {
-         return String.format("%s/%s/%s", getProviderId(), 
-                                          getLocationId(), 
-                                          getRegulatedActivityNumber());
-   }
-
+    public String getPK() {
+	return String.format("%s/%s/%s", getProviderId(), getLocationId(), getRegulatedActivityNumber());
+    }
 
 }
-
-

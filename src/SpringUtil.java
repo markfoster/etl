@@ -10,18 +10,18 @@ import java.util.*;
 
 public class SpringUtil {
 
-     private static ApplicationContext context;
+    private static ApplicationContext context;
 
-     static {
-         try {
-             context = new ClassPathXmlApplicationContext("spring.xml");
-        } catch (Throwable ex) {
-             throw new ExceptionInInitializerError(ex);
-         }
-     }
+    static {
+	try {
+	    context = new ClassPathXmlApplicationContext("spring.xml");
+	} catch (Throwable ex) {
+	    throw new ExceptionInInitializerError(ex);
+	}
+    }
 
-     public static ApplicationContext getApplicationContext() {
-         return context;
-     }
+    public static ApplicationContext getApplicationContext() {
+	return context;
+    }
 
 }

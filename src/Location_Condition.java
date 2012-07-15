@@ -1,4 +1,4 @@
-//package org.cqc;
+// package org.cqc;
 // Generated 24-May-2012 12:01:54 by Hibernate Tools 3.2.2.GA
 
 import java.util.Date;
@@ -8,155 +8,143 @@ import java.util.Date;
  */
 public class Location_Condition implements java.io.Serializable, CQC_Entity {
 
-	private String providerId;
-	private String locationId;
-	private String conditionId;
-	private String regulatedActivityNumber;
-	private Character type;
-	private String text;
-	private String reason;
-	private Character actionCode;
-	private Date lastUpdated;
+    private String    providerId;
+    private String    locationId;
+    private String    conditionId;
+    private String    regulatedActivityNumber;
+    private Character type;
+    private String    text;
+    private String    reason;
+    private Character actionCode;
+    private Date      lastUpdated;
 
-	public Location_Condition() {
-	}
+    public Location_Condition() {
+    }
 
-	public Location_Condition(String providerId, String locationId,
-			String conditionId, String regulatedActivityNumber) {
-		this.providerId = providerId;
-		this.locationId = locationId;
-		this.conditionId = conditionId;
-		this.regulatedActivityNumber = regulatedActivityNumber;
-	}
+    public Location_Condition(String providerId, String locationId, String conditionId, String regulatedActivityNumber) {
+	this.providerId = providerId;
+	this.locationId = locationId;
+	this.conditionId = conditionId;
+	this.regulatedActivityNumber = regulatedActivityNumber;
+    }
 
-	public Location_Condition(String providerId, String locationId,
-			String conditionId, String regulatedActivityNumber, Character type,
-			String text, String reason, Character actionCode, Date lastUpdated) {
-		this.providerId = providerId;
-		this.locationId = locationId;
-		this.conditionId = conditionId;
-		this.regulatedActivityNumber = regulatedActivityNumber;
-		this.type = type;
-		this.text = text;
-		this.reason = reason;
-		this.actionCode = actionCode;
-		this.lastUpdated = lastUpdated;
-	}
+    public Location_Condition(String providerId, String locationId, String conditionId, String regulatedActivityNumber, Character type, String text, String reason,
+	    Character actionCode, Date lastUpdated) {
+	this.providerId = providerId;
+	this.locationId = locationId;
+	this.conditionId = conditionId;
+	this.regulatedActivityNumber = regulatedActivityNumber;
+	this.type = type;
+	this.text = text;
+	this.reason = reason;
+	this.actionCode = actionCode;
+	this.lastUpdated = lastUpdated;
+    }
 
-	public String getProviderId() {
-		return this.providerId;
-	}
+    public String getProviderId() {
+	return this.providerId;
+    }
 
-	public void setProviderId(String providerId) {
-		this.providerId = providerId;
-	}
+    public void setProviderId(String providerId) {
+	this.providerId = providerId;
+    }
 
-	public String getLocationId() {
-		return this.locationId;
-	}
+    public String getLocationId() {
+	return this.locationId;
+    }
 
-	public void setLocationId(String locationId) {
-		this.locationId = locationId;
-	}
+    public void setLocationId(String locationId) {
+	this.locationId = locationId;
+    }
 
-	public String getConditionId() {
-		return this.conditionId;
-	}
+    public String getConditionId() {
+	return this.conditionId;
+    }
 
-	public void setConditionId(String conditionId) {
-		this.conditionId = conditionId;
-	}
+    public void setConditionId(String conditionId) {
+	this.conditionId = conditionId;
+    }
 
-	public String getRegulatedActivityNumber() {
-		return this.regulatedActivityNumber;
-	}
+    public String getRegulatedActivityNumber() {
+	return this.regulatedActivityNumber;
+    }
 
-	public void setRegulatedActivityNumber(String regulatedActivityNumber) {
-		this.regulatedActivityNumber = regulatedActivityNumber;
-	}
+    public void setRegulatedActivityNumber(String regulatedActivityNumber) {
+	this.regulatedActivityNumber = regulatedActivityNumber;
+    }
 
-	public Character getType() {
-		return this.type;
-	}
+    public Character getType() {
+	return this.type;
+    }
 
-	public void setType(Character type) {
-		this.type = type;
-	}
+    public void setType(Character type) {
+	this.type = type;
+    }
 
-	public String getText() {
-		return this.text;
-	}
+    public String getText() {
+	return this.text;
+    }
 
-	public void setText(String text) {
-		this.text = text;
-	}
+    public void setText(String text) {
+	this.text = text;
+    }
 
-	public String getReason() {
-		return this.reason;
-	}
+    public String getReason() {
+	return this.reason;
+    }
 
-	public void setReason(String reason) {
-		this.reason = reason;
-	}
+    public void setReason(String reason) {
+	this.reason = reason;
+    }
 
-	public Character getActionCode() {
-		return this.actionCode;
-	}
+    public Character getActionCode() {
+	return this.actionCode;
+    }
 
-	public void setActionCode(Character actionCode) {
-		this.actionCode = actionCode;
-	}
+    public void setActionCode(Character actionCode) {
+	this.actionCode = actionCode;
+    }
 
-	public Date getLastUpdated() {
-		return this.lastUpdated;
-	}
+    public Date getLastUpdated() {
+	return this.lastUpdated;
+    }
 
-	public void setLastUpdated(Date lastUpdated) {
-		this.lastUpdated = lastUpdated;
-	}
+    public void setLastUpdated(Date lastUpdated) {
+	this.lastUpdated = lastUpdated;
+    }
 
-	public boolean equals(Object other) {
-		if ((this == other))
-			return true;
-		if ((other == null))
-			return false;
-		if (!(other instanceof Location_Condition))
-			return false;
-		Location_Condition castOther = (Location_Condition) other;
+    public boolean equals(Object other) {
+	if ((this == other))
+	    return true;
+	if ((other == null))
+	    return false;
+	if (!(other instanceof Location_Condition))
+	    return false;
+	Location_Condition castOther = (Location_Condition) other;
 
-		return (    (this.getProviderId() == castOther.getProviderId()) || (this.getProviderId() != null && castOther.getProviderId() != null && this.getProviderId().equals(castOther.getProviderId())))
-				&& ((this.getLocationId()  == castOther.getLocationId())  || (this.getLocationId() != null  && castOther.getLocationId() != null  && this.getLocationId().equals(castOther.getLocationId())))
-		&& ((this.getConditionId()  == castOther.getConditionId())  || (this.getConditionId() != null  && castOther.getConditionId() != null  && this.getConditionId().equals(castOther.getConditionId())))
-		&& ((this.getRegulatedActivityNumber()  == castOther.getRegulatedActivityNumber())  || (this.getRegulatedActivityNumber() != null  && castOther.getRegulatedActivityNumber() != null  && this.getRegulatedActivityNumber().equals(castOther.getRegulatedActivityNumber())));
-	}
+	return ((this.getProviderId() == castOther.getProviderId()) || (this.getProviderId() != null && castOther.getProviderId() != null && this.getProviderId().equals(
+	        castOther.getProviderId())))
+	        && ((this.getLocationId() == castOther.getLocationId()) || (this.getLocationId() != null && castOther.getLocationId() != null && this.getLocationId().equals(
+	                castOther.getLocationId())))
+	        && ((this.getConditionId() == castOther.getConditionId()) || (this.getConditionId() != null && castOther.getConditionId() != null && this.getConditionId().equals(
+	                castOther.getConditionId())))
+	        && ((this.getRegulatedActivityNumber() == castOther.getRegulatedActivityNumber()) || (this.getRegulatedActivityNumber() != null
+	                && castOther.getRegulatedActivityNumber() != null && this.getRegulatedActivityNumber().equals(castOther.getRegulatedActivityNumber())));
+    }
 
-	public int hashCode() {
-		int result = 17;
+    public int hashCode() {
+	int result = 17;
 
-		result = 37
-				* result
-				+ (getProviderId() == null ? 0 : this.getProviderId()
-						.hashCode());
-		result = 37
-				* result
-				+ (getLocationId() == null ? 0 : this.getLocationId()
-						.hashCode());
-		result = 37
-				* result
-				+ (getConditionId() == null ? 0 : this.getConditionId()
-						.hashCode());
-		result = 37
-				* result
-				+ (getRegulatedActivityNumber() == null ? 0 : this
-						.getRegulatedActivityNumber().hashCode());
-		
-		return result;
-	}
+	result = 37 * result + (getProviderId() == null ? 0 : this.getProviderId().hashCode());
+	result = 37 * result + (getLocationId() == null ? 0 : this.getLocationId().hashCode());
+	result = 37 * result + (getConditionId() == null ? 0 : this.getConditionId().hashCode());
+	result = 37 * result + (getRegulatedActivityNumber() == null ? 0 : this.getRegulatedActivityNumber().hashCode());
 
-   public String getPK() {
-         return String.format("%s/%s/%s/%s", getProviderId(), getLocationId(), 
-                                          getConditionId(), getRegulatedActivityNumber());
-   }
+	return result;
+    }
 
+    public String getPK() {
+	return String.format("%s/%s/%s/%s", getProviderId(), getLocationId(), getConditionId(), getRegulatedActivityNumber());
+    }
 
 }

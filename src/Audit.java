@@ -9,7 +9,8 @@ import java.util.HashMap;
 import org.apache.commons.logging.*;
 
 public class Audit {
- 
-    public Audit() { } 
- 
-} // end of the class 
+
+    public Audit() {
+    }
+
+} // end of the class

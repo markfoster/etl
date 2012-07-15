@@ -10,7 +10,7 @@ public class DeltaUpdate {
     /**
      * Test method
      */
-    public static void main( String[] args ) {
-        WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Parse", "Parse error", WatchDog.WATCHDOG_CRITICAL);
+    public static void main(String[] args) {
+	WatchDog.log(500, WatchDog.WATCHDOG_ENV_PREV, "Parse", "Parse error", WatchDog.WATCHDOG_CRITICAL);
     }
 }
