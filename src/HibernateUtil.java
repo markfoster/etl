@@ -33,8 +33,8 @@ public class HibernateUtil {
      public static SessionFactory getSessionFactory() {
          return sessionFactory;
      }
-     public static void shutdown() {
 
+     public static void shutdown() {
          getSessionFactory().close();
      }
 
@@ -51,6 +51,9 @@ public class HibernateUtil {
         // Open a new Session, if this Thread has none yet
         Session s = (Session) sessionMaps.get(key);
         if (s == null) {
+            s = ((SessionFactory)sessionFactoryMap.get(key)).openSession();
+            sessionMaps.put(key, s);
+        } else if (!s.isOpen()) {
             s = ((SessionFactory)sessionFactoryMap.get(key)).openSession();
             sessionMaps.put(key, s);
         }
@@ -72,11 +75,11 @@ public class HibernateUtil {
         }
     }
  
-    public static void closeSession() {
+    public static void closeSession(String key) {
         HashMap<String, Session> sessionMaps = (HashMap<String, Session>) sessionMapsThreadLocal.get();
         sessionMapsThreadLocal.set(null);
         if (sessionMaps != null) {
-            Session session = sessionMaps.get("");
+            Session session = sessionMaps.get(key);
             if (session != null && session.isOpen())
                 session.close();
         }

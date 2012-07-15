@@ -141,13 +141,14 @@ public class PreviewLoad {
                      while (i.hasNext()) {
                              String key = (String)i.next();
 
+                             g_session = HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
+
                              Map actions = (Map)audits.get(key);
                              String metric = String.format("Entity: %s, Actions: %s", key, actions);
                              WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "auditload", metric, WatchDog.WATCHDOG_INFO);
                              if (actions.get("active") == null) continue;
 
                              //if (!key.equals("Chapter")) continue;
-
                              String xmlFile = basedir+"/xml/pp_" + key.toLowerCase() + "_xml.xml";
                              String xsdFile = basedir+"/xsd/PP_" + key.toUpperCase() + "_XML.xsd";
                              logger.info("Load and Validate (" + xmlFile + ", " + xsdFile  + ")");
@@ -170,11 +171,15 @@ public class PreviewLoad {
                              g_session.createSQLQuery(sql).executeUpdate();
 
                              loadXML(xmlFile, key);
+
+                             g_session.close();
                      }
                 } catch (Exception ex) {
                      WatchDog.log(WatchDog.WATCHDOG_ENV_PREV,
                                   "xmlload", "Problem loading or validating xml data: " + ex.getMessage(),
                                   WatchDog.WATCHDOG_EMERG);
+                } finally {
+                     
                 }
 	}
 
@@ -298,6 +303,11 @@ public class PreviewLoad {
 			SAXReader reader = new SAXReader();
                         Map attrMap = (Map)ETLContext.getContext().getAuditMap().get(entity);
                         int iTotal =  Integer.parseInt((String)attrMap.get("total"));
+                        if (iTotal > 300000) {
+                            logger.warn("Items are > 300,000, terminating load");
+                            sw.stop();
+                            return false;
+                        }
 		        logger.info(String.format("XML load for %s, %d elements", entity, iTotal));
                         String elementPath = String.format("/List_Of_%s/%s", entity, entity);
                         logger.info("ElementPath = '" + elementPath + "'");

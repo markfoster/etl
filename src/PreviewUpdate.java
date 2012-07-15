@@ -119,8 +119,8 @@ public class PreviewUpdate extends DeltaUpdate {
         Session s_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
         Session s_pp    = HibernateUtil.currentSession("preview_pp");
 
-        Statistics stats = HibernateUtil.getSessionFactory("preview_pp").getStatistics();
-        stats.setStatisticsEnabled(true);
+        //Statistics stats = HibernateUtil.getSessionFactory("preview_pp").getStatistics();
+        //stats.setStatisticsEnabled(true);
 
         int iInserts = 0, iDeletes = 0, iUpdates = 0;
 
@@ -135,7 +135,12 @@ public class PreviewUpdate extends DeltaUpdate {
         logger.info("Processing " + iTotal + " records.");
 
         Transaction tx = null;
-         
+        
+        if (iTotal > 300000) {
+            logger.warn("Items are > 300,000, terminating load");
+            return;
+        }
+ 
         for (int i = 0; i < results.size(); i++) {
              String action = "";
              
@@ -193,7 +198,12 @@ public class PreviewUpdate extends DeltaUpdate {
              WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
                      String.format("Exception detected: %s", ex.getMessage()), 
                      WatchDog.WATCHDOG_EMERG);
+        } finally {
+            logger.warn("Closing sessions...");
+            HibernateUtil.closeSession("preview_delta");
+            HibernateUtil.closeSession("preview_pp");
         }
+ 
         WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
                      String.format("%s... Deleted: %d/%d, Updated: %d/%d, Inserted: %d/%d", 
                             entity, iDeletes, iDeletes, iUpdates, iUpdates, iInserts, iInserts), 
@@ -215,9 +225,6 @@ public class PreviewUpdate extends DeltaUpdate {
         WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "proddeltaload", 
                      String.format("Processing DELETE records for %s", entity), 
                      WatchDog.WATCHDOG_DEBUG);
-
-        Statistics stats = HibernateUtil.getSessionFactory().getStatistics();
-        stats.setStatisticsEnabled(true);
 
         Query query = s_prev_delta.createQuery("FROM " + entity + " WHERE action_code = 'D'");
         logger.info("Query = " + query);
@@ -263,6 +270,13 @@ public class PreviewUpdate extends DeltaUpdate {
                      String.format("Processing UPDATE and INSERT records for %s", entity), 
                      WatchDog.WATCHDOG_DEBUG);
 
+
+        HibernateUtil.closeSession("preview_delta");
+        HibernateUtil.closeSession("production_delta");
+
+        s_prev_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
+        s_prod_delta = HibernateUtil.currentSession("production_delta");
+
         //query = s_prev_delta.createSQLQuery("FROM " + entity + " WHERE action_code IN ('I', 'U') limit 1000");
         SQLQuery squery = s_prev_delta.createSQLQuery("SELECT * FROM " + entity.toLowerCase() + " WHERE action_code IN ('I', 'U')");
         squery.addEntity(entity);
@@ -270,6 +284,11 @@ public class PreviewUpdate extends DeltaUpdate {
         results = squery.list();
         int iTotal = results.size(), iCount = 0;
         logger.info("Processing " + iTotal + " records.");
+
+        if (iTotal > 300000) {
+            logger.warn("Items are > 300,000, terminating load");
+            return;
+        }
 
         Transaction tx = null; 
 
@@ -349,10 +368,14 @@ public class PreviewUpdate extends DeltaUpdate {
              }
 
         }
-            try {
-                 if (tx != null)
-                     tx.commit();
-             } catch (Exception ex) { }
+
+        try {
+             if (tx != null)
+                 tx.commit();
+             logger.warn("Closing sessions...");
+             HibernateUtil.closeSession("preview_delta");
+             HibernateUtil.closeSession("production_delta");
+        } catch (Exception ex) { }
 
     }
 
