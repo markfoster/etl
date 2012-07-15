@@ -13,3 +13,5 @@ while read FILE; do
 done > /var/tmp/report
 
 xmllint -noout --schema xsd/PP_CHAPTER_XML.xsd --stream xml/pp_chapter_xml.xml 2>&1 >/dev/null || echo "Invalid"
+
+touch -d "-1 hour" /mnt/www/etl/pp_audit_xml.xml
