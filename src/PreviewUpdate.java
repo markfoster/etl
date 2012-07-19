@@ -103,7 +103,9 @@ public class PreviewUpdate extends DeltaUpdate {
 	    jt.setDataSource((DataSource) context.getBean("preview-pp"));
 	    String sql = String.format("DELETE FROM %s WHERE last_updated != ?", entity.toLowerCase());
 	    logger.info("updatePreviewCleanup: SQL = " + sql);
-	    jt.update(sql, new Object[] { uid });
+	    int rows = jt.update(sql, new Object[] { uid });
+            WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
+                String.format("%s... Wiped: %d", entity, rows), WatchDog.WATCHDOG_INFO);
 	} catch (Exception ex) {
 	    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "fullcleanup", String.format("Problem with the delete table: %s", ex.getMessage()), WatchDog.WATCHDOG_WARNING);
 	}
@@ -150,8 +152,10 @@ public class PreviewUpdate extends DeltaUpdate {
 		    tx = s_pp.beginTransaction();
 
 		Object previewObject = results.get(i);
+                String pk = "";
 		if (previewObject instanceof CQC_Entity) {
 		    action = ((CQC_Entity) previewObject).getActionCode().toString();
+                    pk = ((CQC_Entity) previewObject).getPK();
 		} else {
 		    logger.warn("Unknown object in result set");
 		}
@@ -167,6 +171,8 @@ public class PreviewUpdate extends DeltaUpdate {
 		try {
 		    if (action.equals("D")) {
 			iDeletes++;
+                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
+                                    String.format("Deleting %s, %s", entity, pk), WatchDog.WATCHDOG_WARNING);
 			s_pp.delete(previewObject);
 		    } else if (action.equals("I")) {
 			iInserts++;
@@ -334,13 +340,19 @@ public class PreviewUpdate extends DeltaUpdate {
 		    s_prod_delta.saveOrUpdate(previewObject);
 		    // s_prod_delta.merge(previewObject);
 		} else {
+                    String pk = ((CQC_Entity) previewObject).getPK();
 		    if (action.equals("U") && productionAction.equals("I")) {
 			((CQC_Entity) previewObject).setActionCode('I');
 			s_prod_delta.merge(previewObject);
 			logger.info(String.format("updateProductionDelta: %s", entity) + " " + String.format("UA: %s, PA: %s", action, productionAction));
+                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "proddeltaload",
+                                    String.format("Changing action for delta from U to I for %s", pk), WatchDog.WATCHDOG_WARNING);
+
 		    } else if (action.equals("D") && productionAction.equals("I")) {
 			logger.warn(String.format("updateProductionDelta: %s", entity) + " " + String.format("UA: %s, PA: %s", action, productionAction));
-			logger.info("Deleting Production Delta record: " + ((CQC_Entity) previewObject).getPK());
+			logger.info("Deleting Production Delta record: " + pk);
+                        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "proddeltaload",
+                                    String.format("Deleting delta record: %s", pk), WatchDog.WATCHDOG_WARNING);
 			s_prod_delta.delete(productionObject);
 		    } else {
 			s_prod_delta.merge(previewObject);
@@ -415,10 +427,16 @@ public class PreviewUpdate extends DeltaUpdate {
 		if (entity.equals(Entity.PROVIDER)) {
 		    sql = "UPDATE " + ent_table + " SET latitude = ?, longitude = ? WHERE provider_id = ?";
 		    rows = jT_PreviewDelta.update(sql, new Object[] { new BigDecimal(latlng[0]), new BigDecimal(latlng[1]), element.get("provider_id") });
+                    if (latlng[0] == 0.0 || latlng[1] == 0.0)
+                       WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
+                                    String.format("Issue getting geocode for Provider %s", element.get("provider_id")), WatchDog.WATCHDOG_WARNING); 
 		} else {
 		    sql = "UPDATE " + ent_table + " SET latitude = ?, longitude = ? WHERE provider_id = ? AND location_id = ?";
 		    rows = jT_PreviewDelta.update(sql,
 			    new Object[] { new BigDecimal(latlng[0]), new BigDecimal(latlng[1]), element.get("provider_id"), element.get("location_id") });
+                    if (latlng[0] == 0.0 || latlng[1] == 0.0)
+                       WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
+                                    String.format("Issue getting geocode for Location %s/%s", element.get("provider_id"), element.get("location_id")), WatchDog.WATCHDOG_WARNING); 
 		}
 	    } catch (Exception ex) {
 		logger.error(String.format("updateGeocoding: %s", entity), ex);

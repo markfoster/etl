@@ -121,9 +121,11 @@ public class ProductionLoad {
 		tx = s_pp.beginTransaction();
 
 	    String action = "";
+            String pk = "";
 	    Object prodObject = results.get(i);
 	    if (prodObject instanceof CQC_Entity) {
 		action = ((CQC_Entity) prodObject).getActionCode().toString();
+                pk = ((CQC_Entity) prodObject).getPK();
 		logger.debug("Object (" + action + ") = " + ((CQC_Entity) prodObject).getPK());
 	    } else {
 		logger.warn("Unknown object in result set");
@@ -131,6 +133,8 @@ public class ProductionLoad {
 	    try {
 		if (action.equals("D")) {
 		    iDeletes++;
+                    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "prodppload",
+                                 String.format("Deleting %s, %s", entity, pk), WatchDog.WATCHDOG_WARNING);
 		    s_pp.delete(prodObject);
 		} else if (action.equals("I")) {
 		    iInserts++;
@@ -176,7 +180,9 @@ public class ProductionLoad {
 	    jt.setDataSource((DataSource) context.getBean("production-pp"));
 	    String sql = String.format("DELETE FROM %s WHERE last_updated != ?", entity.toLowerCase());
 	    logger.info("updateProductionCleanup: SQL = " + sql);
-	    jt.update(sql, new Object[] { uid });
+	    int rows = jt.update(sql, new Object[] { uid });
+            WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "prodppload",
+                String.format("%s... Wiped: %d", entity, rows), WatchDog.WATCHDOG_INFO);
 	} catch (Exception ex) {
 	    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "fullcleanup", String.format("Problem with the delete table: %s", ex.getMessage()), WatchDog.WATCHDOG_WARNING);
 	}

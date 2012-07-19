@@ -456,6 +456,11 @@ public class PreviewLoad {
 	    g_session.flush();
 	} catch (Exception ex) {
 	    logger.error("Error", ex);
+            WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
+                  String.format("Issue loading entity: %s, element: issue:%s", 
+                                entity, 
+                                Entity.getPrimaryKey(element, entity), ex.getMessage()), 
+                  WatchDog.WATCHDOG_WARNING);
 	}
     }
 
