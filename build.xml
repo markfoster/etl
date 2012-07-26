@@ -37,7 +37,7 @@
         <delete dir="build"/>
     </target>
 
-    <target name="build">
+    <target name="build" depends="dependancies">
         <mkdir dir="build"/>
         <javac srcdir="src" destdir="build" includeantruntime="false" debug="on" debuglevel="lines,vars,source">
           <classpath>
