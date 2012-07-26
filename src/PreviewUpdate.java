@@ -140,10 +140,12 @@ public class PreviewUpdate extends DeltaUpdate {
 
 	    Transaction tx = null;
 
+/**
 	    if (iTotal > 300000) {
 		logger.warn("Items are > 300,000, terminating load");
 		return;
 	    }
+**/
 
 	    for (int i = 0; i < results.size(); i++) {
 		String action = "";
@@ -282,10 +284,12 @@ public class PreviewUpdate extends DeltaUpdate {
 	int iTotal = results.size(), iCount = 0;
 	logger.info("Processing " + iTotal + " records.");
 
+/**
 	if (iTotal > 300000) {
 	    logger.warn("Items are > 300,000, terminating load");
 	    return;
 	}
+**/
 
 	Transaction tx = null;
 

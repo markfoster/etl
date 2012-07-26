@@ -57,11 +57,14 @@ public class ProductionLoad {
 	    }
 	    updateProductionProfile(entity);
 
+	    // MSF: 24/07/12 - Bit of an issue here, as we need to check whether an entity is actually involved in the current batch
+            //                 before clearing the tables down. The FULL state could have been left over from a previous run.
 	    // if we are processing a FULL upload then cleanup...
-	    String eState = ProcessState.getEntityState(entity);
-	    if (eState.equals(ProcessState.STATE_FULL)) {
-		updateProductionCleanup(entity, ProcessState.getEntityUniqueId(entity));
-	    }
+	    //String eState = ProcessState.getEntityState(entity);
+	    //if (eState.equals(ProcessState.STATE_FULL)) {
+            //    updateProductionCleanup(entity, ProcessState.getEntityUniqueId(entity));
+	    //    ProcessState.setEntityState(entity, ProcessState.STATE_DELTA);
+	    //}
 	}
     }
 

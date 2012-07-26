@@ -347,11 +347,13 @@ public class PreviewLoad {
 	    SAXReader reader = new SAXReader();
 	    Map attrMap = (Map) ETLContext.getContext().getAuditMap().get(entity);
 	    int iTotal = Integer.parseInt((String) attrMap.get("total"));
+/**
 	    if (iTotal > 300000) {
 		logger.warn("Items are > 300,000, terminating load");
 		sw.stop();
 		return false;
 	    }
+**/
 	    logger.info(String.format("XML load for %s, %d elements", entity, iTotal));
 	    String elementPath = String.format("/List_Of_%s/%s", entity, entity);
 	    logger.info("ElementPath = '" + elementPath + "'");

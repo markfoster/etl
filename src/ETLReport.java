@@ -43,7 +43,7 @@ public class ETLReport {
                 int    runId    = ProcessState.getRunId();
                 
                 //sysState = "PREVIEW_DRUPAL_COMPLETE";
-                //runId = 37713865;
+                //runId = 1480640534;
 
                 String mStart = "PROD_DELTA_LOAD_IN_PROGRESS";
                 String mEnd   = "PROD_DELTA_LOAD_IN_PROGRESS";
@@ -75,11 +75,13 @@ public class ETLReport {
                 end = end.replace(".0", ""); // fudge to fix issue
                 logger.info("Finished = " + end);
 
-                reportOutput.append("System state = " + sysState + "\n");
-                reportOutput.append("Run Id       = " + runId    + "\n");
-                reportOutput.append("Start        = " + start    + "\n");
-                reportOutput.append("Finished     = " + end      + "\n");
-                reportOutput.append("\n\n");
+                StringBuffer emailOutput = new StringBuffer();
+
+                emailOutput.append("System state = " + sysState + "\n");
+                emailOutput.append("Run Id       = " + runId    + "\n");
+                emailOutput.append("Start        = " + start    + "\n");
+                emailOutput.append("Finished     = " + end      + "\n");
+                emailOutput.append("\n\n");
 
                 List<Map> entries = jt.queryForList("SELECT timestamp, message FROM watchdog WHERE uid = ? AND type != 'pp_scheduler'",  new Object[]{ new Integer(runId)} );
                 for (Map line : entries) {
@@ -89,7 +91,7 @@ public class ETLReport {
                      if (mesg.matches("Updating.*")) continue;
                      if (mesg.matches("Processing.*")) continue;
                      if (mesg.matches("Changed internal.*")) continue;
-                     String repLine = time + " : " + mesg;
+                     String repLine = "\"" + time + "\"; \"" + mesg + "\"";
                      logger.info(repLine);
                      reportOutput.append(repLine + "\n");
                 }
@@ -103,13 +105,14 @@ public class ETLReport {
                     for (Map line : entries) {
                          String time = (String)line.get("timestamp").toString().replace(".0", "");
                          String mesg = (String)line.get("message").toString();
-                         String repLine = time + " : " + mesg;
+                         String repLine = "\"" + time + "\"; \"" + mesg + "\"";
                          logger.info(repLine);
                          reportOutput.append(repLine + "\n");
                     }
                 }
 
-                ETLContext.getContext().reportMail(String.format("Report for %s run (%d)",  type, runId), reportOutput.toString());
+                emailOutput.append(reportOutput.toString());
+                ETLContext.getContext().reportMail(String.format("Report for %s run (%d)",  type, runId), emailOutput.toString());
 
                 jt.update("INSERT INTO reporting (run_id, type, start, finish, message, last_updated) VALUES (?, ?, ?, ?, ?, now())", 
                        new Object[] {new Integer(runId), type, start, end, reportOutput.toString() } );
