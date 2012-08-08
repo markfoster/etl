@@ -72,7 +72,8 @@ public class PreviewUpdate extends DeltaUpdate {
      * 
      */
     public void cleanup() {
-	String[] tables = { "chapter", "location_condition", "location_regulated_activity", "nominated_individual", "outcome", "partner", "provider_condition",
+	//String[] tables = { "chapter", "location_condition", "location_regulated_activity", "nominated_individual", "outcome", "partner", "provider_condition",
+	String[] tables = { "chapter", "location_condition", "location_regulated_activity", "nominated_individual", "partner", "provider_condition",
 	        "provider_regulated_activity", "registered_manager", "registered_manager_condition", "report_summary", "service_type", "service_user_band", "visit_date" };
 	try {
 	    ApplicationContext context = SpringUtil.getApplicationContext();
@@ -140,12 +141,10 @@ public class PreviewUpdate extends DeltaUpdate {
 
 	    Transaction tx = null;
 
-/**
 	    if (iTotal > 300000) {
 		logger.warn("Items are > 300,000, terminating load");
 		return;
 	    }
-**/
 
 	    for (int i = 0; i < results.size(); i++) {
 		String action = "";
@@ -284,12 +283,10 @@ public class PreviewUpdate extends DeltaUpdate {
 	int iTotal = results.size(), iCount = 0;
 	logger.info("Processing " + iTotal + " records.");
 
-/**
 	if (iTotal > 300000) {
 	    logger.warn("Items are > 300,000, terminating load");
 	    return;
 	}
-**/
 
 	Transaction tx = null;
 

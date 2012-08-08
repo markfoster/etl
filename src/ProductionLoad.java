@@ -112,6 +112,11 @@ public class ProductionLoad {
 
 	    iCount++;
 
+            if (iTotal > 300000) {
+                logger.warn("Items are > 300,000, terminating load");
+                return;
+            }
+
 	    int iDelta = 1;
 	    if (iTotal > 10000)
 		iDelta = 500;

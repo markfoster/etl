@@ -14,7 +14,7 @@
             </key-property>
         </composite-id>
 
-        <property name="name" type="string">
+        <property name="name" type="string" node="Name">
             <column name="name" length="115" />
         </property>
 
