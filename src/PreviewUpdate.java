@@ -11,6 +11,10 @@ import org.apache.log4j.Logger;
 import net.sf.beanlib.hibernate.*;
 import org.apache.commons.beanutils.*;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 /**
  * 
  * @author Mark
@@ -142,7 +146,8 @@ public class PreviewUpdate extends DeltaUpdate {
 	    Transaction tx = null;
 
 	    if (iTotal > 300000) {
-		logger.warn("Items are > 300,000, terminating load");
+                //optimiseDataLoad(entity);
+		logger.warn("Items are > 300,000, optimising load");
 		return;
 	    }
 
@@ -385,6 +390,12 @@ public class PreviewUpdate extends DeltaUpdate {
 	} catch (Exception ex) {
 	}
 
+    }
+
+    /**
+     * Use MySQLDump and MySQL load to optimise large entity loads
+     */
+    public void optimiseDataLoad(String entity) {
     }
 
     /**
