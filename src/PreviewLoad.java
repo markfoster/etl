@@ -121,6 +121,8 @@ public class PreviewLoad {
 	if (null == rMap) {
 	    throw new Exception("Cannot load actual metrics from " + basedir + "/xml/report.csv");
 	}
+        logger.info("Audit Map : " + aMap);
+        logger.info("Report Map : " + rMap);
 	Iterator i = aMap.keySet().iterator();
 	while (i.hasNext()) {
 	    String key = (String) i.next();

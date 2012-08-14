@@ -74,6 +74,13 @@ public class ETLProductionLoad {
 	    System.exit(1);
 	}
 
+        // Check whether any entities actually need to be processed
+        if (ProcessState.getEntitiesForUpdate().size() == 0) {
+	    ProcessState.setLock(ProcessState.LOCK_CLEAR);
+	    ProcessState.setSystemState(ProcessState.IDLE);
+	    WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodload", "Nothing to process. Resetting state and lock.", WatchDog.WATCHDOG_NOTICE);
+        }
+
 	// Populate the preview delta from XML files
 	ProcessState.setLock(ProcessState.LOCK_SET);
 	ProcessState.setSystemState(ProcessState.PROD_DELTA_LOAD_IN_PROGRESS);

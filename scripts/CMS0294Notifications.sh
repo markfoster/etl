@@ -114,8 +114,12 @@ CheckWatchdog ()
 
 CheckStuckState()
 {
-    SQL="SELECT state FROM process_state WHERE entity='System' AND state != 'IDLE' AND update_id <= (NOW() - INTERVAL 1 HOUR);"
+    SQL="SELECT state FROM process_state WHERE entity='System' AND state != 'IDLE' AND update_id <= (NOW() - INTERVAL 3 HOUR);"
     QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
+    CUR_MIN=$(date +"%M");
+    if [ $CUR_MIN -gt 10 ]; then
+         return 0
+    fi
     if [ "$QUERY" == "" ]; then
          return 0
     fi
@@ -125,8 +129,12 @@ CheckStuckState()
 
 CheckStuckLock()
 {
-    SQL="SELECT state FROM process_state WHERE entity='Lock' AND state = 'SET' AND update_id <= (NOW() - INTERVAL 1 HOUR);"
+    SQL="SELECT state FROM process_state WHERE entity='Lock' AND state = 'SET' AND update_id <= (NOW() - INTERVAL 3 HOUR);"
     QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
+    CUR_MIN=$(date +"%M");
+    if [ $CUR_MIN -gt 10 ]; then
+         return 0
+    fi
     if [ "$QUERY" == "" ]; then
          return 0
     fi
@@ -192,45 +200,58 @@ MailAlert ()
     LOCK_ALERT=""
 
     (
-	echo "To: ${EVENT_MAIL}"
-	echo "From: ${MAIL_FROM}"
-
 	case "${1}" in
 
-	"LOCK_TIMEOUT" )	    echo "Subject: CRITICAL - CMS0294Notifications failed to get the Update lock on ${HostName}"
+	"LOCK_TIMEOUT" )	    echo "To: ${ALERT_MAIL}"
+	                            echo "From: ${MAIL_FROM}"
+                                    echo "Subject: CRITICAL - CMS0294Notifications failed to get the Update lock on ${HostName}"
                                     LOCK_ALERT="LOCK"
                                     ;;
-	"LOCK_CLEAR" )		    echo "Subject: CRITICAL - CMS0294Notifications failed to clear the Update lock on ${HostName}" 
+	"LOCK_CLEAR" )		    echo "To: ${ALERT_MAIL}"
+	                            echo "From: ${MAIL_FROM}"
+                                    echo "Subject: CRITICAL - CMS0294Notifications failed to clear the Update lock on ${HostName}" 
                                     LOCK_ALERT="LOCK"
                                     ;;
-	"DRUPAL_PREVIEW_UPDATED" )  echo "Subject: ALERT - Preview instance update has completed"
+	"DRUPAL_PREVIEW_UPDATED" )  echo "To: ${EVENT_MAIL}"
+	                            echo "From: ${MAIL_FROM}"
+                                    echo "Subject: ETL EVENT - Preview instance update has completed"
                                     echo "Priority: Urgent"
                                     echo "Importance: high"
                                     ;;
-	"DRUPAL_PROD_UPDATED" )     echo "Subject: ALERT - Production instance update has completed" 
+	"DRUPAL_PROD_UPDATED" )     echo "To: ${EVENT_MAIL}"
+	                            echo "From: ${MAIL_FROM}"
+                                    echo "Subject: ETL EVENT - Production instance update has completed" 
                                     echo "Priority: Urgent"
                                     echo "Importance: high"
                                     ;;
-        "WATCHDOG_ALERT" )          echo "Subject: ALERT - Watchdog Alert detected"
-                                    echo "Priority: Urgent"
-                                    echo "Importance: high"
-                                    DumpFiles "Context" ${LOG_FILE}
-                                    ;;
-
-        "STATE_STUCK" )             echo "Subject: ALERT - State has been at ${LOCK_STATE} for more than one hour"
-                                    echo "Priority: Urgent"
-                                    echo "Importance: high"
-                                    DumpFiles "Context" ${LOG_FILE}
-                                    ;;
-
-        "LOCK_STUCK" )              echo "Subject: ALERT - Process lock has been SET for more than one hour"
+        "WATCHDOG_ALERT" )          echo "To: ${ALERT_MAIL}"
+	                            echo "From: ${MAIL_FROM}"
+                                    echo "Subject: ALERT - Watchdog Alert detected"
                                     echo "Priority: Urgent"
                                     echo "Importance: high"
                                     DumpFiles "Context" ${LOG_FILE}
                                     ;;
 
+        "STATE_STUCK" )             echo "To: ${ALERT_MAIL}"
+	                            echo "From: ${MAIL_FROM}"
+                                    echo "Subject: ALERT - State has been at ${LOCK_STATE} for more than one hour"
+                                    echo "Priority: Urgent"
+                                    echo "Importance: high"
+                                    DumpFiles "Context" ${LOG_FILE}
+                                    ;;
 
-	* )			    echo "Subject: WARNING - CMS0294Notifications unknown mail alert on ${HostName}" ;;
+        "LOCK_STUCK" )              echo "To: ${ALERT_MAIL}"
+	                            echo "From: ${MAIL_FROM}"
+                                    echo "Subject: ALERT - Process lock has been SET for more than one hour"
+                                    echo "Priority: Urgent"
+                                    echo "Importance: high"
+                                    DumpFiles "Context" ${LOG_FILE}
+                                    ;;
+
+
+	* )			    echo "To: ${ALERT_MAIL}"
+	                            echo "From: ${MAIL_FROM}"
+                                    echo "Subject: WARNING - CMS0294Notifications unknown mail alert on ${HostName}" ;;
 
 	esac
 
@@ -397,7 +418,6 @@ HostName="$(hostname | sed -e 's/\..*//')"
           if [ "$?" -eq "1" ]
           then MailAlert DRUPAL_PREVIEW_UPDATED 
                java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}
-               #LockNotification DRUPAL_PREVIEW_UPDATED
                "/usr/local/bin/CMS0294ClearLocks.sh"
 	       ErrorExit "Drupal Preview Database updated"
           fi
@@ -409,7 +429,6 @@ HostName="$(hostname | sed -e 's/\..*//')"
           if [ "$?" -eq "1" ]
           then MailAlert DRUPAL_PROD_UPDATED 
                java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}
-               #LockNotification DRUPAL_PROD_UPDATED
                "/usr/local/bin/CMS0294ClearLocks.sh"
 	       ErrorExit "Drupal Production Database updated"
           fi

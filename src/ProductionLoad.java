@@ -46,9 +46,10 @@ public class ProductionLoad {
     /**
      * 
      */
-    public void run() {
+    public boolean run() {
 	ETLContext eContext = ETLContext.getContext();
 	List entities = ProcessState.getEntitiesForUpdate();
+        if (entities.size() == 0) return false;
 	Iterator i = entities.iterator();
 	while (i.hasNext()) {
 	    String entity = (String) i.next();
@@ -66,6 +67,7 @@ public class ProductionLoad {
 	    //    ProcessState.setEntityState(entity, ProcessState.STATE_DELTA);
 	    //}
 	}
+        return true;
     }
 
     /**

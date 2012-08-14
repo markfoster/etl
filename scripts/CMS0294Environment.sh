@@ -57,13 +57,23 @@ export PROD_CRED="ncZ1x6CWSDa"
 
 export JAVA_OPTS="-Xms512m -Xmx2048m"
 
-#export EVENT_MAIL="xansa.club.environmentmgmt@steria.co.uk"    # Alert Email address
-export EVENT_MAIL="mark.foster@steria.co.uk,pratibha.seth9521@steria.co.in,chi@hausolutions.com,jennifer.jordan@steria.co.uk"
 export MAIL_FROM="CMS0294Alert@steria.co.uk"
-#export EVENT_MAIL="mark.foster@steria.co.uk"
-export REPORT_MAIL="mark.foster@steria.co.uk,pratibha.seth9521@steria.co.in,chi@hausolutions.com,jennifer.jordan@steria.co.uk"
-#export REPORT_MAIL="mark.foster@steria.co.uk"
 export REPORT_MAIL_FROM="CMS0294Report@steria.co.uk"
+export ALERT_MAIL="mark.foster@steria.co.uk,chi@hausolutions.com"
+
+#export EVENT_MAIL="xansa.club.environmentmgmt@steria.co.uk"    # Alert Email address
+#export EVENT_MAIL="mark.foster@steria.co.uk"
+#export EVENT_MAIL="mark.foster@steria.co.uk,pratibha.seth9521@steria.co.in,chi@hausolutions.com,jennifer.jordan@steria.co.uk"
+#export REPORT_MAIL="mark.foster@steria.co.uk"
+#export ALERT_MAIL="mark.foster@steria.co.uk,chi@hausolutions.com"
+#export REPORT_MAIL="mark.foster@steria.co.uk,pratibha.seth9521@steria.co.in,chi@hausolutions.com,jennifer.jordan@steria.co.uk"
+
+## For UAT and OAT
+export EVENT_MAIL="erika.farrugia@cqc.org.uk,caroline.milton@cqc.org.uk,mark@axistwelve.com,custsys5@cqc.org.uk,nana.boachie@cqc.org.uk,jennifer.jordan@steria.co.uk,pratibha.seth9521@steria.co.in,anirban.das@steria.co.in,meenakshi.kumar@steria.co.in,mark.foster@steria.co.uk,chi@hausolutions.com,andrew.berry@steria.co.uk"
+export REPORT_MAIL="erika.farrugia@cqc.org.uk,caroline.milton@cqc.org.uk,mark@axistwelve.com,custsys5@cqc.org.uk,nana.boachie@cqc.org.uk,jennifer.jordan@steria.co.uk,pratibha.seth9521@steria.co.in,anirban.das@steria.co.in,meenakshi.kumar@steria.co.in,mark.foster@steria.co.uk,chi@hausolutions.com,andrew.berry@steria.co.uk"
+#export EVENT_MAIL="jennifer.jordan@steria.co.uk,pratibha.seth9521@steria.co.in,anirban.das@steria.co.in,meenakshi.kumar@steria.co.in,mark.foster@steria.co.uk,chi@hausolutions.com"
+#export REPORT_MAIL="jennifer.jordan@steria.co.uk,pratibha.seth9521@steria.co.in,anirban.das@steria.co.in,meenakshi.kumar@steria.co.in,mark.foster@steria.co.uk,chi@hausolutions.com"
+export T_ALERT_MAIL="mark.foster@steria.co.uk,chi@hausolutions.com,andrew.berry@steria.co.uk,jennifer.jordan@steria.co.uk,anirban.das@steria.co.in"
 
 #
 # Health Check Info
@@ -83,7 +93,7 @@ export AuditTimeOut=2
 export FileStabilityTimeOut=2
 export LockTimeOut=1
 export SizeLimit=5000
-export OfficeHoursStart=2
-export OfficeHoursEnd=4
+export OfficeHoursStart=8
+export OfficeHoursEnd=5
 
 

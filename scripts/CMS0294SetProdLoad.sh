@@ -2,11 +2,11 @@
 #
 # ETL - Clear any active locks
 #
-# Usage: CMS0294CheckLocks.sh [ -D ]
+# Usage: CMS0294ClearLocks.sh [ -D ]
 #
 #    -D: Debug
 #
-# $Id: CMS0294CheckLocks.sh,v 1.11 2012/05/01 11:09:03 appadmin Exp $
+# $Id: CMS0294ClearLocks.sh,v 1.11 2012/05/01 11:09:03 appadmin Exp $
 #
 #   Date	Version	Who	Description
 #   ====	=======	===	===========
@@ -19,14 +19,14 @@
 #
 
 Usage () {
-    echo "usage: CMS0294CheckLocks.sh [ -D ]" 1>&2
+    echo "usage: CMS0294ClearLocks.sh [ -D ]" 1>&2
 
     CleanUp
     exit 1
 }
 
 ErrorExit () {
-    echo "CMS0294CheckLocks.sh:" "$*" 1>&2;
+    echo "CMS0294ClearLocks.sh:" "$*" 1>&2;
 
     CleanUp
     exit 1
@@ -81,9 +81,9 @@ UnLockProcess ()
 
 UnLockDatabaseLocks ()
 {
-    SQL="UPDATE process_state SET state = 'CLEAR' WHERE entity='Lock'"
-    QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
-    SQL="UPDATE process_state SET state = 'IDLE' WHERE entity='System'"
+    #SQL="UPDATE process_state SET state = 'CLEAR' WHERE entity='Lock'"
+    #QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
+    SQL="UPDATE process_state SET state = 'PROD_LOAD_TRIGGER' WHERE entity='System'"
     QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
 }
 
@@ -113,10 +113,6 @@ VerboseCheck () {
          SQL="select state from process_state where entity='System'"
          QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
          PrintInfo "System status = ${QUERY}"
-         SQL="select * from process_state"
-         echo "$SQL" | mysql -ss -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}
-         #QUERY=`mysql -e "${SQL}" -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
-         PrintInfo "Output = ${QUERY}"
     fi
 }
 
@@ -128,7 +124,7 @@ VerboseCheck () {
 
 MailAlert ()
 {
-    MAIL_FROM="CMS0294CheckLocks@$(hostname)"
+    MAIL_FROM="CMS0294ClearLocks@$(hostname)"
 
     (
 	echo "To: ${EVENT_MAIL}"
@@ -136,10 +132,10 @@ MailAlert ()
 
 	case "${1}" in
 
-	"LOCK_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294CheckLocks failed to get the Update lock on ${HostName}" ;;
-	"LOCK_CLEAR" )		echo "Subject: CRITICAL - CMS0294CheckLocks failed to clear the Update lock on ${HostName}" ;;
+	"LOCK_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294ClearLocks failed to get the Update lock on ${HostName}" ;;
+	"LOCK_CLEAR" )		echo "Subject: CRITICAL - CMS0294ClearLocks failed to clear the Update lock on ${HostName}" ;;
 
-	* )			echo "Subject: WARNING - CMS0294CheckLocks unknown mail alert on ${HostName}" ;;
+	* )			echo "Subject: WARNING - CMS0294ClearLocks unknown mail alert on ${HostName}" ;;
 
 	esac
 
@@ -187,7 +183,7 @@ if   [ -f "${CMD_PATH}/CMS0294Environment.sh" ]
 then . "${CMD_PATH}/CMS0294Environment.sh"
 elif [ -f "/usr/local/bin/CMS0294Environment.sh" ]
 then . "/usr/local/bin/CMS0294Environment.sh"
-else echo "CMS0294CheckLocks.sh: Environment file missing."
+else echo "CMS0294ClearLocks.sh: Environment file missing."
      exit 1
 fi
 
@@ -200,12 +196,12 @@ F_FLAG=""
 
 # Set up log names, directories and masks
 
-TMP_DIR="/var/tmp/CMS0294CheckLocks"
+TMP_DIR="/var/tmp/CMS0294ClearLocks"
 mkdir -p "${TMP_DIR}" 2>/dev/null
 
-LOG_NAME="CheckLocks.log"
+LOG_NAME="ClearLocks.log"
 LOG_FILE="${TMP_DIR}/${LOG_NAME}"
-LOG_MASK='CheckLocks.????-??-??_??:??:??.log.gz'
+LOG_MASK='ClearLocks.????-??-??_??:??:??.log.gz'
 
 # Check Options
 
@@ -242,7 +238,7 @@ if   [ "${D_FLAG}" = "" ]
 then exec >"${LOG_FILE}" 2>&1
 fi
 
-echo "Starting Check Locks at $(date)"
+echo "Starting Clear Locks at $(date)"
 
 HostName="$(hostname | sed -e 's/\..*//')"
 
@@ -250,6 +246,8 @@ HostName="$(hostname | sed -e 's/\..*//')"
 
      #UnLockProcess
      LOCKDIR=""
+
+     UnLockDatabaseLocks
 
      VerboseCheck 
 
@@ -267,6 +265,6 @@ do
     rm -f $i
 done
 
-echo "Completed Check Locks at $(date)"
+echo "Completed Clear Locks at $(date)"
 
 exit 0;

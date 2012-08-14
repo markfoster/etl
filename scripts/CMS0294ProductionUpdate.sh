@@ -139,27 +139,34 @@ MailAlert ()
     LOCK_ALERT=""
 
     (
-	echo "To: ${EVENT_MAIL}"
-	echo "From: ${MAIL_FROM}"
-
 	case "${1}" in
 
-	"LOCK_TIMEOUT" )	    echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to get the Update lock on ${HostName}"
+	"LOCK_TIMEOUT" )	    echo "To: ${ALERT_MAIL}"
+                                    echo "From: ${MAIL_FROM}"
+                                    echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to get the Update lock on ${HostName}"
                                     LOCK_ALERT="LOCK"
                                     ;;
-	"LOCK_CLEAR" )		    echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to clear the Update lock on ${HostName}" 
+	"LOCK_CLEAR" )		    echo "To: ${ALERT_MAIL}" 
+                                    echo "From: ${MAIL_FROM}"
+                                    echo "Subject: CRITICAL - CMS0294ProductionUpdate failed to clear the Update lock on ${HostName}" 
                                     LOCK_ALERT="LOCK"
                                     ;;
-	"DRUPAL_PREVIEW_UPDATED" )  echo "Subject: ALERT - Preview instance update has completed"
+	"DRUPAL_PREVIEW_UPDATED" )  echo "To: ${EVENT_MAIL}" 
+                                    echo "From: ${MAIL_FROM}"
+                                    echo "Subject: ALERT - Preview instance update has completed"
                                     echo "Priority: Urgent"
                                     echo "Importance: high"
                                     ;;
-	"DRUPAL_PROD_UPDATED" )     echo "Subject: ALERT - Production instance update has completed" 
+	"DRUPAL_PROD_UPDATED" )     echo "To: ${EVENT_MAIL}"
+                                    echo "From: ${MAIL_FROM}"
+                                    echo "Subject: ALERT - Production instance update has completed" 
                                     echo "Priority: Urgent"
                                     echo "Importance: high"
                                     ;;
 
-	* )			    echo "Subject: WARNING - CMS0294ProductionUpdate unknown mail alert on ${HostName}" ;;
+	* )			    echo "To: ${ALERT_MAIL}" 
+                                    echo "From: ${MAIL_FROM}"
+                                    echo "Subject: WARNING - CMS0294ProductionUpdate unknown mail alert on ${HostName}" ;;
 
 	esac
 

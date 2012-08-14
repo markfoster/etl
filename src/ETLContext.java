@@ -164,6 +164,31 @@ public class ETLContext {
     }
 
     /**
+     *
+     * @param subject
+     * @param message
+     */
+    public void reportMailFromFile(String subject, String file) {
+        String[] commandArray = { "/bin/bash", "/usr/local/bin/CMS0294ReportFile.sh", String.format("-s'%s'", subject), String.format("-f %s", file) };
+        try {
+            System.out.println(commandArray.toString());
+            for (String element : commandArray) {
+                 System.out.println(element);
+            }
+            Process process = Runtime.getRuntime().exec(commandArray);
+            int exitValue = process.waitFor();
+            BufferedReader buf = new BufferedReader(new
+            InputStreamReader(process.getInputStream())); String line = "";
+            while ((line = buf.readLine()) != null) {
+             logger.info("exec response: " + line); }
+            
+        } catch (Exception ex) {
+            logger.error("Failed to send alertMail: ", ex);
+        }
+    }
+
+
+    /**
      * 
      * @param args
      */

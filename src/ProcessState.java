@@ -56,7 +56,20 @@ public class ProcessState {
 	});
 	entities.remove(ProcessState.SYSTEM);
 	entities.remove(ProcessState.LOCK);
-	return entities;
+
+        // MSF 10/08/12 - Only return valid entities that have content
+	List<String> validEntities = new ArrayList();
+	JdbcTemplate jtProdDelta = new JdbcTemplate();
+        jtProdDelta.setDataSource((DataSource)context.getBean("production-delta"));
+        for (String entity : entities) {
+            String table = entity.toLowerCase();
+            int rowCount = jtProdDelta.queryForInt("select count(0) from " + table);
+            if (rowCount != 0) {
+                validEntities.add(entity);
+            }
+        }
+
+	return validEntities;
     }
 
     /**

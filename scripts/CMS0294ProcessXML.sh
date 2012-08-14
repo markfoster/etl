@@ -116,19 +116,26 @@ MailAlert ()
     MAIL_FROM="CMS0294ProcessXML@$(hostname)"
 
     (
-	echo "To: ${EVENT_MAIL}"
 	echo "From: ${MAIL_FROM}"
 
 	case "${1}" in
 
-	"LOCK_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294ProcessXML failed to get the Update lock on ${HostName}" ;;
-	"LOCK_CLEAR" )		echo "Subject: CRITICAL - CMS0294ProcessXML failed to clear the Update lock on ${HostName}" ;;
-	"XML_AVAILABLE" )       echo "Subject: INFORMATION - XML available on ${HostName}" ;;
-	"BAD_XML_FORMAT" )      echo "Subject: CRITICAL - XML format issues on ${HostName}" ;;
-	"INVALID_STATE" )       echo "Subject: ALERT - XML detected but not in IDLE state on ${HostName}" ;;
-	"SIZE_EXCEEDED_IN_OFFICE_HOURS" )  echo "Subject: ALERT - XML file size exceeds maximum ${HostName}" ;;
+	"LOCK_TIMEOUT" )	echo "To: ${ALERT_MAIL}"
+                                echo "Subject: CRITICAL - CMS0294ProcessXML failed to get the Update lock on ${HostName}" ;;
+	"LOCK_CLEAR" )		echo "To: ${ALERT_MAIL}"
+                                echo "Subject: CRITICAL - CMS0294ProcessXML failed to clear the Update lock on ${HostName}" ;;
+	"XML_AVAILABLE" )       echo "To: ${EVENT_MAIL}"
+                                echo "Subject: INFORMATION - XML available, processing..." ;;
+	"BAD_XML_FORMAT" )      echo "To: ${EVENT_MAIL}"
+                                echo "Subject: CRITICAL - XML formating issues" ;;
+	"INVALID_STATE" )       echo "To: ${ALERT_MAIL}"
+                                echo "Subject: ALERT - XML detected but not in IDLE state on ${HostName}" ;;
+	"SIZE_EXCEEDED_IN_OFFICE_HOURS" )  
+                                echo "To: ${EVENT_MAIL}"
+                                echo "Subject: ALERT - XML file size exceeds maximum sizes" ;;
 
-	* )			echo "Subject: WARNING - CMS0294ProcessXML unknown mail alert on ${HostName}" ;;
+	* )			echo "To: ${ALERT_MAIL}"
+                                echo "Subject: WARNING - CMS0294ProcessXML unknown mail alert on ${HostName}" ;;
 
 	esac
 
@@ -151,9 +158,9 @@ MailAlert ()
              DumpFiles "Log content" "${LOG_FILE}"
         fi
 
-	if   [ "${LOCKDIR}" != "" ]
-	then DumpFiles "Lock file (${LOCKDIR}/owner}) content" "${LOCKDIR}/owner"
-	fi
+	#if   [ "${LOCKDIR}" != "" ]
+	#then DumpFiles "Lock file (${LOCKDIR}/owner}) content" "${LOCKDIR}/owner"
+	#fi
 	
 	echo
     ) | /usr/lib/sendmail -f "${MAIL_FROM}" -t
@@ -272,12 +279,33 @@ HostName="$(hostname | sed -e 's/\..*//')"
 	  ErrorExit "Did not get the XML Update lock"
      fi
 
-     # The pp_audit_xml.* file should be the last one written in an upload
+     # The pp_z_audit_xml.* file should be the last one written in an upload
      # We wait until this file is at least 5 minutes old before processing
-     PP_AUDIT="pp_audit_xml*"
+     fProcess=0
+     PP_AUDIT="pp_z_audit_xml*"
      MMIN="+5"
 
+     # find an audit file older than 5 minutes
      if [ $(find ${XML_IN_DIR} -maxdepth 1 -type f -mmin ${MMIN} -iname "${PP_AUDIT}" | wc -l) -gt 0 ]; then
+
+         # find the number of files in the directory
+         FILE_COUNT=$(ls -ltr $XML_IN_DIR/pp_*.xml* | wc -l)
+
+         # check for the last updated file in the directory
+         LAST_CHANGED_FILE=$(ls -t1 $XML_IN_DIR | head -n1)
+         LAST_CHANGED=$(stat -c %Y $XML_IN_DIR/$LAST_CHANGED_FILE)
+         LAST_NOW=$(date +%s)
+         let LAST_ELAPSED=LAST_NOW-LAST_CHANGED
+
+         # ...we need at least 16 files and it needs to be older than 5 minutes 
+         if [ $FILE_COUNT -gt 16 -a $LAST_ELAPSED -gt 300 ]; then
+            fProcess=1
+         fi
+     
+     fi
+
+     # ...assuming that the above conditions have been met then continue the processing...
+     if [ $fProcess -gt 0 ]; then
 
         CheckIdleState
         if [ "$?" -eq "0" ]
@@ -285,14 +313,21 @@ HostName="$(hostname | sed -e 's/\..*//')"
              ErrorExit "XML detected, but not at IDLE"
         fi
 
-        MailAlert XML_AVAILABLE
-
         bDate=$(date '+%Y%m%d_%H%M%S')
         tar zcvf ${BACKUP_DIR}/xml_in_${bDate}.tgz ${XML_IN_DIR}/pp* > /dev/null 2>&1
 
         rm -rf "${XML_PROCESS_DIR}"
         mkdir -p "${XML_PROCESS_DIR}" 2>/dev/null
+
+        # MSF: 24/07/12 - New pp_z_audit_xml.* file as audit file
+        ls ${XML_IN_DIR}/pp_z_aud* | while read FILE;
+        do
+            mv "$FILE" "${XML_PROCESS_DIR}/pp_audit_xml.xml"
+        done
         mv ${XML_IN_DIR}/pp_* "${XML_PROCESS_DIR}" > /dev/null 2>&1
+
+        # Trigger the mail alert
+        MailAlert XML_AVAILABLE
 
         # Check the maximum file size and whether we are running in office hours
 	MAX_TMP=`du -k ${XML_PROCESS_DIR}/* | sort -r -n | head -n 1`
@@ -379,6 +414,13 @@ CleanUp
 #
 
 for i in $(find "${TMP_DIR}" -type f -name "${LOG_MASK}" -mtime +30)
+do
+    PrintInfo "Removing old log file: $i"
+    rm -f $i
+done
+
+# remove small log files
+for i in $(find /var/tmp -type f -size -800c -iname "*.gz")
 do
     PrintInfo "Removing old log file: $i"
     rm -f $i

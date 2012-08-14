@@ -43,7 +43,7 @@ public class ETLReport {
                 int    runId    = ProcessState.getRunId();
                 
                 //sysState = "PREVIEW_DRUPAL_COMPLETE";
-                //runId = 1480640534;
+                //runId = 991597794;
 
                 String mStart = "PROD_DELTA_LOAD_IN_PROGRESS";
                 String mEnd   = "PROD_DELTA_LOAD_IN_PROGRESS";
@@ -70,7 +70,7 @@ public class ETLReport {
                                              new Object[]{ new Integer(runId)}, String.class );
                 start = start.replace(".0", ""); // fudge to fix issue
                 logger.info("Started  = " + start);
-                String end   = (String)jt.queryForObject("SELECT timestamp FROM watchdog WHERE uid = ? AND message LIKE '% " + mEnd + "'", 
+                String end   = (String)jt.queryForObject("SELECT timestamp FROM watchdog WHERE uid = ? AND message LIKE '% to " + mEnd + "'", 
                                              new Object[]{ new Integer(runId)}, String.class );
                 end = end.replace(".0", ""); // fudge to fix issue
                 logger.info("Finished = " + end);
@@ -112,19 +112,20 @@ public class ETLReport {
                 }
 
                 emailOutput.append(reportOutput.toString());
-                ETLContext.getContext().reportMail(String.format("Report for %s run (%d)",  type, runId), emailOutput.toString());
+                //ETLContext.getContext().reportMail(String.format("Report for %s run (%d)",  type, runId), emailOutput.toString());
 
                 jt.update("INSERT INTO reporting (run_id, type, start, finish, message, last_updated) VALUES (?, ?, ?, ?, ?, now())", 
                        new Object[] {new Integer(runId), type, start, end, reportOutput.toString() } );
 
                 // write out a report file
+                String reportFilename = "";
                 try {
                     // Generate the report file
                     DateFormat df = new SimpleDateFormat("yyyyMMdd_hhmmss"); 
                     String dateStamp = df.format(new java.util.Date());
                     String filestub = "report_"+dateStamp;
-                    String filename = "/mnt/www/reports/"+filestub;
-                    FileWriter file = new FileWriter(filename);
+                    reportFilename = "/mnt/www/reports/"+filestub;
+                    FileWriter file = new FileWriter(reportFilename);
                     BufferedWriter out = new BufferedWriter(file);
                     out.write(reportOutput.toString());
                     out.close();
@@ -165,5 +166,8 @@ public class ETLReport {
                 } catch (Exception ex) {
                     logger.error("Failed to write report file.", ex);
                 }
+
+                //ETLContext.getContext().reportMail(String.format("Report for %s run (%d)",  type, runId), emailOutput.toString());
+                ETLContext.getContext().reportMailFromFile(String.format("Report for %s run (%d)",  type, runId), reportFilename);
 	}
 }

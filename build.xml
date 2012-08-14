@@ -47,6 +47,22 @@
         </javac>
     </target>
 
+    <target name="doc" depends="build">
+        <delete dir="doc"/>
+        <mkdir dir="doc"/>
+        <javadoc destdir="doc">
+          <fileset dir="src">
+            <exclude name="test*"/>
+            <exclude name="*.org"/>
+            <exclude name="DBTest*"/>
+            <exclude name="jdbc*"/>
+          </fileset>
+          <classpath>
+            <path refid="classpath" />
+          </classpath>
+        </javadoc>
+    </target>
+
     <target name="jar" depends="build">
         <mkdir dir="build/jar"/>
         <jar destfile="build/jar/test.jar" basedir="build">
