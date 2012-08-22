@@ -50,6 +50,12 @@ public class PreviewUpdate extends DeltaUpdate {
 	    // if active then update the profile databases...
 	    if (actions.get("active") != null) {
 		try {
+                    String eState = ProcessState.getEntityState(entity);
+
+                    if (entity.equals(Entity.OUTCOME) && eState.equals(ProcessState.STATE_FULL)) {
+                        continue;
+                    }
+
 		    if (entity.equals(Entity.PROVIDER) || entity.equals(Entity.LOCATION)) {
 			updateGeocoding(entity);
 			updateProductionDelta(entity);
@@ -59,7 +65,6 @@ public class PreviewUpdate extends DeltaUpdate {
 		    updateProductionDelta(entity);
 
 		    // if we are processing a FULL upload then cleanup...
-		    String eState = ProcessState.getEntityState(entity);
 		    if (eState.equals(ProcessState.STATE_FULL)) {
 			updatePreviewCleanup(entity, ProcessState.getEntityUniqueId(entity));
 		    }
@@ -125,13 +130,21 @@ public class PreviewUpdate extends DeltaUpdate {
 	WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload", String.format("Updating Preview PP for %s", entity), WatchDog.WATCHDOG_INFO);
 
 	Session s_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
-	Session s_pp = HibernateUtil.currentSession("preview_pp");
+	Session s_pp    = HibernateUtil.currentSession("preview_pp");
 
 	// Statistics stats =
 	// HibernateUtil.getSessionFactory("preview_pp").getStatistics();
 	// stats.setStatisticsEnabled(true);
 
 	int iInserts = 0, iDeletes = 0, iUpdates = 0;
+
+        // get a quick count of the items in the entity table
+        int iQuickCount = getDeltaCount(entity); 
+        if (iQuickCount > 30000) {
+            logger.warn("Items are > 300,000, optimising load");
+            optimiseDataLoad(entity);
+            return;
+        }
 
 	SQLQuery squery = s_delta.createSQLQuery("SELECT * FROM " + entity.toLowerCase());
 	squery.addEntity(entity);
@@ -144,12 +157,6 @@ public class PreviewUpdate extends DeltaUpdate {
 	    logger.info("Processing " + iTotal + " records.");
 
 	    Transaction tx = null;
-
-	    if (iTotal > 300000) {
-                //optimiseDataLoad(entity);
-		logger.warn("Items are > 300,000, optimising load");
-		return;
-	    }
 
 	    for (int i = 0; i < results.size(); i++) {
 		String action = "";
@@ -396,6 +403,19 @@ public class PreviewUpdate extends DeltaUpdate {
      * Use MySQLDump and MySQL load to optimise large entity loads
      */
     public void optimiseDataLoad(String entity) {
+    }
+
+    /**
+     * Use Spring to get a quick count of an entity table
+     */
+    private int getDeltaCount(String entity) {
+        ApplicationContext context = SpringUtil.getApplicationContext();
+        JdbcTemplate jt_delta = new JdbcTemplate();
+        jt_delta.setDataSource((DataSource)context.getBean("preview-delta"));
+        String sql = String.format("SELECT count(*) FROM %s", entity.toLowerCase());
+        int count = jt_delta.queryForInt(sql);
+	logger.info(String.format("Delta table count for %s = %d", entity, count));
+        return count;
     }
 
     /**

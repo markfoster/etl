@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<Audit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" timestamp="2012-08-20T08:02:54.694250000">
+  <Provider inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Provider_Regulated_Activity inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Provider_Condition inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Nominated_Individual inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Partner inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Location inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Location_Regulated_Activity inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Location_Condition inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Registered_Manager inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Registered_Manager_Condition inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Report_Summary inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Chapter inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Outcome inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Service_Type inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Service_User_Band inserts="0" updates="0" deletes="0" load="DELTA"/>
+  <Visit_Date inserts="0" updates="0" deletes="0" load="DELTA"/>
+</Audit>

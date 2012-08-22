@@ -53,6 +53,13 @@ public class ProductionLoad {
 	Iterator i = entities.iterator();
 	while (i.hasNext()) {
 	    String entity = (String) i.next();
+
+            String eState = ProcessState.getEntityState(entity);
+
+            if (entity.equals(Entity.OUTCOME) && eState.equals(ProcessState.STATE_FULL)) {
+                continue;
+            }
+
 	    if (entity.equals(Entity.PROVIDER) || entity.equals(Entity.LOCATION)) {
 		continue;
 	    }
