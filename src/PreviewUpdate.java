@@ -288,7 +288,7 @@ public class PreviewUpdate extends DeltaUpdate {
 
         // get a quick count of the items in the entity table
         int iQuickCount = getDeltaCount(entity);
-        if (iQuickCount > 30000) {
+        if (iQuickCount > 300000) {
             logger.warn("Items are > 300,000, optimising load");
             return;
         }
