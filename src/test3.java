@@ -32,6 +32,7 @@ public class test3 {
     	ApplicationContext context = 
     		new ClassPathXmlApplicationContext("spring.xml");
 
+/**
 	JdbcTemplate jt_prev = new JdbcTemplate();
         jt_prev.setDataSource((DataSource)context.getBean("preview-delta"));
 
@@ -39,6 +40,16 @@ public class test3 {
         jt_prod.setDataSource((DataSource)context.getBean("production-delta"));
 
         JdbcTemplate jtAction = jt_prev;
+**/
+
+	JdbcTemplate jt_prod = new JdbcTemplate();
+        jt_prod.setDataSource((DataSource)context.getBean("production-pp"));
+        String entity = "Outcome";
+        String sql = String.format("SELECT count(*) FROM %s", entity.toLowerCase());
+        System.out.println(sql + ";");
+        int count = jt_prod.queryForInt(sql);
+        System.out.println("Count = " + count);
+/**
 
         for (String entity : entities) {
 
@@ -75,6 +86,7 @@ public class test3 {
             }
         });
         System.out.println("Result = " + result.size());
+**/
        
     }
 }
