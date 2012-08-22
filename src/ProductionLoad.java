@@ -113,6 +113,14 @@ public class ProductionLoad {
 
 	Transaction tx = null;
 
+        // get a quick count of the items in the entity table
+        int iQuickCount = getDeltaCount(entity);
+        if (iQuickCount > 300000) {
+            logger.warn("Items are > 300,000, optimising load");
+            optimiseDataLoad(entity, iQuickCount);
+            return;
+        }
+
 	Query q = s_delta.createQuery("FROM " + entity);
 	logger.info("Query = " + q);
 	List results = q.list();
@@ -120,11 +128,6 @@ public class ProductionLoad {
 	for (int i = 0; i < iTotal; i++) {
 
 	    iCount++;
-
-            if (iTotal > 300000) {
-                logger.warn("Items are > 300,000, terminating load");
-                return;
-            }
 
 	    int iDelta = 1;
 	    if (iTotal > 10000)
@@ -204,4 +207,29 @@ public class ProductionLoad {
 	    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "fullcleanup", String.format("Problem with the delete table: %s", ex.getMessage()), WatchDog.WATCHDOG_WARNING);
 	}
     }
+
+    /**
+     * Use Spring to get a quick count of an entity table
+     */
+    private int getDeltaCount(String entity) {
+        ApplicationContext context = SpringUtil.getApplicationContext();
+        JdbcTemplate jt_delta = new JdbcTemplate();
+        jt_delta.setDataSource((DataSource)context.getBean("production-delta"));
+        String sql = String.format("SELECT count(*) FROM %s", entity.toLowerCase());
+        int count = jt_delta.queryForInt(sql);
+        logger.info(String.format("Delta table count for %s = %d", entity, count));
+        return count;
+    }
+
+
+    /**
+     * Use MySQLDump and MySQL load to optimise large entity loads
+     */
+    public void optimiseDataLoad(String entity, int count) {
+       int iDeletes = 0, iUpdates = 0, iInserts = count;
+       WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodppload",
+                String.format("%s... Deleted: %d/%d, Updated: %d/%d, Inserted: %d/%d [OPTIMISED]", 
+                entity, iDeletes, iDeletes, iUpdates, iUpdates, iInserts, iInserts), WatchDog.WATCHDOG_INFO);
+    }
+
 }
