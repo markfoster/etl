@@ -187,6 +187,24 @@ public class ETLContext {
         }
     }
 
+    public void runExecCmd(String cmd) {
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            String[] cmdR = new String[] { "/bin/bash", "-c", cmd };
+            System.out.println(cmdR);
+
+            Process process = runtime.exec(new String[] { "/bin/bash", "-c", cmd });
+            int exitValue = process.waitFor();
+            System.out.println("exit value: " + exitValue);
+            BufferedReader buf = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = "";
+            while ((line = buf.readLine()) != null) {
+                System.out.println("exec response: " + line);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 
     /**
      * 

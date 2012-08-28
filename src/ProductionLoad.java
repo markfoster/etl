@@ -24,6 +24,8 @@ import org.hibernate.Transaction;
 import org.apache.commons.beanutils.*;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -56,8 +58,19 @@ public class ProductionLoad {
 
             String eState = ProcessState.getEntityState(entity);
 
-            if (entity.equals(Entity.OUTCOME) && eState.equals(ProcessState.STATE_FULL)) {
-                continue;
+            if (entity.equals(Entity.OUTCOME)) {
+                // get a quick count of the items in the entity table
+                int iQuickCount = getDeltaCount(entity);
+                if (eState.equals(ProcessState.STATE_FULL)) {
+                    optimiseDataLoad(entity, iQuickCount);
+                    continue;
+                } else if (iQuickCount > Entity.MAX_ALLOWED) {
+                    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "prodload", 
+                           "Error: Cannot load production data for delta load > " + iQuickCount,
+                           WatchDog.WATCHDOG_WARNING);
+                    backupExcessiveDataLoad(entity);
+                    continue;
+                }
             }
 
 	    if (entity.equals(Entity.PROVIDER) || entity.equals(Entity.LOCATION)) {
@@ -115,8 +128,8 @@ public class ProductionLoad {
 
         // get a quick count of the items in the entity table
         int iQuickCount = getDeltaCount(entity);
-        if (iQuickCount > 300000) {
-            logger.warn("Items are > 300,000, optimising load");
+        if (iQuickCount > Entity.MAX_ALLOWED) {
+            logger.warn("Items are >  " + Entity.MAX_ALLOWED + " optimising load");
             optimiseDataLoad(entity, iQuickCount);
             return;
         }
@@ -227,9 +240,68 @@ public class ProductionLoad {
      */
     public void optimiseDataLoad(String entity, int count) {
        int iDeletes = 0, iUpdates = 0, iInserts = count;
+
+       try {
+           ApplicationContext context = SpringUtil.getApplicationContext();
+           DriverManagerDataSource ds = (DriverManagerDataSource)context.getBean("production-delta");
+           String user = ds.getUsername();
+           String pass = ds.getPassword();
+           String url  = ds.getUrl();
+           String host = "";
+           try { host = new java.net.URI(url.substring(5)).getHost(); } catch (Exception ex) {}
+
+           String table = entity.toLowerCase();
+           String date = new java.text.SimpleDateFormat("yyyyMMdd_hhmmss").format(new java.util.Date());
+           String file = String.format("%s_prod_%s.sql", table, date);
+           String cmd = String.format("/usr/bin/mysqldump --no-create-info --compact --host=%s --user=%s --password=%s %s %s > /var/tmp/%s",
+                          host, user, pass, "production_delta", table, file);
+           logger.info(cmd);
+           ETLContext.getContext().runExecCmd(cmd);
+           logger.info("complete");
+
+           // update the production_pp database
+           cmd = String.format("/usr/bin/mysql --host=%s --user=%s --password=%s %s -e \"TRUNCATE %s;\"",
+                          host, user, pass, "production_pp", table);
+           logger.info(cmd);
+           ETLContext.getContext().runExecCmd(cmd);
+           cmd = String.format("/usr/bin/mysql --host=%s --user=%s --password=%s %s < /var/tmp/%s",
+                          host, user, pass, "production_pp", file);
+           logger.info(cmd);
+           ETLContext.getContext().runExecCmd(cmd);
+           logger.info("complete");
+
+       } catch (Exception ex) {
+           WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "prodopload", String.format("Problem with the optimised load: %s",
+                        ex.getMessage()), WatchDog.WATCHDOG_WARNING);
+       }
+
        WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodppload",
                 String.format("%s... Deleted: %d/%d, Updated: %d/%d, Inserted: %d/%d [OPTIMISED]", 
                 entity, iDeletes, iDeletes, iUpdates, iUpdates, iInserts, iInserts), WatchDog.WATCHDOG_INFO);
+    }
+
+    private void backupExcessiveDataLoad(String entity) {
+       try {
+           ApplicationContext context = SpringUtil.getApplicationContext();
+           DriverManagerDataSource ds = (DriverManagerDataSource)context.getBean("preview-delta");
+           String user = ds.getUsername();
+           String pass = ds.getPassword();
+           String url  = ds.getUrl();
+           String host = "";
+           try { host = new java.net.URI(url.substring(5)).getHost(); } catch (Exception ex) {}
+
+           String table = entity.toLowerCase();
+           String date = new java.text.SimpleDateFormat("yyyyMMdd_hhmmss").format(new java.util.Date());
+           String file = String.format("%s_prod_err_%s.sql", table, date);
+           String cmd = String.format("/usr/bin/mysqldump --no-create-info --compact --host=%s --user=%s --password=%s %s %s > /var/tmp/%s",
+                          host, user, pass, "preview_delta", table, file);
+           logger.info(cmd);
+           ETLContext.getContext().runExecCmd(cmd);
+           logger.info("complete");
+       } catch (Exception ex) {
+           WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewopload", String.format("Problem with the backup: %s",
+                        ex.getMessage()), WatchDog.WATCHDOG_WARNING);
+       }
     }
 
 }

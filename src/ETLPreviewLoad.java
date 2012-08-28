@@ -59,8 +59,8 @@ public class ETLPreviewLoad {
      */
     public void run() {
 
-	ProcessState.setSystemState(ProcessState.IDLE);
-	ProcessState.setLock(ProcessState.LOCK_CLEAR);
+	//ProcessState.setSystemState(ProcessState.IDLE);
+	//ProcessState.setLock(ProcessState.LOCK_CLEAR);
 
 	String pState = ProcessState.getSystemState();
 	if (!pState.equals(ProcessState.IDLE)) {
@@ -83,6 +83,12 @@ public class ETLPreviewLoad {
 	pl.init();
 	pl.run();
 	WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", "Changed internal process state to PREVIEW_XML_COMPLETE", WatchDog.WATCHDOG_DEBUG);
+
+/**
+	PreviewLoad pl = new PreviewLoad();
+	pl.init();
+	pl.test_run();
+**/
 
 	WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", "Changed internal process state to PREVIEW_DELTA_LOAD_IN_PROGRESS", WatchDog.WATCHDOG_DEBUG);
 	PreviewUpdate pu = new PreviewUpdate();

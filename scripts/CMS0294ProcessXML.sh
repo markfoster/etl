@@ -426,6 +426,13 @@ do
     rm -f $i
 done
 
+# remove small log files
+for i in $(find /var/tmp -type f -mtime +3 -iname "*.sql")
+do
+    PrintInfo "Removing old backup SQL file: $i"
+    rm -f $i
+done
+
 echo "Completed Preview Update at $(date)"
 
 exit 0;

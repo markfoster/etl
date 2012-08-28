@@ -178,12 +178,6 @@ public class PreviewLoad {
 		logger.info("Load and Validate (" + xmlFile + ", " + xsdFile + ")");
 		Document doc = null;
 		String xml = "", xsd = "", result = "";
-		// xml = fileToString(xmlFile);
-		// xsd = fileToString(xsdFile);
-		// doc = checkXML(xml);
-		// docs.put(key, doc);
-		// checkXSD(xsd);
-		// validateXML(xml, xsd);
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String nowAsString = df.format(new Date());
@@ -203,6 +197,47 @@ public class PreviewLoad {
 	} finally {
 
 	}
+    }
+
+    public void test_run() {
+
+        Map docs = new HashMap();
+
+        try {
+            loadAudit();
+        } catch (Exception ex) {
+            WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "auditload", "Problem loading the audit: " + ex.getMessage(), WatchDog.WATCHDOG_EMERG);
+        }
+
+        try {
+            Map audits = context.getAuditMap();
+            Set keys = audits.keySet();
+            Iterator i = keys.iterator();
+            while (i.hasNext()) {
+                String key = (String) i.next();
+
+                g_session = HibernateUtil.getSessionFactory().openSession().getSession(EntityMode.DOM4J);
+
+                Map actions = (Map) audits.get(key);
+                String metric = String.format("Entity: %s, Actions: %s", key, actions);
+                WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "auditload", metric, WatchDog.WATCHDOG_INFO);
+                if (actions.get("active") == null)
+                    continue;
+
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String nowAsString = df.format(new Date());
+                logger.info("Update ID = " + nowAsString);
+                g_nowAsString = nowAsString;
+                ProcessState.setEntityState(key, (String) actions.get("load"));
+                ProcessState.setEntityUniqueId(key, nowAsString);
+
+                g_session.close();
+            }
+        } catch (Exception ex) {
+            WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "xmlload", "Problem loading or validating xml data: " + ex.getMessage(), WatchDog.WATCHDOG_EMERG);
+        } finally {
+
+        }
     }
 
     /**

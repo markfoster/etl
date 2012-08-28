@@ -53,6 +53,9 @@ public class PreviewUpdate extends DeltaUpdate {
                     String eState = ProcessState.getEntityState(entity);
 
                     if (entity.equals(Entity.OUTCOME) && eState.equals(ProcessState.STATE_FULL)) {
+                        // get a quick count of the items in the entity table
+                        int iQuickCount = getDeltaCount(entity);
+                        optimiseDataLoad(entity, iQuickCount);
                         continue;
                     }
 
@@ -81,8 +84,7 @@ public class PreviewUpdate extends DeltaUpdate {
      * 
      */
     public void cleanup() {
-	//String[] tables = { "chapter", "location_condition", "location_regulated_activity", "nominated_individual", "outcome", "partner", "provider_condition",
-	String[] tables = { "chapter", "location_condition", "location_regulated_activity", "nominated_individual", "partner", "provider_condition",
+	String[] tables = { "chapter", "location_condition", "location_regulated_activity", "nominated_individual", "outcome", "partner", "provider_condition",
 	        "provider_regulated_activity", "registered_manager", "registered_manager_condition", "report_summary", "service_type", "service_user_band", "visit_date" };
 	try {
 	    ApplicationContext context = SpringUtil.getApplicationContext();
@@ -140,8 +142,8 @@ public class PreviewUpdate extends DeltaUpdate {
 
         // get a quick count of the items in the entity table
         int iQuickCount = getDeltaCount(entity); 
-        if (iQuickCount > 300000) {
-            logger.warn("Items are > 300,000, optimising load");
+        if (iQuickCount > Entity.MAX_ALLOWED) {
+            logger.warn("Items are >  " + Entity.MAX_ALLOWED + " optimising load");
             optimiseDataLoad(entity, iQuickCount);
             return;
         }
@@ -288,8 +290,8 @@ public class PreviewUpdate extends DeltaUpdate {
 
         // get a quick count of the items in the entity table
         int iQuickCount = getDeltaCount(entity);
-        if (iQuickCount > 300000) {
-            logger.warn("Items are > 300,000, optimising load");
+        if (iQuickCount > Entity.MAX_ALLOWED) {
+            logger.warn("Items are >  " + Entity.MAX_ALLOWED + " optimising load");
             return;
         }
 
@@ -406,6 +408,51 @@ public class PreviewUpdate extends DeltaUpdate {
      */
     public void optimiseDataLoad(String entity, int count) {
        int iDeletes = 0, iUpdates = 0, iInserts = count;
+    
+       try {
+       	   ApplicationContext context = SpringUtil.getApplicationContext();
+       	   DriverManagerDataSource ds = (DriverManagerDataSource)context.getBean("preview-delta");
+       	   String user = ds.getUsername();
+       	   String pass = ds.getPassword();
+       	   String url  = ds.getUrl();
+       	   String host = "";
+       	   try { host = new java.net.URI(url.substring(5)).getHost(); } catch (Exception ex) {}
+
+       	   String table = entity.toLowerCase();
+       	   String date = new java.text.SimpleDateFormat("yyyyMMdd_hhmmss").format(new java.util.Date());
+       	   String file = String.format("%s_%s.sql", table, date);
+       	   String cmd = String.format("/usr/bin/mysqldump --no-create-info --compact --host=%s --user=%s --password=%s %s %s > /var/tmp/%s",
+       	                  host, user, pass, "preview_delta", table, file);
+       	   logger.info(cmd);
+       	   ETLContext.getContext().runExecCmd(cmd);
+       	   logger.info("complete");
+
+       	   // update the preview_pp database
+       	   cmd = String.format("/usr/bin/mysql --host=%s --user=%s --password=%s %s -e \"TRUNCATE %s;\"",
+       	                  host, user, pass, "preview_pp", table);
+       	   logger.info(cmd);
+       	   ETLContext.getContext().runExecCmd(cmd);
+       	   cmd = String.format("/usr/bin/mysql --host=%s --user=%s --password=%s %s < /var/tmp/%s",
+       	                  host, user, pass, "preview_pp", file);
+       	   logger.info(cmd);
+       	   ETLContext.getContext().runExecCmd(cmd);
+       	   logger.info("complete");
+
+       	   // update the production_delta database
+       	   cmd = String.format("/usr/bin/mysql --host=%s --user=%s --password=%s %s -e \"TRUNCATE %s;\"",
+       	                  host, user, pass, "production_delta", table);
+       	   logger.info(cmd);
+       	   ETLContext.getContext().runExecCmd(cmd);
+       	   cmd = String.format("/usr/bin/mysql --host=%s --user=%s --password=%s %s < /var/tmp/%s",
+       	                  host, user, pass, "production_delta", file);
+       	   logger.info(cmd);
+       	   ETLContext.getContext().runExecCmd(cmd);
+       	   logger.info("complete");
+       } catch (Exception ex) {
+           WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewopload", String.format("Problem with the optimised load: %s",
+                        ex.getMessage()), WatchDog.WATCHDOG_WARNING);
+       }
+ 
        WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewppload",
                 String.format("%s... Deleted: %d/%d, Updated: %d/%d, Inserted: %d/%d [OPTIMISED]", 
                 entity, iDeletes, iDeletes, iUpdates, iUpdates, iInserts, iInserts), WatchDog.WATCHDOG_INFO);

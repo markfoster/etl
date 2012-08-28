@@ -36,6 +36,8 @@ public class Entity {
 
     private static Map         primaryKeys                  = new HashMap();
 
+    public static final int    MAX_ALLOWED                  = 500000;
+
     /**
      * getPrimaryKey
      * 

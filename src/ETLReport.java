@@ -43,7 +43,7 @@ public class ETLReport {
                 int    runId    = ProcessState.getRunId();
                 
                 //sysState = "PREVIEW_DRUPAL_COMPLETE";
-                //runId = 991597794;
+                //runId = 1102431895;
 
                 String mStart = "PROD_DELTA_LOAD_IN_PROGRESS";
                 String mEnd   = "PROD_DELTA_LOAD_IN_PROGRESS";
@@ -83,7 +83,7 @@ public class ETLReport {
                 emailOutput.append("Finished     = " + end      + "\n");
                 emailOutput.append("\n\n");
 
-                List<Map> entries = jt.queryForList("SELECT timestamp, message FROM watchdog WHERE uid = ? AND type != 'pp_scheduler'",  new Object[]{ new Integer(runId)} );
+                List<Map> entries = jt.queryForList("SELECT timestamp, message FROM watchdog WHERE uid = ? AND type != 'pp_scheduler' AND type != 'pp_debug'",  new Object[]{ new Integer(runId)} );
                 for (Map line : entries) {
                      String time = (String)line.get("timestamp").toString().replace(".0", "");
                      String mesg = (String)line.get("message").toString();
