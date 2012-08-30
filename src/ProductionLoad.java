@@ -58,7 +58,7 @@ public class ProductionLoad {
 
             String eState = ProcessState.getEntityState(entity);
 
-            if (entity.equals(Entity.OUTCOME)) {
+            if (entity.equals(Entity.OUTCOME) || entity.equals(Entity.VISIT_DATE)) {
                 // get a quick count of the items in the entity table
                 int iQuickCount = getDeltaCount(entity);
                 if (eState.equals(ProcessState.STATE_FULL)) {

@@ -163,6 +163,12 @@ MailAlert ()
                                     echo "Priority: Urgent"
                                     echo "Importance: high"
                                     ;;
+	"PROD_LOAD_STARTED" )       echo "To: ${EVENT_MAIL}"
+                                    echo "From: ${MAIL_FROM}"
+                                    echo "Subject: ETL EVENT - Production load has started" 
+                                    echo "Priority: Urgent"
+                                    echo "Importance: high"
+                                    ;;
 
 	* )			    echo "To: ${ALERT_MAIL}" 
                                     echo "From: ${MAIL_FROM}"
@@ -287,7 +293,8 @@ HostName="$(hostname | sed -e 's/\..*//')"
 
      CheckTriggerState
      if [ "$?" -eq "1" ]
-     then BackupProduction
+     then MailAlert PROD_LOAD_STARTED
+          BackupProduction
           java ${JAVA_OPTS} -classpath ${JAVA_CLASSPATH} ${JAVA_STUB}
      fi
 

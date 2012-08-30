@@ -59,6 +59,13 @@ public class PreviewUpdate extends DeltaUpdate {
                         continue;
                     }
 
+                    if (entity.equals(Entity.VISIT_DATE) && eState.equals(ProcessState.STATE_FULL)) {
+                        // get a quick count of the items in the entity table
+                        int iQuickCount = getDeltaCount(entity);
+                        optimiseDataLoad(entity, iQuickCount);
+                        continue;
+                    }
+
 		    if (entity.equals(Entity.PROVIDER) || entity.equals(Entity.LOCATION)) {
 			updateGeocoding(entity);
 			updateProductionDelta(entity);
