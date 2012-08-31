@@ -2,11 +2,11 @@
 #
 # ETL - Clear any active locks
 #
-# Usage: CMS0294CheckLocks.sh [ -D ]
+# Usage: CMS0294CheckWatchdog.sh [ -D ]
 #
 #    -D: Debug
 #
-# $Id: CMS0294CheckLocks.sh,v 1.11 2012/05/01 11:09:03 appadmin Exp $
+# $Id: CMS0294CheckWatchdog.sh,v 1.11 2012/05/01 11:09:03 appadmin Exp $
 #
 #   Date	Version	Who	Description
 #   ====	=======	===	===========
@@ -19,14 +19,14 @@
 #
 
 Usage () {
-    echo "usage: CMS0294CheckLocks.sh [ -D ]" 1>&2
+    echo "usage: CMS0294CheckWatchdog.sh [ -D -n count -u uid ]" 1>&2
 
     CleanUp
     exit 1
 }
 
 ErrorExit () {
-    echo "CMS0294CheckLocks.sh:" "$*" 1>&2;
+    echo "CMS0294CheckWatchdog.sh:" "$*" 1>&2;
 
     CleanUp
     exit 1
@@ -107,45 +107,19 @@ RanSleep () {
 VerboseCheck () {
     if   [ "${v_FLAG}" = "YES" ]
     then # Unlock the database locks and reset the system state
-         SQL="select wid,uid,message,timestamp from common.watchdog where message not like '%Memory%' and message not like 'Sched%' and message not like 'Skipp%' order by wid desc limit 30;"
+         SQL="select timestamp,wid,uid,message from common.watchdog where message not like '%Memory%' and message not like 'Sched%' and message not like 'Skipp%' "
+         if [ "${U_FLAG}" = "YES" ]
+         then SQL="${SQL} AND uid = $uid"
+         fi
+         SQL="${SQL} order by wid desc"
+         if [ "${N_FLAG}" = "YES" ]
+         then SQL="${SQL} limit $ncount"
+         else SQL="${SQL} limit 20"
+         fi
+         echo "mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}"
          QUERY=`mysql -e "${SQL}" --skip-column-names --raw -h ${COMMON_HOST} -u ${COMMON_USER} --password=${COMMON_CRED} ${COMMON_DB}`
-         PrintInfo "${QUERY}"
+         echo "${QUERY}"
     fi
-}
-
-#
-# Send Mail Alert
-#
-# 1: SOLR or WEB message
-#
-
-MailAlert ()
-{
-    MAIL_FROM="CMS0294CheckLocks@$(hostname)"
-
-    (
-	echo "To: ${EVENT_MAIL}"
-	echo "From: ${MAIL_FROM}"
-
-	case "${1}" in
-
-	"LOCK_TIMEOUT" )	echo "Subject: CRITICAL - CMS0294CheckLocks failed to get the Update lock on ${HostName}" ;;
-	"LOCK_CLEAR" )		echo "Subject: CRITICAL - CMS0294CheckLocks failed to clear the Update lock on ${HostName}" ;;
-
-	* )			echo "Subject: WARNING - CMS0294CheckLocks unknown mail alert on ${HostName}" ;;
-
-	esac
-
-	echo
-
-        #DumpFiles "Switch log content" "${LOG_FILE}"
-
-	if   [ "${LOCKDIR}" != "" ]
-	then DumpFiles "Lock file (${LOCKDIR}/owner}) content" "${LOCKDIR}/owner"
-	fi
-	
-	echo
-    ) | /usr/lib/sendmail -f "${MAIL_FROM}" -t
 }
 
 #
@@ -180,7 +154,7 @@ if   [ -f "${CMD_PATH}/CMS0294Environment.sh" ]
 then . "${CMD_PATH}/CMS0294Environment.sh"
 elif [ -f "/usr/local/bin/CMS0294Environment.sh" ]
 then . "/usr/local/bin/CMS0294Environment.sh"
-else echo "CMS0294CheckLocks.sh: Environment file missing."
+else echo "CMS0294CheckWatchdog.sh: Environment file missing."
      exit 1
 fi
 
@@ -190,10 +164,12 @@ D_FLAG="YES"
 v_FLAG="YES"
 S_FLAG=""
 F_FLAG=""
+N_FLAG=""
+U_FLAG=""
 
 # Set up log names, directories and masks
 
-TMP_DIR="/var/tmp/CMS0294CheckLocks"
+TMP_DIR="/var/tmp/CMS0294CheckWatchdog"
 mkdir -p "${TMP_DIR}" 2>/dev/null
 
 LOG_NAME="CheckLocks.log"
@@ -202,13 +178,18 @@ LOG_MASK='CheckLocks.????-??-??_??:??:??.log.gz'
 
 # Check Options
 
-while getopts "FDv" op
+while getopts ":n:u:Dv" op
 do
     case "${op}" in
 
     "D" ) D_FLAG="YES" ;;
-    "F" ) F_FLAG="YES" ;;
     "v" ) v_FLAG="YES" ;;
+    "n" ) N_FLAG="YES" 
+          ncount=$OPTARG 
+          ;;
+    "u" ) U_FLAG="YES" 
+          uid=$OPTARG 
+          ;;
 
     * ) Usage ;;
 
@@ -220,6 +201,14 @@ shift $((OPTIND - 1))
 #if   [ $# -ne 0 -o "${S_FLAG}" = "" ]
 #then Usage
 #fi
+
+if    [ "${U_FLAG}" = "YES" ]
+then echo "UID = $uid"
+fi
+
+if    [ "${N_FLAG}" = "YES" ]
+then echo "Count= $ncount"
+fi
 
 # Save the old log files
 
@@ -235,31 +224,16 @@ if   [ "${D_FLAG}" = "" ]
 then exec >"${LOG_FILE}" 2>&1
 fi
 
-echo "Starting Check Locks at $(date)"
-
 HostName="$(hostname | sed -e 's/\..*//')"
 
 # Remove the lock
 
      #UnLockProcess
      LOCKDIR=""
-
      VerboseCheck 
 
 # Completed
 
 CleanUp
-
-#
-# Cleanup old log files
-#
-
-for i in $(find "${TMP_DIR}" -type f -name "${LOG_MASK}" -mtime +30)
-do
-    PrintInfo "Removing old log file: $i"
-    rm -f $i
-done
-
-echo "Completed Check Locks at $(date)"
 
 exit 0;
