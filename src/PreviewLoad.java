@@ -46,6 +46,9 @@ public class PreviewLoad {
 
     Logger             logger   = Logger.getLogger(this.getClass().getName());
     private Session    g_session;
+    private Transaction g_tx;
+    private int        g_iCount = 0;
+    private boolean    g_flushed = false;
     private String     g_nowAsString;
     private ETLContext context;
     String             basedir  = "";
@@ -395,7 +398,14 @@ public class PreviewLoad {
 	    String elementPath = String.format("/List_Of_%s/%s", entity, entity);
 	    logger.info("ElementPath = '" + elementPath + "'");
 	    reader.addHandler(elementPath, new CQCEventHandler(this, entity, iTotal));
+	    g_tx = g_session.beginTransaction();
+            g_iCount = 0;
 	    doc = reader.read(new File(xmlfile));
+            if (!g_flushed) {
+               g_session.flush();
+               g_session.clear();
+            }
+            g_tx.commit();
 	} catch (Exception e) {
 	    logger.error("Error", e);
 	}
@@ -472,7 +482,7 @@ public class PreviewLoad {
 	eUpdated.setText(g_nowAsString);
 	element.add(eUpdated);
 	try {
-	    Transaction tx = g_session.beginTransaction();
+	    //Transaction tx = g_session.beginTransaction();
 	    /**	    
 	    ** MSF 15/07/12 - Possible optimisation to get / set the GeoCode values at the XML level
 	    if (entity.equals(Entity.PROVIDER) || entity.equals(Entity.LOCATION)) {
@@ -489,10 +499,16 @@ public class PreviewLoad {
 		}
 	    }
 	    **/	    
-	    g_session.saveOrUpdate(element);
-	    tx.commit();
-	    g_session.evict(element);
-	    g_session.flush();
+            g_flushed = false;
+	    g_session.save(element);
+	    //g_session.saveOrUpdate(element);
+	    //tx.commit();
+	    //g_session.evict(element);
+            if (++g_iCount % 100 == 0) {
+	        g_session.flush();
+	        g_session.clear();
+                g_flushed = true;
+            }
 	} catch (Exception ex) {
 	    logger.error("Error", ex);
             WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", 
