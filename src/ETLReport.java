@@ -91,6 +91,7 @@ public class ETLReport {
                      if (mesg.matches("Updating.*")) continue;
                      if (mesg.matches("Processing.*")) continue;
                      if (mesg.matches("Changed internal.*")) continue;
+                     if (mesg.matches("DB keep alive.*")) continue;
                      String repLine = "\"" + time + "\"; \"" + mesg + "\"";
                      logger.info(repLine);
                      reportOutput.append(repLine + "\n");
