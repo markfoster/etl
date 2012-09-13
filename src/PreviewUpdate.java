@@ -244,53 +244,92 @@ public class PreviewUpdate extends DeltaUpdate {
 	Session s_prev_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
 	Session s_prod_delta = HibernateUtil.currentSession("production_delta");
 
+        // Process Deletes
+
 	WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "proddeltaload", String.format("Processing DELETE records for %s", entity), WatchDog.WATCHDOG_DEBUG);
 
-	Query query = s_prev_delta.createQuery("FROM " + entity + " WHERE action_code = 'D'");
-	logger.info("Query = " + query);
-	List results = query.list();
-	for (int i = 0; i < results.size(); i++) {
-	    String action = "";
-	    Object previewObject = results.get(i);
-	    if (previewObject instanceof CQC_Entity) {
-		action = ((CQC_Entity) previewObject).getActionCode().toString();
-	    } else {
-		logger.warn("Unknown object in result set");
-	    }
-	    Object productionObject = null;
-	    String productionAction = "";
-	    try {
-		Object test = BeanUtils.cloneBean(previewObject);
-		productionObject = s_prod_delta.load(test.getClass(), (java.io.Serializable) test);
-		if (productionObject instanceof CQC_Entity) {
-		    productionAction = ((CQC_Entity) productionObject).getActionCode().toString();
-		}
-		// logger.info("Production delta object found, action code = " +
-		// productionAction);
-	    } catch (Exception ex) {
-		productionObject = null;
-	    }
-	    try {
-		Transaction tx = s_prod_delta.beginTransaction();
-		if (productionObject == null)
-		    s_prod_delta.saveOrUpdate(previewObject);
-		else {
-		    if (!productionAction.equals("D")) {
-			((CQC_Entity) productionObject).setActionCode('D');
-			s_prod_delta.saveOrUpdate(productionObject);
-		    }
-		}
-		tx.commit();
-	    } catch (Exception ex) {
-		logger.error(String.format("updateProductionDelta: %s", entity), ex);
-		productionObject = null;
-	    }
-	}
+        Query query = s_prev_delta.createQuery("FROM " + entity + " WHERE action_code = 'D'");
+        logger.info("Query = " + query);
+        List results = query.list();
+
+        int iTotal = results.size(), iCount = 0;
+        logger.info("Processing " + iTotal + " records.");
+
+        Transaction tx = null;
+        
+        for (int i = 0; i < iTotal; i++) {
+        
+            if (tx == null) {
+                tx = s_prod_delta.beginTransaction();
+            }
+        
+            int iDelta = 1;
+            iCount++;
+            if (iTotal > 10000)
+                iDelta = 1000;
+            else if (iTotal > 1000)
+                iDelta = 50;
+            if (iCount % iDelta == 0 || iCount == iTotal)
+                logger.info(String.format(" -> Record %d / %d", iCount, iTotal));
+
+            String action = "";
+            Object previewObject = results.get(i);
+            if (previewObject instanceof CQC_Entity) {
+                action = ((CQC_Entity) previewObject).getActionCode().toString();
+            } else {
+                logger.warn("Unknown object in result set");
+            }
+            Object productionObject = null;
+            String productionAction = "";
+            try {
+                Object test = BeanUtils.cloneBean(previewObject);
+                productionObject = s_prod_delta.load(test.getClass(), (java.io.Serializable) test);
+                if (productionObject instanceof CQC_Entity) {
+                    productionAction = ((CQC_Entity) productionObject).getActionCode().toString();
+                }
+                // logger.info("Production delta object found, action code = " +
+                // productionAction);
+            } catch (Exception ex) {
+                productionObject = null;
+            }
+            try {
+                if (productionObject == null)
+                    s_prod_delta.saveOrUpdate(previewObject);
+                else {
+                    if (!productionAction.equals("D")) {
+                        ((CQC_Entity) productionObject).setActionCode('D');
+                        s_prod_delta.saveOrUpdate(productionObject);
+                    }
+                }
+                
+                if (tx != null && iTotal < 100) {
+                    tx.commit();
+                    tx = null;
+                }
+                if (tx != null && iCount % 100 == 0) {
+                    tx.commit();
+                    tx = null;
+                }
+                
+                
+            } catch (Exception ex) {
+                logger.error(String.format("updateProductionDelta: %s", entity), ex);
+                productionObject = null;
+            }
+        }
+        
+        try {
+            if (tx != null)
+                tx.commit();
+            logger.warn("Closing sessions...");
+            HibernateUtil.closeSession("preview_delta");
+            HibernateUtil.closeSession("production_delta");
+        } catch (Exception ex) {
+        }
+
+        // Process Updates and Inserts
 
 	WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "proddeltaload", String.format("Processing UPDATE and INSERT records for %s", entity), WatchDog.WATCHDOG_DEBUG);
-
-	HibernateUtil.closeSession("preview_delta");
-	HibernateUtil.closeSession("production_delta");
 
 	s_prev_delta = HibernateUtil.currentSession("preview_delta").getSession(EntityMode.POJO);
 	s_prod_delta = HibernateUtil.currentSession("production_delta");
@@ -308,25 +347,25 @@ public class PreviewUpdate extends DeltaUpdate {
 	squery.addEntity(entity);
 	logger.info("Query = " + squery);
 	results = squery.list();
-	int iTotal = results.size(), iCount = 0;
+	iTotal = results.size();
+        iCount = 0;
 	logger.info("Processing " + iTotal + " records.");
 
-	Transaction tx = null;
+	tx = null;
 
 	for (int i = 0; i < iTotal; i++) {
-
-	    iCount++;
 
 	    if (tx == null) {
 		tx = s_prod_delta.beginTransaction();
 	    }
 
 	    int iDelta = 1;
+	    iCount++;
 	    if (iTotal > 10000)
 		iDelta = 1000;
 	    else if (iTotal > 1000)
 		iDelta = 50;
-	    if (i % iDelta == 0)
+	    if (iCount % iDelta == 0 || iCount == iTotal)
 		logger.info(String.format(" -> Record %d / %d", iCount, iTotal));
 
 	    String action = "";
