@@ -42,8 +42,8 @@ public class ETLReport {
                 String sysState = ProcessState.getSystemState();
                 int    runId    = ProcessState.getRunId();
                 
-                //sysState = "PREVIEW_DRUPAL_COMPLETE";
-                //runId = 1102431895;
+                //sysState = "PROD_DRUPAL_COMPLETE";
+                //runId = 255626082;
 
                 String mStart = "PROD_DELTA_LOAD_IN_PROGRESS";
                 String mEnd   = "PROD_DELTA_LOAD_IN_PROGRESS";
@@ -66,11 +66,11 @@ public class ETLReport {
                 logger.info("System state = " + sysState);
                 logger.info("Run Id       = " + runId);
 
-                String start = (String)jt.queryForObject("SELECT timestamp FROM watchdog WHERE uid = ? AND message LIKE 'Acquired lock % " + mStart + "'",  
+                String start = (String)jt.queryForObject("SELECT timestamp FROM watchdog WHERE uid = ? AND message LIKE 'Acquired lock % " + mStart + "' limit 1",  
                                              new Object[]{ new Integer(runId)}, String.class );
                 start = start.replace(".0", ""); // fudge to fix issue
                 logger.info("Started  = " + start);
-                String end   = (String)jt.queryForObject("SELECT timestamp FROM watchdog WHERE uid = ? AND message LIKE '% to " + mEnd + "'", 
+                String end   = (String)jt.queryForObject("SELECT timestamp FROM watchdog WHERE uid = ? AND message LIKE '% to " + mEnd + "' limit 1", 
                                              new Object[]{ new Integer(runId)}, String.class );
                 end = end.replace(".0", ""); // fudge to fix issue
                 logger.info("Finished = " + end);

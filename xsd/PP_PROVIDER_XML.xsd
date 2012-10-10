@@ -2,16 +2,21 @@
 <!-- Provider Profile - Provider XSD
      v0.1 03-05-2012 MCRITES - Created
      v0.2 29-05-2012 MCRITES - Added minOccurs indicators
+     v0.3 19-09-2012 DCALLEAR - Added new fields for deregistered Providers and constituency
+     v0.4 24-09-2012 DCALLEAR - Constituency >>> ONSPD_Constituency
   -->
 <xs:schema version="0.2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:simpleType name="max1"><xs:restriction base="xs:string"><xs:maxLength value="1"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max2"><xs:restriction base="xs:string"><xs:maxLength value="2"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max5"><xs:restriction base="xs:string"><xs:maxLength value="5"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max10"><xs:restriction base="xs:string"><xs:maxLength value="10"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max20"><xs:restriction base="xs:string"><xs:maxLength value="20"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max25"><xs:restriction base="xs:string"><xs:maxLength value="25"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max30"><xs:restriction base="xs:string"><xs:maxLength value="30"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max32"><xs:restriction base="xs:string"><xs:maxLength value="32"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max40"><xs:restriction base="xs:string"><xs:maxLength value="40"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max50"><xs:restriction base="xs:string"><xs:maxLength value="50"/></xs:restriction></xs:simpleType>
+    <xs:simpleType name="max75"><xs:restriction base="xs:string"><xs:maxLength value="75"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max100"><xs:restriction base="xs:string"><xs:maxLength value="100"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max115"><xs:restriction base="xs:string"><xs:maxLength value="115"/></xs:restriction></xs:simpleType>
     <xs:simpleType name="max200"><xs:restriction base="xs:string"><xs:maxLength value="200"/></xs:restriction></xs:simpleType>
@@ -29,8 +34,12 @@
                             <xs:element name="Name" type="max100" minOccurs="0" />
                             <xs:element name="In_Process" type="max1" minOccurs="0" />
                             <xs:element name="Type" type="max30" minOccurs="0" />
+                            <xs:element name="Status" type="max25" minOccurs="0" />
+                            <xs:element name="Deregistration_Date" type="xs:date" minOccurs="0" />
+                            <xs:element name="Deregistration_Reason" type="max20" minOccurs="0" />
                             <xs:element name="Local_Authority" type="max50" minOccurs="0" />
                             <xs:element name="Region" type="max50" minOccurs="0" />
+                            <xs:element name="ONSPD_Constituency" type="max75" minOccurs="0" />
                             <xs:element name="Also_Known_As" type="max100" minOccurs="0" />
                             <xs:element name="Address_Line_1" type="max200" minOccurs="0" />
                             <xs:element name="Address_Line_2" type="max100" minOccurs="0" />

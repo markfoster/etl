@@ -102,6 +102,23 @@
         <property name="website" type="string" node="Website">
             <column name="website" length="100" />
         </property>
+
+        <property name="status" type="string" node="Status">
+            <column name="status" length="25" />
+        </property>
+
+        <property name="deregistration_date" type="string" node="Deregistration_Date">
+            <column name="deregistration_date" length="20" />
+        </property>
+
+        <property name="deregistration_reason" type="string" node="Deregistration_Reason">
+            <column name="deregistration_reason" length="20" />
+        </property>
+
+        <property name="onspd_constituency" type="string" node="ONSPD_Constituency">
+            <column name="onspd_constituency" length="75" />
+        </property>
+
     </class>
 </hibernate-mapping>
 

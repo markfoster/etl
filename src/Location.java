@@ -36,6 +36,10 @@ public class Location implements java.io.Serializable, CQC_Entity {
     private String     underReviewText;
     private String     userExperience;
     private String     website;
+    private String     status;
+    private String     deregistration_date;
+    private String     deregistration_reason;
+    private String     onspd_constituency;
 
     public Location() {
     }
@@ -48,7 +52,7 @@ public class Location implements java.io.Serializable, CQC_Entity {
     public Location(String providerId, String locationId, String aboutLocation, Character actionCode, String addressLine1, String addressLine2, String alsoKnownAs, String county,
 	    String email, String fax, String inProcess, Date lastUpdated, BigDecimal latitude, String localAuthority, BigDecimal longitude, String name, String postcode,
 	    String region, String segmentation, String statementDate, String subtype, String telephone, String townCity, String type, String underReviewText,
-	    String userExperience, String website) {
+	    String userExperience, String website, String status, String deregistration_date, String deregistration_reason, String onspd_constituency) {
 	this.providerId = providerId;
 	this.locationId = locationId;
 	this.aboutLocation = aboutLocation;
@@ -76,6 +80,10 @@ public class Location implements java.io.Serializable, CQC_Entity {
 	this.underReviewText = underReviewText;
 	this.userExperience = userExperience;
 	this.website = website;
+        this.status = status;
+        this.deregistration_date = deregistration_date;
+        this.deregistration_reason = deregistration_reason;
+        this.onspd_constituency = onspd_constituency;
     }
 
     public String getLocationId() {
@@ -292,6 +300,38 @@ public class Location implements java.io.Serializable, CQC_Entity {
 
     public void setWebsite(String website) {
 	this.website = website;
+    }
+
+    public String getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getDeregistration_date() {
+        return this.deregistration_date;
+    }
+
+    public void setDeregistration_date(String deregistration_date) {
+        this.deregistration_date = deregistration_date;
+    }
+
+    public String getDeregistration_reason() {
+        return this.deregistration_reason;
+    }
+
+    public void setDeregistration_reason(String deregistration_reason) {
+        this.deregistration_reason = deregistration_reason;
+    }
+
+    public String getOnspd_constituency() {
+        return this.onspd_constituency;
+    }
+
+    public void setOnspd_constituency(String onspd_constituency) {
+        this.onspd_constituency = onspd_constituency;
     }
 
     public boolean equals(Object other) {
