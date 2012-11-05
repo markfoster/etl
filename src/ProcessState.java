@@ -73,6 +73,24 @@ public class ProcessState {
     }
 
     /**
+     *
+     * @return
+     */
+    public static List getEntities() {
+        ApplicationContext context = SpringUtil.getApplicationContext();
+        JdbcTemplate jt = new JdbcTemplate();
+        jt.setDataSource((DataSource) context.getBean("common"));
+        List<String> entities = jt.query("select entity from process_state", new RowMapper() {
+            public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+                return resultSet.getString(1);
+            }
+        });
+        entities.remove(ProcessState.SYSTEM);
+        entities.remove(ProcessState.LOCK);
+        return entities;
+    }
+
+    /**
      * 
      * @return
      */
@@ -149,6 +167,21 @@ public class ProcessState {
 	JdbcTemplate jt = new JdbcTemplate();
 	jt.setDataSource((DataSource) context.getBean("common"));
 	int rows = jt.update("update process_state set state = ? where entity = ?", new Object[] { state, entity });
+	return (rows == 1);
+    }
+
+    /**
+     * 
+     * @param entity
+     * @param state
+     * @return
+     */
+    public static boolean setEntityRunId(String entity, int id) {
+	checkEntityExists(entity);
+	ApplicationContext context = SpringUtil.getApplicationContext();
+	JdbcTemplate jt = new JdbcTemplate();
+	jt.setDataSource((DataSource) context.getBean("common"));
+        int rows = jt.update("update process_state set run_id = ? where entity = ?", new Object[] { new Integer(id), entity });
 	return (rows == 1);
     }
 

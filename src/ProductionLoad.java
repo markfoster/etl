@@ -50,14 +50,19 @@ public class ProductionLoad {
      */
     public boolean run() {
 	ETLContext eContext = ETLContext.getContext();
-	List entities = ProcessState.getEntitiesForUpdate();
-        if (entities.size() == 0) return false;
+	List entities = ProcessState.getEntities();
 	Iterator i = entities.iterator();
 	while (i.hasNext()) {
 	    String entity = (String) i.next();
-
+            ProcessState.setEntityRunId(entity, 0);
+        }
+	entities = ProcessState.getEntitiesForUpdate();
+        if (entities.size() == 0) return false;
+	i = entities.iterator();
+	while (i.hasNext()) {
+	    String entity = (String) i.next();
             String eState = ProcessState.getEntityState(entity);
-
+            ProcessState.setEntityRunId(entity, ProcessState.getRunId());
             if (entity.equals(Entity.OUTCOME) || entity.equals(Entity.VISIT_DATE)) {
                 // get a quick count of the items in the entity table
                 int iQuickCount = getDeltaCount(entity);

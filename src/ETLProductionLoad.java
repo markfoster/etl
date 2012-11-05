@@ -79,6 +79,7 @@ public class ETLProductionLoad {
 	    ProcessState.setLock(ProcessState.LOCK_CLEAR);
 	    ProcessState.setSystemState(ProcessState.IDLE);
 	    WatchDog.log(WatchDog.WATCHDOG_ENV_PROD, "prodload", "Nothing to process. Resetting state and lock.", WatchDog.WATCHDOG_NOTICE);
+            return;
         }
 
 	// Populate the preview delta from XML files

@@ -46,11 +46,13 @@ public class PreviewUpdate extends DeltaUpdate {
 	while (i.hasNext()) {
 	    String entity = (String) i.next();
 	    Map actions = (Map) aMap.get(entity);
-	    // TEST CODE: if (!entity.equals("Provider")) { continue; }
 	    // if active then update the profile databases...
+            ProcessState.setEntityRunId(entity, 0);
 	    if (actions.get("active") != null) {
 		try {
                     String eState = ProcessState.getEntityState(entity);
+
+                    ProcessState.setEntityRunId(entity, ProcessState.getRunId());
 
                     if (entity.equals(Entity.OUTCOME) && eState.equals(ProcessState.STATE_FULL)) {
                         // get a quick count of the items in the entity table
@@ -75,9 +77,9 @@ public class PreviewUpdate extends DeltaUpdate {
 		    updateProductionDelta(entity);
 
 		    // if we are processing a FULL upload then cleanup...
-		    if (eState.equals(ProcessState.STATE_FULL)) {
-			updatePreviewCleanup(entity, ProcessState.getEntityUniqueId(entity));
-		    }
+		    //if (eState.equals(ProcessState.STATE_FULL)) {
+		    //    updatePreviewCleanup(entity, ProcessState.getEntityUniqueId(entity));
+		    //}
 		} catch (Exception ex) {
 		    logger.error("Preview Load error", ex);
 		    WatchDog.log(WatchDog.WATCHDOG_ENV_PREV, "previewload", ex.getMessage(), WatchDog.WATCHDOG_WARNING);
